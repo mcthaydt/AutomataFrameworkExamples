@@ -239,7 +239,14 @@ test('stop empties the root and can be called twice', async () => {
 test('readFrom fetches beside its base and rejects when the file is not there', async () => {
   const read = readFrom(new URL('/', location.href))
   expect(await read('automata.toml')).toMatch(/^format = 1/)
-  await expect(read('no-such-file.json')).rejects.toThrow('no-such-file.json')
+  // The dev server answers an unknown path with the page itself (200), as a single-page host would, so the missing
+  // file is a 404 made here: what this checks is what `readFrom` does with a refusal, not what a server does.
+  vi.stubGlobal('fetch', () => Promise.resolve(new Response('', { status: 404 })))
+  try {
+    await expect(read('no-such-file.json')).rejects.toThrow('no-such-file.json')
+  } finally {
+    vi.unstubAllGlobals()
+  }
 })
 
 test('both entries of the framework share one Player', async () => {
