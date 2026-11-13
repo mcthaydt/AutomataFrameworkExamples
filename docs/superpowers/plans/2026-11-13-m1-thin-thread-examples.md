@@ -62,7 +62,8 @@ Checked while this plan was written (an install in a scratch folder, not a test)
   `@automataframework/framework/headless` and no other package, and never a path inside the package.
 - **The pin is a commit, never a branch:** `github:mcthaydt/AutomataFramework#<40 hex digits>`. Moving it is its own
   pull request and changes two lines of `package.json` (the dependency and `pnpm.onlyBuiltDependencies`) and the
-  lockfile.
+  lockfile. A move that changes the framework's physics or hashing fails the strict replay checks, and so always the
+  test-game one: that is right, and it means a pin move may need a new recording, which the Owner sees (audit N5).
 - **Tests run only in GitHub-hosted CI, never locally.** `pnpm install`, `pnpm lint`, `pnpm typecheck`, `pnpm knip`,
   `pnpm build` and the scripts in `scripts/` are not tests and are run locally before every push.
 - The sim side (`hero`, `plugins`, `src/lib/`) has no I/O, no wall clock and no `Math.random`. Only the sim changes
@@ -81,7 +82,9 @@ Checked while this plan was written (an install in a scratch folder, not a test)
   repo's golden: once it holds hashes it changes only with the Owner seeing before and after.
 - **The drunk-grandma test.** Every word a player can read is pinned in this plan (Task 5). The pictures Task 6
   uploads, at phone, tablet and desktop sizes, upright and sideways, are what the implementation audit reads; a
-  screen that fails is a defect.
+  screen that fails is a defect. The words stay at the top for the whole game, which on a phone held sideways costs a
+  share of a short screen: that is deliberate in M1 (a player who looks away and back still needs them), and M2's
+  title and pause screens take over the job (audit S4).
 - Comments say why. Conventional Commits. The author is Dawson McThay
   (`git config --global user.name "Dawson McThay" && git config --global user.email "107786093+mcthaydt@users.noreply.github.com"`).
   No AI attribution in commits, pull request bodies or docs. The pull request body is edited only with the GitHub MCP
@@ -109,16 +112,19 @@ Change any of this only with a note to the coordinator.
 
 - **Where the game is.** At this repo's root: `automata.toml`, and the files it lists under `content/`. The working
   name is "Crate Game" until the Owner names the game.
-- **What an editor may change.** Any file `automata.toml` lists, written with `writeContent`. CI fails a commit whose
-  content file is not byte for byte what `writeContent` writes, or for which `loadGame` reports a problem. The crate
-  is the thing `crate-1` in `content/levels/level-1.json`.
+- **What an editor may change.** Any file `automata.toml` lists, written with `writeContent`. An editor saves by
+  pushing a branch (`automata/<login>`) in this repo and opening a pull request into `main`; CI runs on that pull
+  request and fails when a content file is not byte for byte what `writeContent` writes, or when `loadGame` reports a
+  problem; a person merges it on GitHub. A Suggest from a fork is not supported by this repo's CI in M1. The crate is
+  the thing `crate-1` in `content/levels/level-1.json`.
 - **What a moved crate does to CI.** Nothing breaks: the replay check accepts "the content changed" and still
   compares the four engines with each other. An editor never writes `replays/`.
 - **The build.** `pnpm install --frozen-lockfile && pnpm build` leaves `dist/`: `index.html`, `assets/`, and the
   game's files beside them (`dist/automata.toml`, `dist/content/...`). Every URL is relative, so the folder works
   from any path of any site. The page fetches the game's files at run time, relative to itself.
 - **The page.** `<main id="game" data-state="loading | playing | problem">` fills the window. `window.automataGame`
-  is the running `Game` (`undefined` on a problem), for journeys and agents.
+  is the running `Game` (`undefined` on a problem), for journeys and agents. The page listens for keys on its own
+  `window`: a page that embeds it in a frame must give the frame focus (or say "Click the game, then...").
 - **Keys.** ArrowLeft or KeyA, ArrowRight or KeyD, Space or ArrowUp. Touch buttons: Left, Right, Jump.
 - **Check-run names.** `check`, `engines (chromium)`, `engines (webkit)`, `engines (firefox)`; `screens` only copies
   pictures and is not a verdict on the game.
@@ -165,7 +171,7 @@ Inputs the spec does not name but a person will meet. Each has a test in the tas
 1. **A commit that breaks a game file** (an agent's hand edit that is not valid JSON, a missing file, a file not in
    the standard form): CI says which file and what to do in a plain sentence, and the page shows the same sentence,
    never a blank canvas. Tasks 2, 5, 6.
-2. **A commit that moves the crate** (the editor's whole job in M1): CI must pass and still prove the four engines
+2. **A pull request that moves the crate** (the editor's whole job in M1): CI must pass and still prove the four engines
    agree. Tasks 4, 6.
 3. **Pressing jump in the air**, at the very top of a jump included, and holding jump on landing: one press is one
    jump. Task 3.
@@ -723,7 +729,7 @@ export function untilTick(page: Page, tick: number): Promise<void>
   and closes the server at the end. Each journey file launches `playwright[ENGINE]` once, opens a fresh context per
   test (viewport and `hasTouch` from `SIZES`), and closes everything it opened.
 
-- [ ] **Step 1: Write the failing journeys.** `play.journey.test.ts`:
+- [x] **Step 1: Write the failing journeys.** `play.journey.test.ts`:
 
 ```ts
 test('the game opens, says what to do, and nothing goes wrong', ...)
@@ -769,16 +775,16 @@ test('a missing file is named', ...)
   `tests/workflows/ci.test.ts` gains the framework's four `screens`
   checks (only that job may write; never for a fork; one push, to `ci-screens`; one writer at a time), and: the
   `engines` job runs `pnpm build` and then `pnpm test:journeys` with `ENGINE: ${{ matrix.engine }}` after `same-hash`.
-- [ ] **Step 2: Extend `ci.yml`.** In `engines`, after `same-hash`: `pnpm build`, `pnpm test:journeys` with
+- [x] **Step 2: Extend `ci.yml`.** In `engines`, after `same-hash`: `pnpm build`, `pnpm test:journeys` with
   `ENGINE` set, and the framework's upload step (`screens-${{ matrix.engine }}`, `tests/**/__screenshots__/**`,
   `if: always()`). Add the framework's `screens` job, unchanged. Push; the three engine jobs fail on the build
   (`index.html` does not exist).
-- [ ] **Step 3: Implement** the page, the config, `copy-game.ts`, `serve.ts` and `open.ts`. Run `pnpm build` locally
+- [x] **Step 3: Implement** the page, the config, `copy-game.ts`, `serve.ts` and `open.ts`. Run `pnpm build` locally
   and check `dist/` holds `index.html`, `assets/`, `automata.toml` and the three content files.
-- [ ] **Step 4: Push; all jobs pass,** each engine's journeys included, and the `ci-screens` branch holds six
+- [x] **Step 4: Push; all jobs pass,** each engine's journeys included, and the `ci-screens` branch holds six
   pictures per engine under `pr-<number>/`. Note in the tracker that the branch now exists (it is the repo's one
   long-lived branch beside `main`).
-- [ ] **Step 5: Commit** (`feat: the game as a static page, with journeys in three browsers`).
+- [x] **Step 5: Commit** (`feat: the game as a static page, with journeys in three browsers`).
 
 ### Task 7: The README, the tracker and the close
 

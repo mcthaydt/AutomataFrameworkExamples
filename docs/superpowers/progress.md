@@ -9,7 +9,7 @@ framework's own tracker are in AutomataFramework
 
 Plan: [`plans/2026-11-13-m1-thin-thread-examples.md`](plans/2026-11-13-m1-thin-thread-examples.md)
 
-Overall: **53%** (stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14, stage 6 is 12 and the
+Overall: **60%** (stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14, stage 6 is 12 and the
 Owner's review is the last 6; stage 1, the spec, was done in AutomataFramework)
 
 | Stage | State | Output |
@@ -17,7 +17,7 @@ Owner's review is the last 6; stage 1, the spec, was done in AutomataFramework)
 | 1. Spec | Done (in AutomataFramework) | the spec linked above |
 | 2. Plan (M1, Examples) | Done, 100% (in review) | `plans/2026-11-13-m1-thin-thread-examples.md` |
 | 3. Plan audit | Done, 100% (in review) | `audits/2026-11-13-m1-examples-plan-audit.md` |
-| 4. Execution | In progress, 70% (Tasks 1 to 5 done) | the plan, ticked as it goes (each task is 14% of the stage, the close 2%) |
+| 4. Execution | In progress, 84% (Tasks 1 to 6 done) | the plan, ticked as it goes (each task is 14% of the stage, the close 2%) |
 | 5. Implementation audit | Not started | `audits/2026-11-13-m1-examples-implementation-audit.md` |
 | 6. Fixes | Not started | |
 | 7. Owner review | Not started | |
@@ -31,6 +31,15 @@ Milestones, for this repo:
 
 ### Log
 
+- 2026-11-13: Stage 4, Task 6. The page (`index.html`, `src/main.ts`), the build (`pnpm build` makes `dist/`, which plays
+  from any path) and the journeys (the built page, served by `vite preview`, played in a real browser in each engine:
+  the goal words, the first touch switching them to the buttons' words, the done words after a push, the same
+  sentence on a broken file). The first full run failed in all three engines on one test: Task 5's `readFrom` check
+  asked the dev server for a missing file and, now that `index.html` exists, it answers with the page (200), as a
+  single-page host would. The check now makes its own 404. `ci-screens` now exists: seven pictures per engine under
+  `pr-3/` (phone, sideways phone, tablet both ways, desktop, done and problem). Looked at: the words and buttons read
+  well upright; sideways on a phone the Left and Right buttons sit over the hero's starting place (the level fills the
+  height). Not fixed here; it is for the implementation audit and the Owner to judge.
 - 2026-11-13: Stage 4, Task 5. The page's pieces are in `src/features/play/`: the words (`words.ts`, one place for every
   sentence a player reads), the controls (`controls.ts`), the problem reader (`read.ts`) and `play.ts`, which loads the
   game, starts it and changes the goal line to "done" once the crate has been pushed more than a tile. Red first

@@ -23,9 +23,10 @@ particular to this repo added under "This repo".
   the lockfile. At Release 1 it switches to the npm version.
 - **Content has one writer.** A content file is committed exactly as the framework's `writeContent` writes it;
   after a hand edit, run `pnpm content:write`. CI fails a file that is not in that form or that does not load.
-- **Editors commit here.** The browser editors save by committing content files to this repo. A commit that only
-  changes content must pass CI, so the replay check accepts "the content changed" and compares the four engines with
-  each other.
+- **Editors open pull requests here.** The browser editors save by pushing a branch (`automata/<login>`) with the
+  changed content files and opening a pull request into `main`; a person merges it on GitHub. A change that only
+  touches content must pass CI, so the replay check accepts "the content changed" and compares the four engines with
+  each other. Once the Owner marks the checks required on `main` (see the tracker), a red pull request cannot be merged.
 - **`replays/level-1.json` is the golden.** It is recorded in CI, never typed. Once it holds hashes it changes only
   with the Owner seeing before and after. An editor never writes it.
 - **Nothing is published from here.** No changesets, no API report, no release workflow. `pnpm build` makes `dist/`,
@@ -70,7 +71,7 @@ package.
   layouts; languages.
 - **Editors:** all nine old 2D editors plus the figure and environment builders, which make 2D art only. In the
   browser, and as a Tauri app for iPad, Android and desktop.
-- **Edits live in the game's GitHub repo.** Save makes a commit; edits that collide merge the way GitHub does.
+- **Edits live in the game's GitHub repo.** Save pushes a branch and opens a pull request for review; edits that collide merge the way GitHub does.
   Sign-in runs through a Cloudflare Pages Function; the site is on Cloudflare Pages.
 - **Formats:** game content is JSON; everything else is TOML.
 - **Order inside the editors:** Levels, then Feel and Tuner (the first editor slice), then every other 2D editor.
