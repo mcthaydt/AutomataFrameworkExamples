@@ -23,12 +23,22 @@ particular to this repo added under "This repo".
   the lockfile. At Release 1 it switches to the npm version.
 - **Content has one writer.** A content file is committed exactly as the framework's `writeContent` writes it;
   after a hand edit, run `pnpm content:write`. CI fails a file that is not in that form or that does not load.
-- **Editors open pull requests here.** The browser editors save by pushing a branch (`automata/<login>`) with the
-  changed content files and opening a pull request into `main`; a person merges it on GitHub. A change that only
-  touches content must pass CI, so the replay check accepts "the content changed" and compares the four engines with
-  each other. Once the Owner marks the checks required on `main` (see the tracker), a red pull request cannot be merged.
-- **`replays/level-1.json` is the golden.** It is recorded in CI, never typed. Once it holds hashes it changes only
-  with the Owner seeing before and after. An editor never writes it.
+- **Editors save here by the person's level** (the spec's "Saving"; levels are in `automata.access.toml`). An Edit or
+  Owner save is committed by the editors' GitHub App straight to `main`; a Suggest or Approve save is a pull request
+  from `automata/<login>` into `main`, which a person who may approve approves in the editor (the App merges it once
+  the checks pass). Either way the change is content files only, written as `writeContent` writes them, so a change
+  that only touches content must pass CI: the replay check accepts "the content changed" and compares the four
+  engines with each other. An Edit save lands before CI has run on it, so CI's push run on `main` is its check, and
+  the Site shows only the newest commit whose checks all passed (its own rule), so a red save is never shown. For the
+  App to commit to `main`, which requires `check` and the three `engines` checks, it must be on `main`'s bypass list
+  here; that is a settings step when the editors are deployed. The journeys that check gameplay play a level of
+  their own (`tests/fixtures/pinned-level.ts`), so a content save, wherever it puts the crate, cannot turn them red.
+- **`replays/level-1.json` and `replays/test-game.json` are the goldens.** Both are recorded in CI, never typed. Once
+  one holds hashes it changes only with the Owner seeing before and after. An editor never writes either. The first
+  is the real level's play, which a content edit may change without breaking CI (the check says "the content
+  changed"); the second is a play of a game built inside the tests, which no edit can reach, so a change to the
+  game's code that alters the play fails in every engine. The merge session stops on a golden moved without a commit
+  naming it, and these are the two files it watches.
 - **Nothing is published from here.** No changesets, no API report, no release workflow. `pnpm build` makes `dist/`,
   a static folder that plays the game from any path; the Site repo builds and hosts it.
 - **`ci-screens`** is a long-lived branch CI writes pictures to (phone, tablet and desktop, upright and sideways),
@@ -71,8 +81,9 @@ package.
   layouts; languages.
 - **Editors:** all nine old 2D editors plus the figure and environment builders, which make 2D art only. In the
   browser, and as a Tauri app for iPad, Android and desktop.
-- **Edits live in the game's GitHub repo.** Save pushes a branch and opens a pull request for review; edits that collide merge the way GitHub does.
-  Sign-in runs through a Cloudflare Pages Function; the site is on Cloudflare Pages.
+- **Edits live in the game's GitHub repo.** Save makes a commit or a pull request, by the person's level (see "Editors
+  save here" below); edits that collide merge the way GitHub does. Sign-in runs through a Cloudflare Pages Function;
+  the site is on Cloudflare Pages.
 - **Formats:** game content is JSON; everything else is TOML.
 - **Order inside the editors:** Levels, then Feel and Tuner (the first editor slice), then every other 2D editor.
 - **Releases are big and few** (the Owner, 2026-11-13). Release 1 is when 2D is finished (the framework in full and
@@ -141,7 +152,8 @@ implementations or incomplete integrations. Do your best work."
   commits, pull request bodies or docs (the Owner, 2026-11-13). Before any commit, set the author with
   `git config --global user.name "Dawson McThay" && git config --global user.email "107786093+mcthaydt@users.noreply.github.com"`.
 - Refresh sessions after 90 minutes.
-- Branches: `main` plus branches with CI running, five at most.
+- Branches: `main` plus branches with CI running, five at most. The editors' save branches (`automata/<login>`) do not
+  count: this repo is our test game, and the editors are a product for other teams' repos (the Owner, 2026-11-13).
 - **Tests run only in GitHub-hosted CI, never locally.** Verify through the pull request's CI runs.
 
 ## Structure
@@ -149,7 +161,7 @@ implementations or incomplete integrations. Do your best work."
 ```
 automata.toml                 the project file: the game's name, its first level, its hero, its content files
 content/                      the game's content, JSON, written only by writeContent
-replays/                      recorded plays; level-1.json is the golden
+replays/                      recorded plays; level-1.json and test-game.json are the goldens
 index.html                    the page
 src/index.ts                  the public surface: everything, for a page
 src/headless.ts               everything that needs no page: the sim side of the game
@@ -158,12 +170,15 @@ src/lib/                      shared helpers, no feature logic
 src/features/<feature>/       <feature>.ts entry, <part>.ts one job per file
 scripts/                      thin CLI wrappers
 tests/architecture.test.ts    imports go down, no cycles, no tests in src, only the framework is imported
+tests/architecture/           the rules that test reads (rules.ts) and a test of the rules
+tests/pin.test.ts             the framework pin is a commit, in both places
+tests/framework.test.ts       the pinned framework is installed and built
 tests/features/<feature>/     mirrors src/features
 tests/lib/                    tests of src/lib
 tests/game/                   checks of the game's own files at the root
-tests/replay/                 the recorded play, in Node and three browsers
+tests/replay/                 the recorded plays (level-1.json, test-game.json), in Node and three browsers
 tests/journeys/               the built page driven in a real browser, end to end
-tests/fixtures/               shared test helpers
+tests/fixtures/               shared test helpers, the test game and the pinned level the journeys play
 tests/workflows/, tests/docs/ checks that read a workflow or the README
 docs/superpowers/             plans/, audits/, progress.md (specs live in AutomataFramework)
 ```
