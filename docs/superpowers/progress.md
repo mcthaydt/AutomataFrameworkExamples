@@ -9,7 +9,7 @@ framework's own tracker are in AutomataFramework
 
 Plan: [`plans/2026-11-13-m1-thin-thread-examples.md`](plans/2026-11-13-m1-thin-thread-examples.md)
 
-Overall: **60%** (stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14, stage 6 is 12 and the
+Overall: **64%** (stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14, stage 6 is 12 and the
 Owner's review is the last 6; stage 1, the spec, was done in AutomataFramework)
 
 | Stage | State | Output |
@@ -17,7 +17,7 @@ Owner's review is the last 6; stage 1, the spec, was done in AutomataFramework)
 | 1. Spec | Done (in AutomataFramework) | the spec linked above |
 | 2. Plan (M1, Examples) | Done, 100% (in review) | `plans/2026-11-13-m1-thin-thread-examples.md` |
 | 3. Plan audit | Done, 100% (in review) | `audits/2026-11-13-m1-examples-plan-audit.md` |
-| 4. Execution | In progress, 84% (Tasks 1 to 6 done) | the plan, ticked as it goes (each task is 14% of the stage, the close 2%) |
+| 4. Execution | Done, 100% (in review) | the plan, ticked as it goes (each task is 14% of the stage, the close 2%) |
 | 5. Implementation audit | Not started | `audits/2026-11-13-m1-examples-implementation-audit.md` |
 | 6. Fixes | Not started | |
 | 7. Owner review | Not started | |
@@ -31,6 +31,16 @@ Milestones, for this repo:
 
 ### Log
 
+- 2026-11-13: Stage 4, Task 7 and the close. The README gets a stranger from clone to a changed game (install, play,
+  change `crate-1`'s `x`, `pnpm content:write`, reload) and `tests/docs/readme.test.ts` reads it for the scripts and
+  files it names. Audit B1, S4 and N5 are applied to the plan and `CLAUDE.md` (editors open pull requests). The
+  whole-branch review was a self-review by the author (no subagents, project rule), so it is weaker than a fresh
+  reviewer's; the stage 5 audit is the fresh one. It found nothing Critical or Important. Deferred minors:
+  (1) `stop()` called while the files are still loading lets the game start afterwards; (2) `readFrom` on a host that
+  answers a missing file with the page itself (200) gives "not valid" words, not "no such file"; (3) a finger that
+  touches the screen while the page is still loading does not switch the words to the buttons' words; (4) sideways on
+  a phone the buttons sit over the hero's start place, a framework layout matter (touch buttons overlay the mount,
+  `fitWorld` fits the whole mount): the framework landscape fix is in another thread, then a pin move and a journey.
 - 2026-11-13: Stage 4, Task 6. The page (`index.html`, `src/main.ts`), the build (`pnpm build` makes `dist/`, which plays
   from any path) and the journeys (the built page, served by `vite preview`, played in a real browser in each engine:
   the goal words, the first touch switching them to the buttons' words, the done words after a push, the same

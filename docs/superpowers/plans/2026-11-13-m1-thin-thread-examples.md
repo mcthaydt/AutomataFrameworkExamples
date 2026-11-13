@@ -793,23 +793,23 @@ test('a missing file is named', ...)
   `docs/superpowers/progress.md`
 - Test: `tests/docs/readme.test.ts`
 
-- [ ] **Step 1: Write the failing test** `tests/docs/readme.test.ts`: the README names every script in
+- [x] **Step 1: Write the failing test** `tests/docs/readme.test.ts`: the README names every script in
   `package.json`'s `scripts` that a person runs (`dev`, `build`, `content:write`, `lint`, `typecheck`); it names
   `automata.toml`, `content/` and `replays/level-1.json`; it does not contain `npm install @automataframework`
   (the package is not on npm before Release 1).
-- [ ] **Step 2: Push; `check` fails** on the README.
-- [ ] **Step 3: Write `README.md`,** in plain words: what this repo is (the demo game made with AutomataFramework,
+- [x] **Step 2: Push; `check` fails** on the README.
+- [x] **Step 3: Write `README.md`,** in plain words: what this repo is (the demo game made with AutomataFramework,
   and later the site's examples); how to play it (`pnpm install`, `pnpm dev`); where things are (the project file,
   the content files, the hero's code, the recording); how to change the game (edit a content file, run
   `pnpm content:write`, open a pull request; CI checks it in four engines); what the recording is and how a new one
   is taken (Task 4's words, and that the Owner sees before and after); that tests run only in GitHub Actions; the
   licence. No strategy, market, competitor or pricing words.
-- [ ] **Step 4: Push; all jobs pass.**
-- [ ] **Step 5: The whole-branch review** (`superpowers:executing-plans`, "Final Review"; a self-review, since the
+- [x] **Step 4: Push; all jobs pass.**
+- [x] **Step 5: The whole-branch review** (`superpowers:executing-plans`, "Final Review"; a self-review, since the
   project allows no subagents). Fix what it finds, test first.
-- [ ] **Step 6: Close the stage.** Mark the pull request ready, set the tracker's stage to 100%, and send the
+- [x] **Step 6: Close the stage.** Mark the pull request ready, set the tracker's stage to 100%, and send the
   coordinator the end summary: commits, test counts per job, the recording's `finalHash`, the two run numbers of
   Task 4 Step 5, every deviation, the deferred minors, and what is the Owner's: marking `check` and the three
   `engines` checks as required on `main` (repo settings, which no session can change), and looking at the pictures
   on `ci-screens`.
-- [ ] **Step 7: Commit** (`docs: the README and the tracker for M1`).
+- [x] **Step 7: Commit** (`docs: the README and the tracker for M1`).
