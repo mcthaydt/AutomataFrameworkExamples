@@ -76,15 +76,17 @@ const inside = (inner: DOMRect, outer: DOMRect): boolean =>
   inner.top >= outer.top - 0.5 &&
   inner.bottom <= outer.bottom + 0.5
 
-test('play fills the root, starts the game and says so', async () => {
+test('play fills the root (the words, then the game under them), starts the game and says so', async () => {
   const { play: made } = await begin()
   expect(made.state).toBe('playing')
   expect(root.dataset.state).toBe('playing')
   const canvas = root.querySelector('canvas')
   expect(canvas).not.toBeNull()
   const box = canvas?.getBoundingClientRect()
+  const words = root.querySelector('.play-words')?.getBoundingClientRect()
   expect(Math.round(box?.width ?? 0)).toBe(390)
-  expect(Math.round(box?.height ?? 0)).toBe(844)
+  expect(Math.round(box?.bottom ?? 0)).toBe(844)
+  expect(box?.top ?? 0).toBeGreaterThanOrEqual((words?.bottom ?? 0) - 0.5)
   expect(made.game?.sim.tick).toBe(0)
 })
 
