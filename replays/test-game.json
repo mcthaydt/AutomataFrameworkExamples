@@ -1,0 +1,78 @@
+{
+  "format": 1,
+  "framework": "0.1.0",
+  "tickHz": 60,
+  "seed": 1,
+  "contentHash": "5acab95e8b06830a",
+  "ticks": 240,
+  "commands": [
+    {
+      "tick": 10,
+      "source": 1,
+      "seq": 0,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "right"
+        ]
+      }
+    },
+    {
+      "tick": 100,
+      "source": 1,
+      "seq": 1,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "jump",
+          "right"
+        ]
+      }
+    },
+    {
+      "tick": 150,
+      "source": 1,
+      "seq": 2,
+      "type": "controls",
+      "payload": {
+        "held": []
+      }
+    },
+    {
+      "tick": 180,
+      "source": 1,
+      "seq": 3,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "left"
+        ]
+      }
+    },
+    {
+      "tick": 220,
+      "source": 1,
+      "seq": 4,
+      "type": "controls",
+      "payload": {
+        "held": []
+      }
+    }
+  ],
+  "checks": [
+    {
+      "tick": 60,
+      "hash": "f20af319340114db"
+    },
+    {
+      "tick": 120,
+      "hash": "01904c9860c85c5f"
+    },
+    {
+      "tick": 180,
+      "hash": "b39e6ceaefc40429"
+    }
+  ],
+  "finalHash": "44468dddbdc870ec",
+  "meta": {}
+}
