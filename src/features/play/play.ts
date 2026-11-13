@@ -126,7 +126,7 @@ export async function play(options: PlayOptions): Promise<Play> {
     const content = loaded.value
 
     const stage = element('div', 'play-stage')
-    root.prepend(stage)
+    root.append(stage)
     const goal = element('p', 'play-goal', WORDS.goal)
     const how = element('p', 'play-how', coarse ? WORDS.touch : WORDS.keys)
     words.replaceChildren(goal, how)

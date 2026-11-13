@@ -14,8 +14,9 @@
         background: #1b1b24;
         overscroll-behavior: none;
       }
+      /* No `display` here: the page's own stylesheet makes this a flex column (the words, then the game), and an id rule
+         would beat it. */
       #game {
-        display: block;
         width: 100%;
         height: 100dvh;
       }

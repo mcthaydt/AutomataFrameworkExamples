@@ -76,15 +76,17 @@ const inside = (inner: DOMRect, outer: DOMRect): boolean =>
   inner.top >= outer.top - 0.5 &&
   inner.bottom <= outer.bottom + 0.5
 
-test('play fills the root, starts the game and says so', async () => {
+test('play fills the root (the words, then the game under them), starts the game and says so', async () => {
   const { play: made } = await begin()
   expect(made.state).toBe('playing')
   expect(root.dataset.state).toBe('playing')
   const canvas = root.querySelector('canvas')
   expect(canvas).not.toBeNull()
   const box = canvas?.getBoundingClientRect()
+  const words = root.querySelector('.play-words')?.getBoundingClientRect()
   expect(Math.round(box?.width ?? 0)).toBe(390)
-  expect(Math.round(box?.height ?? 0)).toBe(844)
+  expect(Math.round(box?.bottom ?? 0)).toBe(844)
+  expect(box?.top ?? 0).toBeGreaterThanOrEqual((words?.bottom ?? 0) - 0.5)
   expect(made.game?.sim.tick).toBe(0)
 })
 
@@ -144,6 +146,26 @@ test('the words stay inside a small phone and are big enough to read', async () 
     expect(Number.parseFloat(getComputedStyle(words).fontSize), `${width}x${height}`).toBeGreaterThanOrEqual(
       18,
     )
+    running?.stop()
+  }
+})
+
+test('the words sit above the game, never on the level', async () => {
+  for (const [width, height] of [
+    [320, 568],
+    [390, 844],
+    [844, 390],
+  ] as const) {
+    root.style.width = `${width}px`
+    root.style.height = `${height}px`
+    await begin()
+    const words = root.querySelector('.play-words')?.getBoundingClientRect()
+    const stage = root.querySelector('.play-stage')?.getBoundingClientRect()
+    if (words === undefined || stage === undefined) throw new Error('no words or no stage')
+    const label = `${width}x${height}`
+    expect(stage.top, label).toBeGreaterThanOrEqual(words.bottom - 0.5)
+    expect(stage.bottom, label).toBeCloseTo(root.getBoundingClientRect().bottom, 0)
+    expect(stage.width, label).toBeCloseTo(width, 0)
     running?.stop()
   }
 })
