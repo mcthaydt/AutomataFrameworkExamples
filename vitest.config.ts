@@ -1,9 +1,9 @@
-// Vitest projects. Test file suffixes decide where a test runs:
+// Five Vitest projects. Test file suffixes decide where a test runs:
 //   *.test.ts          Node
 //   *.parity.test.ts   Node and all three browsers: the same hash must come out of every engine
 //   *.browser.test.ts  the three browsers only (layout, DOM, canvas)
+//   *.journey.test.ts  Node, driving one real browser (named by ENGINE) against the built page in dist/
 // Node is the fourth engine of the determinism proof; the browsers are real Chromium, WebKit and Firefox.
-// (Task 6 adds a `journeys` project that drives the built page.)
 import { playwright } from '@vitest/browser-playwright'
 import { defineConfig, type ViteUserConfig } from 'vitest/config'
 
@@ -17,6 +17,21 @@ const node = {
     include: ['tests/**/*.test.ts'],
     // Browser tests need a page; journeys need the built game and have their own project.
     exclude: ['**/*.browser.test.ts', '**/*.journey.test.ts', '**/node_modules/**'],
+  },
+}
+
+// The built game, driven from outside by one real browser. `serve.ts` serves `dist/` once for all of them.
+const journeys = {
+  extends: true,
+  test: {
+    name: 'journeys',
+    environment: 'node',
+    include: ['tests/**/*.journey.test.ts'],
+    globalSetup: ['tests/journeys/serve.ts'],
+    testTimeout: 60_000,
+    hookTimeout: 90_000,
+    // One browser at a time: the journeys are about the page, not about how many pages a runner can hold.
+    fileParallelism: false,
   },
 }
 
@@ -40,7 +55,7 @@ const inBrowser = (engine: (typeof ENGINES)[number]) => ({
 
 // Annotated because the repo's tsconfig demands explicit types on everything exported.
 const config: ViteUserConfig = defineConfig({
-  test: { projects: [node, ...ENGINES.map(inBrowser)] },
+  test: { projects: [node, ...ENGINES.map(inBrowser), journeys] },
 })
 
 export default config
