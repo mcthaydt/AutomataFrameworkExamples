@@ -195,7 +195,7 @@ export interface Violation { readonly file: string; readonly rule: string; reado
 export function checkArchitecture(files: SourceFiles): Violation[]
 ```
 
-- [ ] **Step 1: Write the config.** Copy `tsconfig.json`, `biome.json`, `knip.json`, `.gitignore` and
+- [x] **Step 1: Write the config.** Copy `tsconfig.json`, `biome.json`, `knip.json`, `.gitignore` and
   `vitest.config.ts` from AutomataFramework at the pin and change only what follows. `package.json`:
 
 ```json
@@ -238,12 +238,12 @@ export function checkArchitecture(files: SourceFiles): Violation[]
   project also excludes `**/*.journey.test.ts`. `src/index.ts` and `src/headless.ts` start as a comment each.
   Run `pnpm install`; `node_modules/@automataframework/framework/dist/index.js` must exist. If pnpm stops with
   `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED`, the string it prints is the one `onlyBuiltDependencies` needs.
-- [ ] **Step 2: Write `.github/workflows/ci.yml`:** the framework's `ci.yml` at the pin, with the same triggers,
+- [x] **Step 2: Write `.github/workflows/ci.yml`:** the framework's `ci.yml` at the pin, with the same triggers,
   permissions, concurrency, runner, Node version and pinned action SHAs, cut down to the `check` job (install, lint,
   typecheck, knip, `pnpm test:node`) and the `engines` matrix job (install, `playwright install --with-deps`,
   `pnpm test:engine`). No `package` job (nothing is packed here). The `screens` job and the upload step arrive in
   Task 6, with the first pictures.
-- [ ] **Step 3: Write the failing tests.** `tests/architecture/rules.test.ts` feeds `checkArchitecture` made-up file
+- [x] **Step 3: Write the failing tests.** `tests/architecture/rules.test.ts` feeds `checkArchitecture` made-up file
   maps and expects one violation each, by `rule`. Each map names the feature's entry file as the offender, so
   `feature-has-entry` does not also fire:
 
@@ -288,16 +288,16 @@ test('the game depends on nothing but the framework', () => expect(Object.keys(d
 
   `tests/workflows/ci.test.ts` reads `ci.yml`'s text: `permissions:\n  contents: read` at the top; every `uses:` line
   ends in `@` and 40 hex digits; the matrix is `engine: [chromium, webkit, firefox]` with `fail-fast: false`.
-- [ ] **Step 4: Push; the `check` job fails** because `checkArchitecture` is not defined. This run also answers
+- [x] **Step 4: Push; the `check` job fails** because `checkArchitecture` is not defined. This run also answers
   "Before starting" item 2. Open the stage's pull request as a draft now, with a few lines saying what M1 builds here.
-- [ ] **Step 5: Write `tests/architecture/rules.ts`:** the framework's file at the pin, with first line
+- [x] **Step 5: Write `tests/architecture/rules.ts`:** the framework's file at the pin, with first line
   `// Adapted from AutomataFramework@ec4fddd: tests/architecture/rules.ts`, and these changes only. `LAYERS` as above.
   Pure features: `hero`, `plugins` (and `src/lib/`). Page features: `play`. The `package-confined` rule is replaced by
   `only-the-framework` (under `src/`, a specifier that is not relative and not `#src/` must be exactly
   `@automataframework/framework` or `@automataframework/framework/headless`) and `sim-side-is-headless` (in a pure
   feature or `src/lib/`, only the second). `src/main.ts` is checked like a `play` file.
-- [ ] **Step 6: Push; all jobs pass** (the engine jobs have no tests yet and say so).
-- [ ] **Step 7: Commit** (`chore: repo skeleton, the pinned framework, CI and the architecture test`).
+- [x] **Step 6: Push; all jobs pass** (the engine jobs have no tests yet and say so).
+- [x] **Step 7: Commit** (`chore: repo skeleton, the pinned framework, CI and the architecture test`).
 
 ### Task 2: The game's files
 
@@ -352,7 +352,7 @@ path = "content/characters/crate.json"
   and the yellow are what the page's words call them (Task 5). Each JSON file is committed as the text
   `writeContent` gives for it: write the values in `scripts/write-content.ts`'s terms, not by hand (Step 3).
 
-- [ ] **Step 1: Write the failing tests** in `tests/game/game-files.test.ts`. They read the real files with
+- [x] **Step 1: Write the failing tests** in `tests/game/game-files.test.ts`. They read the real files with
   `node:fs` (so a file the glob would miss is still found) from the repo's root:
 
 ```ts
@@ -372,15 +372,15 @@ test('a broken file is named in words', async () => {
 })
 ```
 
-- [ ] **Step 2: Push; `check` fails** because `automata.toml` is missing.
-- [ ] **Step 3: Write `scripts/write-content.ts`** (`"content:write": "node scripts/write-content.ts"`): read
+- [x] **Step 2: Push; `check` fails** because `automata.toml` is missing.
+- [x] **Step 3: Write `scripts/write-content.ts`** (`"content:write": "node scripts/write-content.ts"`): read
   `automata.toml` with `parseProject`; for each listed file, `parseContent` it and write back `writeContent`'s text
   when it differs, printing `Rewrote <path>.`; print `Every content file was already in the standard form.` when none
   did. A problem prints its `formatDiagnostic` line and exits 1 without writing that file. With `--check` it writes
   nothing and exits 1 if any file would change. Then write the game's files with any layout and run
   `pnpm content:write` to put them in the standard form.
-- [ ] **Step 4: Push; all jobs pass.**
-- [ ] **Step 5: Commit** (`feat(game): one level, the hero and one crate`).
+- [x] **Step 4: Push; all jobs pass.**
+- [x] **Step 5: Commit** (`feat(game): one level, the hero and one crate`).
 
 ### Task 3: The hero
 

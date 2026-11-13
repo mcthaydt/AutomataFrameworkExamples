@@ -9,7 +9,7 @@ framework's own tracker are in AutomataFramework
 
 Plan: [`plans/2026-11-13-m1-thin-thread-examples.md`](plans/2026-11-13-m1-thin-thread-examples.md)
 
-Overall: **18%** (stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14, stage 6 is 12 and the
+Overall: **32%** (stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14, stage 6 is 12 and the
 Owner's review is the last 6; stage 1, the spec, was done in AutomataFramework)
 
 | Stage | State | Output |
@@ -17,7 +17,7 @@ Owner's review is the last 6; stage 1, the spec, was done in AutomataFramework)
 | 1. Spec | Done (in AutomataFramework) | the spec linked above |
 | 2. Plan (M1, Examples) | Done, 100% (in review) | `plans/2026-11-13-m1-thin-thread-examples.md` |
 | 3. Plan audit | Done, 100% (in review) | `audits/2026-11-13-m1-examples-plan-audit.md` |
-| 4. Execution | Not started | the plan, ticked as it goes (each task is 14% of the stage, the close 2%) |
+| 4. Execution | In progress, 28% (Tasks 1 and 2 done) | the plan, ticked as it goes (each task is 14% of the stage, the close 2%) |
 | 5. Implementation audit | Not started | `audits/2026-11-13-m1-examples-implementation-audit.md` |
 | 6. Fixes | Not started | |
 | 7. Owner review | Not started | |
@@ -26,11 +26,18 @@ Milestones, for this repo:
 
 | Milestone | State |
 |---|---|
-| M1 The thin thread: one level, the hero, one crate, checked in four engines | Planned |
+| M1 The thin thread: one level, the hero, one crate, checked in four engines | In progress |
 | M2 The demo game's full content and every built-in | Not started |
 
 ### Log
 
+- 2026-11-13: Stage 4, Tasks 1 and 2. The skeleton, the pinned framework, CI and the architecture rules are in
+  (every job green on the pull request), and the game's files are in: `automata.toml`, one level, the hero and the
+  crate, written by `pnpm content:write`. GitHub-hosted runners accept jobs for this repo ("Before starting" item 2).
+  Rulings: `tests/framework.test.ts` (a one-line check that the pinned framework is installed and built) is added
+  because knip fails on a dependency nothing imports yet; `pnpm-workspace.yaml` (`saveExact`) is copied from the
+  framework; one more test in `game-files.test.ts` uses `loadTheGame`, which knip would otherwise call unused until
+  Task 4.
 - 2026-11-13: Stage 3. The plan audit is written: two blocking findings (B1: editors now save by pull request, so
   the contract says so and the checks must be required early; B2: the player is never told they pushed the crate),
   seven should-fix (S1, a second golden over the test game keeps the replay check strict after edits), six notes and

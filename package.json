@@ -18,7 +18,8 @@
     "typecheck": "tsc -p .",
     "knip": "knip",
     "test:node": "vitest run --project node",
-    "test:engine": "vitest run --passWithNoTests --project"
+    "test:engine": "vitest run --passWithNoTests --project",
+    "content:write": "node scripts/write-content.ts"
   },
   "dependencies": {
     "@automataframework/framework": "github:mcthaydt/AutomataFramework#ec4fddd96d0f1e39365ff807306faf9b42ac3190"
