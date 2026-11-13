@@ -112,13 +112,21 @@ Change any of this only with a note to the coordinator.
 
 - **Where the game is.** At this repo's root: `automata.toml`, and the files it lists under `content/`. The working
   name is "Crate Game" until the Owner names the game.
-- **What an editor may change.** Any file `automata.toml` lists, written with `writeContent`. An editor saves by
-  pushing a branch (`automata/<login>`) in this repo and opening a pull request into `main`; CI runs on that pull
-  request and fails when a content file is not byte for byte what `writeContent` writes, or when `loadGame` reports a
-  problem; a person merges it on GitHub. A Suggest from a fork is not supported by this repo's CI in M1. The crate is
-  the thing `crate-1` in `content/levels/level-1.json`.
+- **What an editor may change.** Any file `automata.toml` lists, written with `writeContent`. How a save lands depends
+  on the person's level (spec, "Saving"): an Edit or Owner save is committed by the editors' GitHub App straight to
+  `main`; a Suggest or Approve save is a pull request from `automata/<login>` into `main`, which a person who may
+  approve approves in the editor (the App merges it once the checks pass). CI runs on the pull request, or on the push
+  to `main`, and fails when a content file is not byte for byte what `writeContent` writes, or when `loadGame` reports
+  a problem. An Edit save lands before CI has run on it, so CI's push run on `main` is its check, and the Site shows
+  only the newest commit whose checks all passed until that run is green. For the App to commit to `main`, which
+  requires the checks, it is on `main`'s bypass list (a settings step when the editors are deployed). A Suggest from
+  a fork is not supported by this repo's CI in M1. The crate is the thing `crate-1` in
+  `content/levels/level-1.json`. (Stage 6, audit F3: this replaces the earlier "every save is a pull request a person
+  merges on GitHub".)
 - **What a moved crate does to CI.** Nothing breaks: the replay check accepts "the content changed" and still
-  compares the four engines with each other. An editor never writes `replays/`.
+  compares the four engines with each other, and the journeys that check gameplay play a level of their own
+  (`tests/fixtures/pinned-level.ts`, audit F1), wherever the crate is. An editor never writes `replays/`. The goldens
+  are `replays/level-1.json` and `replays/test-game.json`.
 - **The build.** `pnpm install --frozen-lockfile && pnpm build` leaves `dist/`: `index.html`, `assets/`, and the
   game's files beside them (`dist/automata.toml`, `dist/content/...`). Every URL is relative, so the folder works
   from any path of any site. The page fetches the game's files at run time, relative to itself.

@@ -249,6 +249,33 @@ test('readFrom fetches beside its base and rejects when the file is not there', 
   }
 })
 
+test('readFrom calls a web page a missing file: a host that answers every path with its home page', async () => {
+  // A single-page host (Cloudflare Pages with no 404.html is one) answers a missing path with its home page and a 200.
+  // The game reads only TOML and JSON, so a page is never the file; the person should be told "no such file", not sent
+  // looking for a comma that is not there.
+  const read = readFrom(new URL('/', location.href))
+  const answerWith = (body: string, type: string): void => {
+    vi.stubGlobal('fetch', () =>
+      Promise.resolve(new Response(body, { status: 200, headers: { 'content-type': type } })),
+    )
+  }
+  try {
+    for (const type of ['text/html', 'text/html; charset=utf-8', 'TEXT/HTML']) {
+      answerWith('<!doctype html><html><body>Home</body></html>', type)
+      await expect(read('content/characters/crate.json'), type).rejects.toThrow(
+        'content/characters/crate.json: no such file',
+      )
+    }
+    // JSON and plain text still read, whatever else the host says.
+    for (const type of ['application/json', 'text/plain; charset=utf-8', 'application/toml']) {
+      answerWith('{"format":1}', type)
+      expect(await read('content/characters/crate.json'), type).toBe('{"format":1}')
+    }
+  } finally {
+    vi.unstubAllGlobals()
+  }
+})
+
 test('both entries of the framework share one Player', async () => {
   // A bundler that copied the shared code into each entry would make two of everything, and a hero made with one
   // would be invisible to the other.

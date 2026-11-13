@@ -3,7 +3,7 @@
 import { playReplay, Thing, Transform, verifyReplay } from '@automataframework/framework/headless'
 import { afterAll, afterEach, expect, test } from 'vitest'
 import { WORDS } from '#src/features/play/words.ts'
-import { loadTheGame } from '../fixtures/game-files.ts'
+import { PINNED_CRATE_X, pinnedFiles } from '../fixtures/pinned-level.ts'
 import { closeBrowser, nodeSim, type Opened, openGame, replayOf, tickOf, untilTick } from './open.ts'
 
 let opened: Opened | undefined
@@ -32,24 +32,22 @@ test('the game opens, says what to do, and nothing goes wrong', async () => {
 })
 
 test('holding the right arrow key pushes the crate, and what was played replays to the same hash in Node', async () => {
-  opened = await openGame()
+  // The level is one this file owns (`pinned-level.ts`), so an editor moving the real crate cannot break the push.
+  opened = await openGame({ files: pinnedFiles })
   const { page } = opened
   await page.keyboard.down('ArrowRight')
   await untilTick(page, 180)
   await page.keyboard.up('ArrowRight')
   const replay = await replayOf(page)
 
-  const checking = await nodeSim()
+  const checking = await nodeSim(pinnedFiles)
   expect(verifyReplay(checking, replay)).toEqual({ ok: true })
   checking.dispose()
 
-  const played = await nodeSim()
+  const played = await nodeSim(pinnedFiles)
   playReplay(played, replay)
-  const game = await loadTheGame()
-  const startX =
-    game.levels[game.project.start]?.things.find((thing) => thing.id === 'crate-1')?.x ?? Number.NaN
   const crate = played.query(Thing, Transform).find((entity) => entity.get(Thing).id === 'crate-1')
-  expect(crate?.get(Transform).x).toBeGreaterThan(startX + 1)
+  expect(crate?.get(Transform).x).toBeGreaterThan(PINNED_CRATE_X + 1)
   played.dispose()
 
   // And the page told the player so: the words changed from "push" to "you did it".

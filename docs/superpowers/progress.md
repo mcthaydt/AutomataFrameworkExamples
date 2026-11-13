@@ -9,7 +9,7 @@ framework's own tracker are in AutomataFramework
 
 Plan: [`plans/2026-11-13-m1-thin-thread-examples.md`](plans/2026-11-13-m1-thin-thread-examples.md)
 
-Overall: **64%** (stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14, stage 6 is 12 and the
+Overall: **90%** (stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14, stage 6 is 12 and the
 Owner's review is the last 6; stage 1, the spec, was done in AutomataFramework)
 
 | Stage | State | Output |
@@ -18,8 +18,8 @@ Owner's review is the last 6; stage 1, the spec, was done in AutomataFramework)
 | 2. Plan (M1, Examples) | Done, 100% (in review) | `plans/2026-11-13-m1-thin-thread-examples.md` |
 | 3. Plan audit | Done, 100% (in review) | `audits/2026-11-13-m1-examples-plan-audit.md` |
 | 4. Execution | Done, 100% (in review) | the plan, ticked as it goes (each task is 14% of the stage, the close 2%) |
-| 5. Implementation audit | Not started | `audits/2026-11-13-m1-examples-implementation-audit.md` |
-| 6. Fixes | Not started | |
+| 5. Implementation audit | Done, 100% (in review) | `audits/2026-11-13-m1-examples-implementation-audit.md` |
+| 6. Fixes | Done, 100% (in review) | F1 to F4 of the implementation audit, in pull request 7 |
 | 7. Owner review | Not started | |
 
 Milestones, for this repo:
@@ -39,6 +39,33 @@ Milestones, for this repo:
   Green on the new pin in all four jobs. New pictures: `ci-screens` under `pr-5/`; looked at: the sideways phone now
   shows the hero and the crate above the buttons. One thing to know: the words box still covers the top of the level on
   a sideways phone (the upper wall, nothing to play with), which M2's title and pause screens take over.
+- 2026-11-13: Stage 6. The four audit findings are fixed, in pull request 7 (built on pull request 4, which holds the
+  audit). F1: the push journey, the done picture and the moved-crate check play `tests/fixtures/pinned-level.ts`
+  (the real level's tiles and starts, `crate-1` at 9.5, written with `writeContent`), so a crate an editor puts
+  against the right wall, left of the hero, or deletes can no longer turn CI red; the journeys that only open, play
+  and replay stay on the real files. F2: the README's step 1 installs Corepack first (`npm install --global
+  corepack@latest`, then `corepack enable`), since Node 25 and later do not ship it, and the commands table says
+  `pnpm dev` reloads on a change to the code only; `tests/docs/readme.test.ts` checks the order. F3: `CLAUDE.md` and
+  the plan's contract say an Edit or Owner save is committed straight to `main` and a Suggest or Approve save is a
+  pull request approved in the editor; that an Edit save lands before CI runs, so CI's push run is its check and the
+  Site shows only the newest passing commit; both `replays/level-1.json` and `replays/test-game.json` are goldens;
+  and the Structure block lists `replays/test-game.json`, `tests/pin.test.ts`, `tests/framework.test.ts` and
+  `tests/architecture/`. F4: `readFrom` answers "no such file" for a page, as for a 404 (a `content-type` of
+  `text/html`), with a browser test. Plan audit Q1 is answered (the Owner, 2026-11-13): the editors' save branches
+  (`automata/<login>`) do not count toward the five-branch cap, because this repo is our test game and the editors
+  are a product for other teams' repos; `CLAUDE.md` says so. The Site plan should still ship a top-level `404.html`.
+  The seven minors (M1 to M7) stay for later milestones.
+  Proof, as Task 4 Step 5 did it: the F4 test alone was red in all three engines (run 43524032769), the fix made
+  every job pass (run 43524196965); then `crate-1` moved to 14.5, against the right wall, passed every job (run
+  43524540782, no journey fails) and was reverted in the next commit.
+- 2026-11-13: Stage 5. The implementation audit is written, for pull request 3 at `bc922f8` (CI run 43522330339
+  green: `check` 57 tests, each engine 20 browser, 5 replay and 14 journey tests; level 1 ends on
+  `77be68a6e1859241` in all four engines). Nothing blocks the merge. Four should-fix findings for stage 6: F1, the
+  journeys check the push against the real level's crate, so a crate an editor puts near the right wall or left of
+  the hero fails CI (they should play a level the tests own); F2, `corepack enable` fails on Node 25 and later; F3,
+  `CLAUDE.md` and the contract are behind the spec's Edit-saves-go-straight-in and don't name `test-game.json` as a
+  golden; F4, `readFrom` takes a host's web page for a game file. Seven minors noted. The four deferred minors and every
+  ruling were judged; all stand, and deferred minor 2 is raised to F4. Stage 6 applies F1 to F4.
 - 2026-11-13: Stage 4, Task 7 and the close. The README gets a stranger from clone to a changed game (install, play,
   change `crate-1`'s `x`, `pnpm content:write`, reload) and `tests/docs/readme.test.ts` reads it for the scripts and
   files it names. Audit B1, S4 and N5 are applied to the plan and `CLAUDE.md` (editors open pull requests). The
@@ -100,5 +127,7 @@ sessions were told the same on 2026-11-13.
 
 ### For the Owner
 
-- As soon as Task 4's checks are green (before any editor pull request; plan audit B1): mark `check` and the three `engines` checks as required on `main`, and turn on "Automatically delete head branches" (repo settings; no session can change them).
+- Answered: editor save branches do not count toward the five-branch cap (plan audit Q1).
+- Done (read through the API on 2026-11-13): `check` and the three `engines` checks are required on `main`, and
+  "Automatically delete head branches" is on.
 - Look at the pictures CI copies to the `ci-screens` branch, for the drunk-grandma test.

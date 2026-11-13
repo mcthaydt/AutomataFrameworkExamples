@@ -3,10 +3,8 @@
 import { parseContent, verifyReplay, writeContent } from '@automataframework/framework/headless'
 import { afterAll, afterEach, expect, test } from 'vitest'
 import { WORDS } from '#src/features/play/words.ts'
-import { gameFiles } from '../fixtures/game-files.ts'
+import { LEVEL_FILE as LEVEL, pinnedLevel } from '../fixtures/pinned-level.ts'
 import { closeBrowser, nodeSim, type Opened, openGame, replayOf, untilTick } from './open.ts'
-
-const LEVEL = 'content/levels/level-1.json'
 
 let opened: Opened | undefined
 afterEach(async () => {
@@ -15,10 +13,10 @@ afterEach(async () => {
 })
 afterAll(closeBrowser)
 
-/** The level file with the crate moved to `x`, written the standard way. */
+/** The pinned level (not the file on disk) with the crate moved to `x`, written the standard way. */
 function levelWithCrateAt(x: number): string {
-  const parsed = parseContent('level', gameFiles[LEVEL] ?? '', LEVEL)
-  if (!parsed.ok) throw new Error('the real level did not parse')
+  const parsed = parseContent('level', pinnedLevel, LEVEL)
+  if (!parsed.ok) throw new Error('the pinned level did not parse')
   return writeContent('level', {
     ...parsed.value,
     things: parsed.value.things.map((thing) => (thing.id === 'crate-1' ? { ...thing, x } : thing)),
@@ -36,10 +34,11 @@ test('the game plays the level file it is given: a moved crate is where the file
   expect(verifyReplay(same, replay)).toEqual({ ok: true })
   same.dispose()
 
-  // And the file on disk is not what the page played.
-  const disk = await nodeSim()
-  const verdict = verifyReplay(disk, replay)
-  disk.dispose()
+  // And it is not the level the crate started in: the pinned level, with the crate at 9.5, does not verify it. The
+  // check is against the pinned level, not the file on disk, which an editor may have put the crate at 12.5 in too.
+  const before = await nodeSim({ [LEVEL]: pinnedLevel })
+  const verdict = verifyReplay(before, replay)
+  before.dispose()
   expect(verdict.ok).toBe(false)
   if (!verdict.ok) expect(verdict.reason).toBe('content-changed')
 })
