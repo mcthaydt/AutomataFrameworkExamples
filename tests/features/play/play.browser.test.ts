@@ -148,6 +148,26 @@ test('the words stay inside a small phone and are big enough to read', async () 
   }
 })
 
+test('the words sit above the game, never on the level', async () => {
+  for (const [width, height] of [
+    [320, 568],
+    [390, 844],
+    [844, 390],
+  ] as const) {
+    root.style.width = `${width}px`
+    root.style.height = `${height}px`
+    await begin()
+    const words = root.querySelector('.play-words')?.getBoundingClientRect()
+    const stage = root.querySelector('.play-stage')?.getBoundingClientRect()
+    if (words === undefined || stage === undefined) throw new Error('no words or no stage')
+    const label = `${width}x${height}`
+    expect(stage.top, label).toBeGreaterThanOrEqual(words.bottom - 0.5)
+    expect(stage.bottom, label).toBeCloseTo(root.getBoundingClientRect().bottom, 0)
+    expect(stage.width, label).toBeCloseTo(width, 0)
+    running?.stop()
+  }
+})
+
 test('the words never sit under a touch button', async () => {
   for (const [width, height] of [
     [320, 568],

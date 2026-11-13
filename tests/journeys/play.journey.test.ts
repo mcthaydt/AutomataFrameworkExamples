@@ -26,8 +26,11 @@ test('the game opens, says what to do, and nothing goes wrong', async () => {
   expect(await canvases.count()).toBe(1)
   expect(await canvases.isVisible()).toBe(true)
   const box = await canvases.boundingBox()
+  // The words have a strip of their own above the game; the game takes the rest of the window.
+  const words = await page.locator('.play-words').boundingBox()
   expect(Math.round(box?.width ?? 0)).toBe(1280)
-  expect(Math.round(box?.height ?? 0)).toBe(720)
+  expect(Math.round((box?.y ?? 0) + (box?.height ?? 0))).toBe(720)
+  expect(box?.y ?? 0).toBeGreaterThanOrEqual((words?.y ?? 0) + (words?.height ?? 0) - 0.5)
   expect(errors).toEqual([])
 })
 
@@ -91,7 +94,7 @@ test('turning the phone keeps the game on screen and playing', async () => {
   await untilTick(page, before + 10)
   const box = await page.locator('canvas').boundingBox()
   expect(Math.round(box?.width ?? 0)).toBe(844)
-  expect(Math.round(box?.height ?? 0)).toBe(390)
+  expect(Math.round((box?.y ?? 0) + (box?.height ?? 0))).toBe(390)
   const words = await page.locator('.play-words').boundingBox()
   expect(words?.x ?? -1).toBeGreaterThanOrEqual(0)
   expect(words?.y ?? -1).toBeGreaterThanOrEqual(0)
