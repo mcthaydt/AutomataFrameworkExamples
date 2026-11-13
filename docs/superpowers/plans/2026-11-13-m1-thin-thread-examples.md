@@ -638,7 +638,7 @@ export function play(options: PlayOptions): Promise<Play>
   `pointer-events: none` so they never take a touch meant for the game; the problem screen is `#1b1b24` on `#ffffff`,
   scrolls if it is long, and its text is at least 18 px. Font: `system-ui, sans-serif`.
 
-- [ ] **Step 1: Write the failing tests** (each engine; a 390 by 844 root unless said; `manualFrames()`;
+- [x] **Step 1: Write the failing tests** (each engine; a 390 by 844 root unless said; `manualFrames()`;
   `read: readTestGame(overrides)`; `stop()` in `afterEach`):
 
 ```ts
@@ -669,11 +669,11 @@ test('both entries of the framework share one Player', async () => {
 })
 ```
 
-- [ ] **Step 2: Push; the three engine jobs fail** because `play.ts` does not exist.
-- [ ] **Step 3: Implement,** and re-export `play` (the feature's entry, which re-exports `CONTROLS`, `WORDS` and
+- [x] **Step 2: Push; the three engine jobs fail** because `play.ts` does not exist.
+- [x] **Step 3: Implement,** and re-export `play` (the feature's entry, which re-exports `CONTROLS`, `WORDS` and
   `readFrom`) from `src/index.ts`.
-- [ ] **Step 4: Push; all jobs pass.**
-- [ ] **Step 5: Commit** (`feat(play): the game on a page, with words for what to do and for what went wrong`).
+- [x] **Step 4: Push; all jobs pass.**
+- [x] **Step 5: Commit** (`feat(play): the game on a page, with words for what to do and for what went wrong`).
 
 ### Task 6: The page, the build and the journeys
 
