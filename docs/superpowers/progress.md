@@ -31,6 +31,14 @@ Milestones, for this repo:
 
 ### Log
 
+- 2026-11-13: The pin moved from `ec4fddd` to `2a8b09f` (AutomataFramework pull request 14, "keep the touch buttons off
+  the play area": the level is now fitted above the touch buttons). `tests/journeys/layout.journey.test.ts` looks at a
+  picture of the page after a first touch, finds the hero (the one red thing) and checks that Left, Right and Jump sit
+  on none of it, at phone and tablet sizes held both ways. Red first on the old pin, in all three engines: only
+  `phone-844x390` failed, "Right sits on the hero" (this closes the deferred minor about the sideways buttons).
+  Green on the new pin in all four jobs. New pictures: `ci-screens` under `pr-5/`; looked at: the sideways phone now
+  shows the hero and the crate above the buttons. One thing to know: the words box still covers the top of the level on
+  a sideways phone (the upper wall, nothing to play with), which M2's title and pause screens take over.
 - 2026-11-13: Stage 6. The four audit findings are fixed, in pull request 7 (built on pull request 4, which holds the
   audit). F1: the push journey, the done picture and the moved-crate check play `tests/fixtures/pinned-level.ts`
   (the real level's tiles and starts, `crate-1` at 9.5, written with `writeContent`), so a crate an editor puts
