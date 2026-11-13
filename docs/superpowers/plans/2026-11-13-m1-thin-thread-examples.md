@@ -426,7 +426,7 @@ export function loadTestGame(): Promise<GameContent>
   `tests/fixtures/test-game.ts` builds its content files as strings with `writeContent` and loads them with
   `loadGame`, so unit tests never break when an editor moves the crate.
 
-- [ ] **Step 1: Write the failing tests.** Each makes `createGameSim({ content: await loadTestGame(), plugins: gamePlugins, players })`,
+- [x] **Step 1: Write the failing tests.** Each makes `createGameSim({ content: await loadTestGame(), plugins: gamePlugins, players })`,
   steps 10 idle ticks first so the hero is standing, and disposes its sims in `afterEach`:
 
 ```ts
@@ -447,10 +447,10 @@ test('the same inputs end on the same hash twice', ...)   // two sims, the same 
 test('gamePlugins is the hero', () => expect(gamePlugins.map((p) => p.name)).toEqual(['hero']))
 ```
 
-- [ ] **Step 2: Push; `check` fails** because `hero.ts` does not exist.
-- [ ] **Step 3: Implement,** and re-export both features from `src/headless.ts`.
-- [ ] **Step 4: Push; all jobs pass.**
-- [ ] **Step 5: Commit** (`feat(hero): run and jump, one jump a press, for any player`).
+- [x] **Step 2: Push; `check` fails** because `hero.ts` does not exist.
+- [x] **Step 3: Implement,** and re-export both features from `src/headless.ts`.
+- [x] **Step 4: Push; all jobs pass.**
+- [x] **Step 5: Commit** (`feat(hero): run and jump, one jump a press, for any player`).
 
 ### Task 4: The recorded play, the same in four engines
 
