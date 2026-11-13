@@ -47,6 +47,9 @@ Milestones, for this repo:
   (`automata/<login>`) do not count toward the five-branch cap, because this repo is our test game and the editors
   are a product for other teams' repos; `CLAUDE.md` says so. The Site plan should still ship a top-level `404.html`.
   The seven minors (M1 to M7) stay for later milestones.
+  Proof, as Task 4 Step 5 did it: the F4 test alone was red in all three engines (run 43524032769), the fix made
+  every job pass (run 43524196965); then `crate-1` moved to 14.5, against the right wall, passed every job (run
+  43524540782, no journey fails) and was reverted in the next commit.
 - 2026-11-13: Stage 5. The implementation audit is written, for pull request 3 at `bc922f8` (CI run 43522330339
   green: `check` 57 tests, each engine 20 browser, 5 replay and 14 journey tests; level 1 ends on
   `77be68a6e1859241` in all four engines). Nothing blocks the merge. Four should-fix findings for stage 6: F1, the
