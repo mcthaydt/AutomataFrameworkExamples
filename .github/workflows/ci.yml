@@ -47,3 +47,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps ${{ matrix.engine }}
       - run: pnpm test:engine ${{ matrix.engine }}
+      # The browser just saved where it ended in `.hashes/`. Node plays the same recording here, so the two can be
+      # compared; three browsers each equal to Node is all four engines the same.
+      - run: pnpm vitest run --project node tests/replay
+      - run: pnpm same-hash node ${{ matrix.engine }}

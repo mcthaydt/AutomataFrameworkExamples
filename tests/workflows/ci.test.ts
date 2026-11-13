@@ -18,3 +18,14 @@ test('the engines run in three browsers, and one failing does not stop the other
   expect(ci).toContain('engine: [chromium, webkit, firefox]')
   expect(ci).toContain('fail-fast: false')
 })
+
+test('each engine plays the recording in Node too and is compared with it, in that order', () => {
+  const steps = [
+    `pnpm test:engine \${{ matrix.engine }}`,
+    'pnpm vitest run --project node tests/replay',
+    `pnpm same-hash node \${{ matrix.engine }}`,
+  ]
+  const at = steps.map((step) => ci.indexOf(`- run: ${step}\n`))
+  expect(at.every((position) => position > 0)).toBe(true)
+  expect(at).toEqual([...at].sort((a, b) => a - b))
+})
