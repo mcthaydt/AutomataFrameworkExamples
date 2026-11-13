@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Crate Game</title>
+    <!-- No icon yet, and none asked for: without this a browser asks the server for /favicon.ico and logs a 404. -->
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #1b1b24;
+        overscroll-behavior: none;
+      }
+      #game {
+        display: block;
+        width: 100%;
+        height: 100dvh;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="game"></main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
