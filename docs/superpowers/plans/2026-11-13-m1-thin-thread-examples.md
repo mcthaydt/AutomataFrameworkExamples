@@ -62,7 +62,8 @@ Checked while this plan was written (an install in a scratch folder, not a test)
   `@automataframework/framework/headless` and no other package, and never a path inside the package.
 - **The pin is a commit, never a branch:** `github:mcthaydt/AutomataFramework#<40 hex digits>`. Moving it is its own
   pull request and changes two lines of `package.json` (the dependency and `pnpm.onlyBuiltDependencies`) and the
-  lockfile.
+  lockfile. A move that changes the framework's physics or hashing fails the strict replay checks, and so always the
+  test-game one: that is right, and it means a pin move may need a new recording, which the Owner sees (audit N5).
 - **Tests run only in GitHub-hosted CI, never locally.** `pnpm install`, `pnpm lint`, `pnpm typecheck`, `pnpm knip`,
   `pnpm build` and the scripts in `scripts/` are not tests and are run locally before every push.
 - The sim side (`hero`, `plugins`, `src/lib/`) has no I/O, no wall clock and no `Math.random`. Only the sim changes
@@ -81,7 +82,9 @@ Checked while this plan was written (an install in a scratch folder, not a test)
   repo's golden: once it holds hashes it changes only with the Owner seeing before and after.
 - **The drunk-grandma test.** Every word a player can read is pinned in this plan (Task 5). The pictures Task 6
   uploads, at phone, tablet and desktop sizes, upright and sideways, are what the implementation audit reads; a
-  screen that fails is a defect.
+  screen that fails is a defect. The words stay at the top for the whole game, which on a phone held sideways costs a
+  share of a short screen: that is deliberate in M1 (a player who looks away and back still needs them), and M2's
+  title and pause screens take over the job (audit S4).
 - Comments say why. Conventional Commits. The author is Dawson McThay
   (`git config --global user.name "Dawson McThay" && git config --global user.email "107786093+mcthaydt@users.noreply.github.com"`).
   No AI attribution in commits, pull request bodies or docs. The pull request body is edited only with the GitHub MCP
@@ -109,16 +112,19 @@ Change any of this only with a note to the coordinator.
 
 - **Where the game is.** At this repo's root: `automata.toml`, and the files it lists under `content/`. The working
   name is "Crate Game" until the Owner names the game.
-- **What an editor may change.** Any file `automata.toml` lists, written with `writeContent`. CI fails a commit whose
-  content file is not byte for byte what `writeContent` writes, or for which `loadGame` reports a problem. The crate
-  is the thing `crate-1` in `content/levels/level-1.json`.
+- **What an editor may change.** Any file `automata.toml` lists, written with `writeContent`. An editor saves by
+  pushing a branch (`automata/<login>`) in this repo and opening a pull request into `main`; CI runs on that pull
+  request and fails when a content file is not byte for byte what `writeContent` writes, or when `loadGame` reports a
+  problem; a person merges it on GitHub. A Suggest from a fork is not supported by this repo's CI in M1. The crate is
+  the thing `crate-1` in `content/levels/level-1.json`.
 - **What a moved crate does to CI.** Nothing breaks: the replay check accepts "the content changed" and still
   compares the four engines with each other. An editor never writes `replays/`.
 - **The build.** `pnpm install --frozen-lockfile && pnpm build` leaves `dist/`: `index.html`, `assets/`, and the
   game's files beside them (`dist/automata.toml`, `dist/content/...`). Every URL is relative, so the folder works
   from any path of any site. The page fetches the game's files at run time, relative to itself.
 - **The page.** `<main id="game" data-state="loading | playing | problem">` fills the window. `window.automataGame`
-  is the running `Game` (`undefined` on a problem), for journeys and agents.
+  is the running `Game` (`undefined` on a problem), for journeys and agents. The page listens for keys on its own
+  `window`: a page that embeds it in a frame must give the frame focus (or say "Click the game, then...").
 - **Keys.** ArrowLeft or KeyA, ArrowRight or KeyD, Space or ArrowUp. Touch buttons: Left, Right, Jump.
 - **Check-run names.** `check`, `engines (chromium)`, `engines (webkit)`, `engines (firefox)`; `screens` only copies
   pictures and is not a verdict on the game.
@@ -165,7 +171,7 @@ Inputs the spec does not name but a person will meet. Each has a test in the tas
 1. **A commit that breaks a game file** (an agent's hand edit that is not valid JSON, a missing file, a file not in
    the standard form): CI says which file and what to do in a plain sentence, and the page shows the same sentence,
    never a blank canvas. Tasks 2, 5, 6.
-2. **A commit that moves the crate** (the editor's whole job in M1): CI must pass and still prove the four engines
+2. **A pull request that moves the crate** (the editor's whole job in M1): CI must pass and still prove the four engines
    agree. Tasks 4, 6.
 3. **Pressing jump in the air**, at the very top of a jump included, and holding jump on landing: one press is one
    jump. Task 3.
@@ -195,7 +201,7 @@ export interface Violation { readonly file: string; readonly rule: string; reado
 export function checkArchitecture(files: SourceFiles): Violation[]
 ```
 
-- [ ] **Step 1: Write the config.** Copy `tsconfig.json`, `biome.json`, `knip.json`, `.gitignore` and
+- [x] **Step 1: Write the config.** Copy `tsconfig.json`, `biome.json`, `knip.json`, `.gitignore` and
   `vitest.config.ts` from AutomataFramework at the pin and change only what follows. `package.json`:
 
 ```json
@@ -238,12 +244,12 @@ export function checkArchitecture(files: SourceFiles): Violation[]
   project also excludes `**/*.journey.test.ts`. `src/index.ts` and `src/headless.ts` start as a comment each.
   Run `pnpm install`; `node_modules/@automataframework/framework/dist/index.js` must exist. If pnpm stops with
   `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED`, the string it prints is the one `onlyBuiltDependencies` needs.
-- [ ] **Step 2: Write `.github/workflows/ci.yml`:** the framework's `ci.yml` at the pin, with the same triggers,
+- [x] **Step 2: Write `.github/workflows/ci.yml`:** the framework's `ci.yml` at the pin, with the same triggers,
   permissions, concurrency, runner, Node version and pinned action SHAs, cut down to the `check` job (install, lint,
   typecheck, knip, `pnpm test:node`) and the `engines` matrix job (install, `playwright install --with-deps`,
   `pnpm test:engine`). No `package` job (nothing is packed here). The `screens` job and the upload step arrive in
   Task 6, with the first pictures.
-- [ ] **Step 3: Write the failing tests.** `tests/architecture/rules.test.ts` feeds `checkArchitecture` made-up file
+- [x] **Step 3: Write the failing tests.** `tests/architecture/rules.test.ts` feeds `checkArchitecture` made-up file
   maps and expects one violation each, by `rule`. Each map names the feature's entry file as the offender, so
   `feature-has-entry` does not also fire:
 
@@ -288,16 +294,16 @@ test('the game depends on nothing but the framework', () => expect(Object.keys(d
 
   `tests/workflows/ci.test.ts` reads `ci.yml`'s text: `permissions:\n  contents: read` at the top; every `uses:` line
   ends in `@` and 40 hex digits; the matrix is `engine: [chromium, webkit, firefox]` with `fail-fast: false`.
-- [ ] **Step 4: Push; the `check` job fails** because `checkArchitecture` is not defined. This run also answers
+- [x] **Step 4: Push; the `check` job fails** because `checkArchitecture` is not defined. This run also answers
   "Before starting" item 2. Open the stage's pull request as a draft now, with a few lines saying what M1 builds here.
-- [ ] **Step 5: Write `tests/architecture/rules.ts`:** the framework's file at the pin, with first line
+- [x] **Step 5: Write `tests/architecture/rules.ts`:** the framework's file at the pin, with first line
   `// Adapted from AutomataFramework@ec4fddd: tests/architecture/rules.ts`, and these changes only. `LAYERS` as above.
   Pure features: `hero`, `plugins` (and `src/lib/`). Page features: `play`. The `package-confined` rule is replaced by
   `only-the-framework` (under `src/`, a specifier that is not relative and not `#src/` must be exactly
   `@automataframework/framework` or `@automataframework/framework/headless`) and `sim-side-is-headless` (in a pure
   feature or `src/lib/`, only the second). `src/main.ts` is checked like a `play` file.
-- [ ] **Step 6: Push; all jobs pass** (the engine jobs have no tests yet and say so).
-- [ ] **Step 7: Commit** (`chore: repo skeleton, the pinned framework, CI and the architecture test`).
+- [x] **Step 6: Push; all jobs pass** (the engine jobs have no tests yet and say so).
+- [x] **Step 7: Commit** (`chore: repo skeleton, the pinned framework, CI and the architecture test`).
 
 ### Task 2: The game's files
 
@@ -352,7 +358,7 @@ path = "content/characters/crate.json"
   and the yellow are what the page's words call them (Task 5). Each JSON file is committed as the text
   `writeContent` gives for it: write the values in `scripts/write-content.ts`'s terms, not by hand (Step 3).
 
-- [ ] **Step 1: Write the failing tests** in `tests/game/game-files.test.ts`. They read the real files with
+- [x] **Step 1: Write the failing tests** in `tests/game/game-files.test.ts`. They read the real files with
   `node:fs` (so a file the glob would miss is still found) from the repo's root:
 
 ```ts
@@ -372,15 +378,15 @@ test('a broken file is named in words', async () => {
 })
 ```
 
-- [ ] **Step 2: Push; `check` fails** because `automata.toml` is missing.
-- [ ] **Step 3: Write `scripts/write-content.ts`** (`"content:write": "node scripts/write-content.ts"`): read
+- [x] **Step 2: Push; `check` fails** because `automata.toml` is missing.
+- [x] **Step 3: Write `scripts/write-content.ts`** (`"content:write": "node scripts/write-content.ts"`): read
   `automata.toml` with `parseProject`; for each listed file, `parseContent` it and write back `writeContent`'s text
   when it differs, printing `Rewrote <path>.`; print `Every content file was already in the standard form.` when none
   did. A problem prints its `formatDiagnostic` line and exits 1 without writing that file. With `--check` it writes
   nothing and exits 1 if any file would change. Then write the game's files with any layout and run
   `pnpm content:write` to put them in the standard form.
-- [ ] **Step 4: Push; all jobs pass.**
-- [ ] **Step 5: Commit** (`feat(game): one level, the hero and one crate`).
+- [x] **Step 4: Push; all jobs pass.**
+- [x] **Step 5: Commit** (`feat(game): one level, the hero and one crate`).
 
 ### Task 3: The hero
 
@@ -426,7 +432,7 @@ export function loadTestGame(): Promise<GameContent>
   `tests/fixtures/test-game.ts` builds its content files as strings with `writeContent` and loads them with
   `loadGame`, so unit tests never break when an editor moves the crate.
 
-- [ ] **Step 1: Write the failing tests.** Each makes `createGameSim({ content: await loadTestGame(), plugins: gamePlugins, players })`,
+- [x] **Step 1: Write the failing tests.** Each makes `createGameSim({ content: await loadTestGame(), plugins: gamePlugins, players })`,
   steps 10 idle ticks first so the hero is standing, and disposes its sims in `afterEach`:
 
 ```ts
@@ -447,10 +453,10 @@ test('the same inputs end on the same hash twice', ...)   // two sims, the same 
 test('gamePlugins is the hero', () => expect(gamePlugins.map((p) => p.name)).toEqual(['hero']))
 ```
 
-- [ ] **Step 2: Push; `check` fails** because `hero.ts` does not exist.
-- [ ] **Step 3: Implement,** and re-export both features from `src/headless.ts`.
-- [ ] **Step 4: Push; all jobs pass.**
-- [ ] **Step 5: Commit** (`feat(hero): run and jump, one jump a press, for any player`).
+- [x] **Step 2: Push; `check` fails** because `hero.ts` does not exist.
+- [x] **Step 3: Implement,** and re-export both features from `src/headless.ts`.
+- [x] **Step 4: Push; all jobs pass.**
+- [x] **Step 5: Commit** (`feat(hero): run and jump, one jump a press, for any player`).
 
 ### Task 4: The recorded play, the same in four engines
 
@@ -503,7 +509,7 @@ export function saveHashes(played: Played): Promise<void>
   the golden it is the Owner who sees before and after. The framework's audit already asks M2 for a replay that
   tells "code changed" from "content changed" (its M4); that plan should settle who re-records and when.
 
-- [ ] **Step 1: Write the failing tests.** `tests/lib/same-hash.test.ts`:
+- [x] **Step 1: Write the failing tests.** `tests/lib/same-hash.test.ts`:
 
 ```ts
 const run = (engine: string, finalHash: string, hashes: string[]) =>
@@ -548,20 +554,20 @@ test('the recording is written the one standard way', ...)   // writeReplay(pars
 
   `tests/workflows/ci.test.ts` gains: the `engines` job runs, in this order, `pnpm test:engine ${{ matrix.engine }}`,
   `pnpm vitest run --project node tests/replay` and `pnpm same-hash node ${{ matrix.engine }}`.
-- [ ] **Step 2: Add those two steps to the `engines` job** after `pnpm test:engine`. Push; `check` fails because
+- [x] **Step 2: Add those two steps to the `engines` job** after `pnpm test:engine`. Push; `check` fails because
   `same-hash.ts` does not exist.
-- [ ] **Step 3: Implement** `same-hash.ts`, the script and the fixtures, with no `replays/level-1.json` yet. Push;
+- [x] **Step 3: Implement** `same-hash.ts`, the script and the fixtures, with no `replays/level-1.json` yet. Push;
   the Node tests now fail with `REPLAY NOT RECORDED` and nothing else. Copy the recording from the Node job's log
   into `replays/level-1.json` exactly as printed.
-- [ ] **Step 4: Push; all jobs pass,** and each engine job's log has the line
+- [x] **Step 4: Push; all jobs pass,** and each engine job's log has the line
   `node and <engine> both ended on <hash>.` with one hash across the three jobs, equal to the recording's `finalHash`.
   If a browser differs from Node, stop and report: that is a determinism defect, not a flake.
-- [ ] **Step 5: Prove the editor's case once, by hand, on the branch.** Push a commit that only changes `crate-1`'s
+- [x] **Step 5: Prove the editor's case once, by hand, on the branch.** Push a commit that only changes `crate-1`'s
   `x` to `11.5` in `level-1.json`. Every job must pass, the three `same-hash` lines must agree on one hash that is
   *not* the recording's `finalHash`, and the Node log must carry the "level changed" line. Then push the revert. Put
   both run numbers in the coordinator's line. (Task 6's journey keeps this proven; this step shows it in CI's own
   terms before the page exists.)
-- [ ] **Step 6: Commit** (`feat(replay): the recorded play of level 1, compared across four engines`).
+- [x] **Step 6: Commit** (`feat(replay): the recorded play of level 1, compared across four engines`).
 
 ### Task 5: The page's pieces
 
@@ -638,7 +644,7 @@ export function play(options: PlayOptions): Promise<Play>
   `pointer-events: none` so they never take a touch meant for the game; the problem screen is `#1b1b24` on `#ffffff`,
   scrolls if it is long, and its text is at least 18 px. Font: `system-ui, sans-serif`.
 
-- [ ] **Step 1: Write the failing tests** (each engine; a 390 by 844 root unless said; `manualFrames()`;
+- [x] **Step 1: Write the failing tests** (each engine; a 390 by 844 root unless said; `manualFrames()`;
   `read: readTestGame(overrides)`; `stop()` in `afterEach`):
 
 ```ts
@@ -669,11 +675,11 @@ test('both entries of the framework share one Player', async () => {
 })
 ```
 
-- [ ] **Step 2: Push; the three engine jobs fail** because `play.ts` does not exist.
-- [ ] **Step 3: Implement,** and re-export `play` (the feature's entry, which re-exports `CONTROLS`, `WORDS` and
+- [x] **Step 2: Push; the three engine jobs fail** because `play.ts` does not exist.
+- [x] **Step 3: Implement,** and re-export `play` (the feature's entry, which re-exports `CONTROLS`, `WORDS` and
   `readFrom`) from `src/index.ts`.
-- [ ] **Step 4: Push; all jobs pass.**
-- [ ] **Step 5: Commit** (`feat(play): the game on a page, with words for what to do and for what went wrong`).
+- [x] **Step 4: Push; all jobs pass.**
+- [x] **Step 5: Commit** (`feat(play): the game on a page, with words for what to do and for what went wrong`).
 
 ### Task 6: The page, the build and the journeys
 
@@ -723,7 +729,7 @@ export function untilTick(page: Page, tick: number): Promise<void>
   and closes the server at the end. Each journey file launches `playwright[ENGINE]` once, opens a fresh context per
   test (viewport and `hasTouch` from `SIZES`), and closes everything it opened.
 
-- [ ] **Step 1: Write the failing journeys.** `play.journey.test.ts`:
+- [x] **Step 1: Write the failing journeys.** `play.journey.test.ts`:
 
 ```ts
 test('the game opens, says what to do, and nothing goes wrong', ...)
@@ -769,16 +775,16 @@ test('a missing file is named', ...)
   `tests/workflows/ci.test.ts` gains the framework's four `screens`
   checks (only that job may write; never for a fork; one push, to `ci-screens`; one writer at a time), and: the
   `engines` job runs `pnpm build` and then `pnpm test:journeys` with `ENGINE: ${{ matrix.engine }}` after `same-hash`.
-- [ ] **Step 2: Extend `ci.yml`.** In `engines`, after `same-hash`: `pnpm build`, `pnpm test:journeys` with
+- [x] **Step 2: Extend `ci.yml`.** In `engines`, after `same-hash`: `pnpm build`, `pnpm test:journeys` with
   `ENGINE` set, and the framework's upload step (`screens-${{ matrix.engine }}`, `tests/**/__screenshots__/**`,
   `if: always()`). Add the framework's `screens` job, unchanged. Push; the three engine jobs fail on the build
   (`index.html` does not exist).
-- [ ] **Step 3: Implement** the page, the config, `copy-game.ts`, `serve.ts` and `open.ts`. Run `pnpm build` locally
+- [x] **Step 3: Implement** the page, the config, `copy-game.ts`, `serve.ts` and `open.ts`. Run `pnpm build` locally
   and check `dist/` holds `index.html`, `assets/`, `automata.toml` and the three content files.
-- [ ] **Step 4: Push; all jobs pass,** each engine's journeys included, and the `ci-screens` branch holds six
+- [x] **Step 4: Push; all jobs pass,** each engine's journeys included, and the `ci-screens` branch holds six
   pictures per engine under `pr-<number>/`. Note in the tracker that the branch now exists (it is the repo's one
   long-lived branch beside `main`).
-- [ ] **Step 5: Commit** (`feat: the game as a static page, with journeys in three browsers`).
+- [x] **Step 5: Commit** (`feat: the game as a static page, with journeys in three browsers`).
 
 ### Task 7: The README, the tracker and the close
 
@@ -787,23 +793,23 @@ test('a missing file is named', ...)
   `docs/superpowers/progress.md`
 - Test: `tests/docs/readme.test.ts`
 
-- [ ] **Step 1: Write the failing test** `tests/docs/readme.test.ts`: the README names every script in
+- [x] **Step 1: Write the failing test** `tests/docs/readme.test.ts`: the README names every script in
   `package.json`'s `scripts` that a person runs (`dev`, `build`, `content:write`, `lint`, `typecheck`); it names
   `automata.toml`, `content/` and `replays/level-1.json`; it does not contain `npm install @automataframework`
   (the package is not on npm before Release 1).
-- [ ] **Step 2: Push; `check` fails** on the README.
-- [ ] **Step 3: Write `README.md`,** in plain words: what this repo is (the demo game made with AutomataFramework,
+- [x] **Step 2: Push; `check` fails** on the README.
+- [x] **Step 3: Write `README.md`,** in plain words: what this repo is (the demo game made with AutomataFramework,
   and later the site's examples); how to play it (`pnpm install`, `pnpm dev`); where things are (the project file,
   the content files, the hero's code, the recording); how to change the game (edit a content file, run
   `pnpm content:write`, open a pull request; CI checks it in four engines); what the recording is and how a new one
   is taken (Task 4's words, and that the Owner sees before and after); that tests run only in GitHub Actions; the
   licence. No strategy, market, competitor or pricing words.
-- [ ] **Step 4: Push; all jobs pass.**
-- [ ] **Step 5: The whole-branch review** (`superpowers:executing-plans`, "Final Review"; a self-review, since the
+- [x] **Step 4: Push; all jobs pass.**
+- [x] **Step 5: The whole-branch review** (`superpowers:executing-plans`, "Final Review"; a self-review, since the
   project allows no subagents). Fix what it finds, test first.
-- [ ] **Step 6: Close the stage.** Mark the pull request ready, set the tracker's stage to 100%, and send the
+- [x] **Step 6: Close the stage.** Mark the pull request ready, set the tracker's stage to 100%, and send the
   coordinator the end summary: commits, test counts per job, the recording's `finalHash`, the two run numbers of
   Task 4 Step 5, every deviation, the deferred minors, and what is the Owner's: marking `check` and the three
   `engines` checks as required on `main` (repo settings, which no session can change), and looking at the pictures
   on `ci-screens`.
-- [ ] **Step 7: Commit** (`docs: the README and the tracker for M1`).
+- [x] **Step 7: Commit** (`docs: the README and the tracker for M1`).
