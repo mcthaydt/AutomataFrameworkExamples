@@ -59,7 +59,7 @@ package.
   public repos; the Owner keeps them in the project's private files.
 - **The first layer** is a thin slice through the whole offering: the framework, a demo game, the editors, the site and
   deployment, built as a thin thread through all four repos first and then widened (milestones M1 to M4).
-- **Repos:** AutomataFramework (this one), AutomataFrameworkExamples (the demo game, later the 3D game, the site's
+- **Repos:** AutomataFramework, AutomataFrameworkExamples (this one: the demo game, later the 3D game, the site's
   examples), AutomataFrameworkEditors, AutomataFrameworkSite. PixiJS is the biggest inspiration.
 - **Determinism means physics.** Rapier's deterministic 2D build. Physics and networking (Colyseus) are in the core,
   like the ECS (Koota).
