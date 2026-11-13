@@ -9,7 +9,7 @@ framework's own tracker are in AutomataFramework
 
 Plan: [`plans/2026-11-13-m1-thin-thread-examples.md`](plans/2026-11-13-m1-thin-thread-examples.md)
 
-Overall: **64%** (stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14, stage 6 is 12 and the
+Overall: **78%** (stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14, stage 6 is 12 and the
 Owner's review is the last 6; stage 1, the spec, was done in AutomataFramework)
 
 | Stage | State | Output |
@@ -18,7 +18,7 @@ Owner's review is the last 6; stage 1, the spec, was done in AutomataFramework)
 | 2. Plan (M1, Examples) | Done, 100% (in review) | `plans/2026-11-13-m1-thin-thread-examples.md` |
 | 3. Plan audit | Done, 100% (in review) | `audits/2026-11-13-m1-examples-plan-audit.md` |
 | 4. Execution | Done, 100% (in review) | the plan, ticked as it goes (each task is 14% of the stage, the close 2%) |
-| 5. Implementation audit | Not started | `audits/2026-11-13-m1-examples-implementation-audit.md` |
+| 5. Implementation audit | Done, 100% (in review) | `audits/2026-11-13-m1-examples-implementation-audit.md` |
 | 6. Fixes | Not started | |
 | 7. Owner review | Not started | |
 
@@ -31,6 +31,14 @@ Milestones, for this repo:
 
 ### Log
 
+- 2026-11-13: Stage 5. The implementation audit is written, for pull request 3 at `bc922f8` (CI run 43522330339
+  green: `check` 57 tests, each engine 20 browser, 5 replay and 14 journey tests; level 1 ends on
+  `77be68a6e1859241` in all four engines). Nothing blocks the merge. Four should-fix findings for stage 6: F1, the
+  journeys check the push against the real level's crate, so a crate an editor puts near the right wall or left of
+  the hero fails CI (they should play a level the tests own); F2, `corepack enable` fails on Node 25 and later; F3,
+  `CLAUDE.md` and the contract are behind the spec's Edit-saves-go-straight-in and don't name `test-game.json` as a
+  golden; F4, `readFrom` takes a host's web page for a game file. Seven minors noted. The four deferred minors and every
+  ruling were judged; all stand, and deferred minor 2 is raised to F4. Stage 6 applies F1 to F4.
 - 2026-11-13: Stage 4, Task 7 and the close. The README gets a stranger from clone to a changed game (install, play,
   change `crate-1`'s `x`, `pnpm content:write`, reload) and `tests/docs/readme.test.ts` reads it for the scripts and
   files it names. Audit B1, S4 and N5 are applied to the plan and `CLAUDE.md` (editors open pull requests). The
@@ -92,5 +100,6 @@ sessions were told the same on 2026-11-13.
 
 ### For the Owner
 
-- As soon as Task 4's checks are green (before any editor pull request; plan audit B1): mark `check` and the three `engines` checks as required on `main`, and turn on "Automatically delete head branches" (repo settings; no session can change them).
+- Done (read through the API on 2026-11-13): `check` and the three `engines` checks are required on `main`, and
+  "Automatically delete head branches" is on.
 - Look at the pictures CI copies to the `ci-screens` branch, for the drunk-grandma test.
