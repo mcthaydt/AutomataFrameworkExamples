@@ -7,10 +7,12 @@ The game is a small physics platformer. Right now it is one level: you are the r
 
 ## Start here
 
-**1. Install what it needs.** You need [Node](https://nodejs.org) 24.21.0 or later, `git`, and pnpm. pnpm comes with
-Node; switch it on once:
+**1. Install what it needs.** You need [Node](https://nodejs.org) 24.21.0 or later, `git`, and pnpm. pnpm is switched
+on by a small helper called Corepack. Node 25 and later no longer include it, so add it first (on Node 24 this does no
+harm), then switch pnpm on once:
 
 ```sh
+npm install --global corepack@latest
 corepack enable
 ```
 
@@ -54,7 +56,7 @@ what is wrong if something is.
 
 | Command | What it does |
 | --- | --- |
-| `pnpm dev` | Plays the game in your browser, and reloads when you change a file. |
+| `pnpm dev` | Plays the game in your browser, and reloads when you change the code. A content file needs a reload by hand. |
 | `pnpm build` | Makes `dist/`, a folder of plain files that plays the game from any address. |
 | `pnpm content:write` | Puts every content file in the standard form. Run it after you edit one by hand. |
 | `pnpm lint` | Checks the style of the code. `pnpm format` fixes what it can. |

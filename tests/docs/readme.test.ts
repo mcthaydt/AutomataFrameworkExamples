@@ -22,7 +22,10 @@ test('it names the game, its content and the recording', () => {
 })
 
 test('it starts with what to install, then how to play, then a first change', () => {
-  const at = ['corepack enable', 'pnpm dev', 'first change'].map((words) => readme.indexOf(words))
+  // Node 25 and later no longer ship Corepack, so the first command a stranger types installs it.
+  const at = ['npm install --global corepack', 'corepack enable', 'pnpm dev', 'first change'].map((words) =>
+    readme.indexOf(words),
+  )
   expect(at.every((position) => position >= 0)).toBe(true)
   expect(at).toEqual([...at].sort((a, b) => a - b))
 })
