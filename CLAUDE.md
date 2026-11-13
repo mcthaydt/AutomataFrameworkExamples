@@ -79,13 +79,17 @@ package.
 - **The demo game** is a small original physics platformer, single-player, with every built-in: saves; title, pause and
   settings screens; keyboard, touch and gamepad with remapping; music and sound with volume; phone, tablet and desktop
   layouts; languages.
-- **Editors:** all nine old 2D editors plus the figure and environment builders, which make 2D art only. In the
-  browser, and as a Tauri app for iPad, Android and desktop.
+- **Editors:** all nine old 2D editors plus the figure and environment builders, which make 2D art only, combined
+  into five: World (Levels, Tiles, the environment builder), Characters (the figure builder, clips and entity kinds,
+  Schematic), Feel (Feel, Tuner), Sound (Audio) and Story (Writer, Sequence). World and Characters have a 2D and a 3D
+  version; the 2D ones work the way the old 3D builders did. In the browser, and as a Tauri app for iPad, Android
+  and desktop.
 - **Edits live in the game's GitHub repo.** Save makes a commit or a pull request, by the person's level (see "Editors
   save here" below); edits that collide merge the way GitHub does. Sign-in runs through a Cloudflare Pages Function;
   the site is on Cloudflare Pages.
 - **Formats:** game content is JSON; everything else is TOML.
-- **Order inside the editors:** Levels, then Feel and Tuner (the first editor slice), then every other 2D editor.
+- **Order inside the editors:** World's Levels part (M1), then Feel with Tuner inside it (the first editor slice),
+  then the rest of the five.
 - **Releases are big and few** (the Owner, 2026-11-13). Release 1 is when 2D is finished (the framework in full and
   the demo game), Release 2 the 2D editors, Release 3 the website, Release 4 distribution (shipping games and the
   editor app), Release 5 3D, and the loop repeats for 3D. Milestones are not releases: nothing is published per
@@ -148,6 +152,8 @@ implementations or incomplete integrations. Do your best work."
   first-time player must learn what to do, how to do it and that they did it; a first-time developer must get from
   clone to a changed game by following the README.
 - No subagents unless the Owner says so.
+- **CLI first.** If something can be done with a CLI (gh, npm, wrangler and the like), do it with the CLI, and give
+  the Owner CLI commands rather than click-through steps.
 - **No AI attribution anywhere.** No `Co-Authored-By: Claude`, no session-link trailer and no "Generated with Claude Code" in
   commits, pull request bodies or docs (the Owner, 2026-11-13). Before any commit, set the author with
   `git config --global user.name "Dawson McThay" && git config --global user.email "107786093+mcthaydt@users.noreply.github.com"`.
