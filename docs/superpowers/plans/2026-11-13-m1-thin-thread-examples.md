@@ -503,7 +503,7 @@ export function saveHashes(played: Played): Promise<void>
   the golden it is the Owner who sees before and after. The framework's audit already asks M2 for a replay that
   tells "code changed" from "content changed" (its M4); that plan should settle who re-records and when.
 
-- [ ] **Step 1: Write the failing tests.** `tests/lib/same-hash.test.ts`:
+- [x] **Step 1: Write the failing tests.** `tests/lib/same-hash.test.ts`:
 
 ```ts
 const run = (engine: string, finalHash: string, hashes: string[]) =>
@@ -548,20 +548,20 @@ test('the recording is written the one standard way', ...)   // writeReplay(pars
 
   `tests/workflows/ci.test.ts` gains: the `engines` job runs, in this order, `pnpm test:engine ${{ matrix.engine }}`,
   `pnpm vitest run --project node tests/replay` and `pnpm same-hash node ${{ matrix.engine }}`.
-- [ ] **Step 2: Add those two steps to the `engines` job** after `pnpm test:engine`. Push; `check` fails because
+- [x] **Step 2: Add those two steps to the `engines` job** after `pnpm test:engine`. Push; `check` fails because
   `same-hash.ts` does not exist.
-- [ ] **Step 3: Implement** `same-hash.ts`, the script and the fixtures, with no `replays/level-1.json` yet. Push;
+- [x] **Step 3: Implement** `same-hash.ts`, the script and the fixtures, with no `replays/level-1.json` yet. Push;
   the Node tests now fail with `REPLAY NOT RECORDED` and nothing else. Copy the recording from the Node job's log
   into `replays/level-1.json` exactly as printed.
-- [ ] **Step 4: Push; all jobs pass,** and each engine job's log has the line
+- [x] **Step 4: Push; all jobs pass,** and each engine job's log has the line
   `node and <engine> both ended on <hash>.` with one hash across the three jobs, equal to the recording's `finalHash`.
   If a browser differs from Node, stop and report: that is a determinism defect, not a flake.
-- [ ] **Step 5: Prove the editor's case once, by hand, on the branch.** Push a commit that only changes `crate-1`'s
+- [x] **Step 5: Prove the editor's case once, by hand, on the branch.** Push a commit that only changes `crate-1`'s
   `x` to `11.5` in `level-1.json`. Every job must pass, the three `same-hash` lines must agree on one hash that is
   *not* the recording's `finalHash`, and the Node log must carry the "level changed" line. Then push the revert. Put
   both run numbers in the coordinator's line. (Task 6's journey keeps this proven; this step shows it in CI's own
   terms before the page exists.)
-- [ ] **Step 6: Commit** (`feat(replay): the recorded play of level 1, compared across four engines`).
+- [x] **Step 6: Commit** (`feat(replay): the recorded play of level 1, compared across four engines`).
 
 ### Task 5: The page's pieces
 
