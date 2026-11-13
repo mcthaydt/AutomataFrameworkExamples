@@ -30,6 +30,8 @@ export interface Opened {
   readonly page: Page
   /** Console errors and uncaught errors seen so far. */
   readonly errors: string[]
+  /** Content-Security-Policy violations the page reported, as "directive: blocked thing". Empty unless `csp` was set. */
+  readonly violations: string[]
   close(): Promise<void>
 }
 
@@ -50,7 +52,12 @@ export async function closeBrowser(): Promise<void> {
  * fetches (by its path from the game's root); `undefined` answers 404.
  */
 export async function openGame(
-  options: { size?: keyof typeof SIZES; files?: Readonly<Record<string, string | undefined>> } = {},
+  options: {
+    size?: keyof typeof SIZES
+    files?: Readonly<Record<string, string | undefined>>
+    /** A Content-Security-Policy to put on the page, as a host would; the page's violations come back in `violations`. */
+    csp?: string
+  } = {},
 ): Promise<Opened> {
   const size = SIZES[options.size ?? 'desktop-1280x720']
   const context = await (await launch()).newContext({
@@ -64,9 +71,27 @@ export async function openGame(
   })
   page.on('pageerror', (error) => errors.push(error.message))
 
+  const violations: string[] = []
+  const { csp } = options
+  if (csp !== undefined) {
+    await page.exposeFunction('automataViolation', (what: string) => violations.push(what))
+    await page.addInitScript(() => {
+      document.addEventListener('securitypolicyviolation', (event) => {
+        void (window as unknown as { automataViolation(what: string): void }).automataViolation(
+          `${event.effectiveDirective}: ${event.blockedURI} ${event.sample}`,
+        )
+      })
+    })
+  }
+
   const base = new URL(inject('siteUrl'))
   const files = options.files ?? {}
   await page.route('**/*', async (route) => {
+    // A host sends the policy with the page itself; every other file is served as it is.
+    if (csp !== undefined && route.request().resourceType() === 'document') {
+      const response = await route.fetch()
+      return route.fulfill({ response, headers: { ...response.headers(), 'content-security-policy': csp } })
+    }
     const path = decodeURIComponent(new URL(route.request().url()).pathname.slice(base.pathname.length))
     if (!(path in files)) return route.continue()
     const body = files[path]
@@ -78,7 +103,7 @@ export async function openGame(
   await page.waitForSelector('#game[data-state="playing"], #game[data-state="problem"]', {
     state: 'attached',
   })
-  return { page, errors, close: () => context.close() }
+  return { page, errors, violations, close: () => context.close() }
 }
 
 /** The play so far, from the page. */

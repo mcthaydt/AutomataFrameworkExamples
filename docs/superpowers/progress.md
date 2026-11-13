@@ -31,6 +31,13 @@ Milestones, for this repo:
 
 ### Log
 
+- 2026-11-13: The pin moved from `2a8b09f` to `9109fa357193f57e2d12271c6e6b58dbd783b427` (AutomataFramework pull
+  request 19, "stop zod's eval probe before anything else loads"). Under the Site's strict CSP
+  (`script-src 'self' 'wasm-unsafe-eval'`) Firefox logged a blocked eval from `/play/assets/headless-*.js`: zod probes
+  `new Function` the first time a schema needs it, and the headless modules built schemas before the switch that stops
+  the probe ran. Both entries now import a module that sets it first. No game code changed; the framework's own tests
+  load each entry with `Function` throwing and count the attempts in all three browsers.
+
 - 2026-11-13: The words now sit in a strip of their own above the game, not over its top (the Owner's sideways-layout
   rule: held sideways on a phone the level fills the height, and the words hid its upper wall). The cause was this
   repo's page, not the framework: `.play-words` was laid over the stage. `.play-root` is now a flex column (the
