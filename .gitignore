@@ -1,0 +1,7 @@
+node_modules/
+dist/
+coverage/
+.superpowers/
+*.tsbuildinfo
+__screenshots__/
+.hashes/
