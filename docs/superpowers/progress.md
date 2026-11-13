@@ -31,6 +31,16 @@ Milestones, for this repo:
 
 ### Log
 
+- 2026-11-13: The words now sit in a strip of their own above the game, not over its top (the Owner's sideways-layout
+  rule: held sideways on a phone the level fills the height, and the words hid its upper wall). The cause was this
+  repo's page, not the framework: `.play-words` was laid over the stage. `.play-root` is now a flex column (the
+  words, then the stage), the canvas is taken out of the flow so its own size cannot decide the stage's, and
+  `index.html`'s `#game` rule no longer sets `display` (an id rule beat the class and kept the root from being flex;
+  found by looking at the first build, where the level was cut off). Tests first: a browser test and
+  `tests/journeys/words.journey.test.ts` (at every size the words end where the canvas begins and the canvas runs to
+  the bottom of the window), red on the old page in all three engines, and the two older journey checks that
+  expected a window-sized canvas now expect the strip. A framework note, not a patch: a mount whose height comes from
+  its own canvas can grow past its container; a canvas that is not in the flow avoids it.
 - 2026-11-13: The pin moved from `ec4fddd` to `2a8b09f` (AutomataFramework pull request 14, "keep the touch buttons off
   the play area": the level is now fitted above the touch buttons). `tests/journeys/layout.journey.test.ts` looks at a
   picture of the page after a first touch, finds the hero (the one red thing) and checks that Left, Right and Jump sit
