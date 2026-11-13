@@ -3,6 +3,7 @@
 // with anything; CI copies them to the `ci-screens` branch, and the checks here are about the words, not the pixels.
 import { afterAll, afterEach, expect, test } from 'vitest'
 import { WORDS } from '#src/features/play/words.ts'
+import { pinnedFiles } from '../fixtures/pinned-level.ts'
 import { closeBrowser, type Opened, openGame, SIZES, untilTick } from './open.ts'
 
 const OUT = 'tests/journeys/__screenshots__'
@@ -52,7 +53,8 @@ test('how it looks when a file is broken', async () => {
 })
 
 test('how it looks when the crate has been pushed', async () => {
-  opened = await openGame({ size: 'phone-390x844' })
+  // The pinned level, so the crate is where the push needs it whatever an editor has done to the real level.
+  opened = await openGame({ size: 'phone-390x844', files: pinnedFiles })
   const { page } = opened
   await page.keyboard.down('ArrowRight')
   await untilTick(page, 180)
