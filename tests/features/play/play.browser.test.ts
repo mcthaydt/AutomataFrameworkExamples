@@ -1,14 +1,14 @@
 // The page's pieces in each real browser: real DOM, real key and pointer events, hand-driven frames. The test game
 // (`tests/fixtures/test-game.ts`) is the one played, so no editor's change to the real level can break these.
-import { Player, parseContent, Transform, writeContent } from '@automataframework/framework'
+import { Player, Transform } from '@automataframework/framework'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { userEvent } from 'vitest/browser'
 import { type Play, type PlayOptions, play, readFrom, WORDS } from '#src/features/play/play.ts'
 import { manualFrames } from '../../fixtures/frames.ts'
-import { readTestGame, testGameFiles } from '../../fixtures/test-game.ts'
+import { readTestGame } from '../../fixtures/test-game.ts'
+import { LEVEL, levelWithCrate } from '../../fixtures/test-game-recording.ts'
 
 const FRAME = 1000 / 60
-const LEVEL = 'content/levels/level-1.json'
 
 let root: HTMLDivElement
 let running: Play | undefined
@@ -33,16 +33,6 @@ afterEach(() => {
   root.remove()
   vi.restoreAllMocks()
 })
-
-/** A level of the test game with the crate 4 tiles to the right of the hero's start. */
-function levelWithCrate(): string {
-  const parsed = parseContent('level', testGameFiles[LEVEL] ?? '', LEVEL)
-  if (!parsed.ok) throw new Error('the test game level did not parse')
-  return writeContent('level', {
-    ...parsed.value,
-    things: [{ id: 'crate-1', character: 'crate', x: 14.5, y: 7.5 }],
-  })
-}
 
 async function begin(
   extra: { files?: Record<string, string | undefined>; coarse?: boolean } & Partial<PlayOptions> = {},

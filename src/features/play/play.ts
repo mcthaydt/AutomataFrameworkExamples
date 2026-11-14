@@ -1,28 +1,36 @@
 // The page: loads the game's files, starts the game in an element, and puts words on top of it. The sim decides
 // everything; this file only shows it and says what to do. Whatever goes wrong becomes a screen of plain words, never
-// a blank canvas and never an error nobody reads.
+// a blank canvas and never an error nobody reads. In `watch` mode the game first plays its own recording by itself, and
+// `takeOver` hands the same page over to a player, from the start of the level, with nothing reloaded.
 import {
   type Diagnostic,
   type Frames,
   type Game,
+  type GameContent,
   type Host,
   loadGame,
+  type Replay,
   startGame,
   Thing,
   Transform,
+  type Watch,
+  watchReplay,
   webHost,
 } from '@automataframework/framework'
 import { gamePlugins } from '../plugins/plugins.ts'
 import { CONTROLS } from './controls.ts'
 import './blueprint.css'
 import './play.css'
+import type { Mode } from './mode.ts'
+import { whileSeen } from './seen.ts'
+import { listenToTakeOver, loadRecording } from './watching.ts'
 import { WORDS } from './words.ts'
 
 export { CONTROLS } from './controls.ts'
 export { readFrom } from './read.ts'
 export { WORDS } from './words.ts'
 
-export type PlayState = 'loading' | 'playing' | 'problem'
+export type PlayState = 'loading' | 'watching' | 'playing' | 'problem'
 
 export interface PlayOptions {
   readonly root: HTMLElement
@@ -35,12 +43,23 @@ export interface PlayOptions {
   readonly coarse?: boolean
   /** Default `startGame`; a test passes one that throws. */
   readonly start?: typeof startGame
+  /** Default `'play'`: `'watch'` plays the first level's recording by itself until `takeOver`. */
+  readonly mode?: Mode
+  /** Default `watchReplay`; a test passes one that throws. */
+  readonly watch?: typeof watchReplay
+  /** Called each time the state changes, `loading` excluded. */
+  readonly onState?: (state: Exclude<PlayState, 'loading'>) => void
 }
 
 export interface Play {
-  readonly state: 'playing' | 'problem'
-  /** `undefined` on a problem. */
+  /** A getter: it changes on hand-over. */
+  readonly state: 'watching' | 'playing' | 'problem'
+  /** `undefined` while watching and on a problem. */
   readonly game: Game | undefined
+  /** The recording that is playing; `undefined` unless watching. Its sim and rounds say how far it has got. */
+  readonly watch: Watch | undefined
+  /** Watching: stops the recording and starts the level with the controls live. Otherwise does nothing. */
+  takeOver(): Promise<void>
   /** Stops the game and empties the root. Safe to call twice. */
   stop(): void
 }
@@ -55,7 +74,7 @@ const pageFrames: Frames = {
 }
 
 /** The same frames, with `after` called once each time a frame has been delivered to the game. */
-function watching(frames: Frames, after: () => void): Frames {
+function observing(frames: Frames, after: () => void): Frames {
   return {
     request: (callback) =>
       frames.request((ms) => {
@@ -94,22 +113,67 @@ const lineOf = (d: Diagnostic): ProblemLine => ({
 
 /** Loads the game through `read` and starts it in `root`. Never rejects: anything that goes wrong is a screen of words. */
 export async function play(options: PlayOptions): Promise<Play> {
-  const { root, read, host = webHost(), start = startGame } = options
+  const { root, read, host = webHost(), start = startGame, mode = 'play', watch = watchReplay } = options
   const coarse = options.coarse ?? window.matchMedia('(pointer: coarse)').matches
+  const frames = options.frames ?? pageFrames
+  let state: PlayState = 'loading'
   let game: Game | undefined
+  let watching: Watch | undefined
+  let seen: (Host & { destroy(): void }) | undefined
+  let unlistenTakeOver: (() => void) | undefined
+  let takingOver: Promise<void> | undefined
   let stopped = false
   let onTouch: ((event: PointerEvent) => void) | undefined
+  // What `begin` needs, once the game's files have loaded.
+  let content: GameContent
+  let stage: HTMLElement
+  let words: HTMLElement
 
-  const setState = (state: PlayState): void => {
-    root.dataset.state = state
+  const setState = (next: PlayState): void => {
+    state = next
+    root.dataset.state = next
+    if (next !== 'loading') options.onState?.(next)
+  }
+  /** Stops watching: the listeners, the recording and what looks at the window. The root is left as it is. */
+  const stopWatching = (): void => {
+    unlistenTakeOver?.()
+    unlistenTakeOver = undefined
+    watching?.stop()
+    watching = undefined
+    seen?.destroy()
+    seen = undefined
   }
   const stop = (): void => {
     if (stopped) return
     stopped = true
     if (onTouch !== undefined) root.removeEventListener('pointerdown', onTouch)
+    stopWatching()
     game?.stop()
     root.replaceChildren()
     root.classList.remove('play-root')
+  }
+  // Only handed out once loading is over, so its state is never `loading`.
+  const made: Play = {
+    get state() {
+      return state as Exclude<PlayState, 'loading'>
+    },
+    get game() {
+      return game
+    },
+    get watch() {
+      return watching
+    },
+    takeOver() {
+      if (state !== 'watching') return Promise.resolve()
+      // A second press while the first is starting the game is the same hand-over, not another game.
+      takingOver ??= (async () => {
+        stopWatching()
+        stage.replaceChildren()
+        await begin()
+      })()
+      return takingOver
+    },
+    stop,
   }
 
   /**
@@ -118,6 +182,7 @@ export async function play(options: PlayOptions): Promise<Play> {
    * as `formatDiagnostic` gives them.
    */
   const problem = (title: string, lines: readonly ProblemLine[], fix: boolean): Play => {
+    stopWatching()
     root.replaceChildren()
     const screen = element('div', 'play-problem')
     screen.setAttribute('role', 'alert')
@@ -132,24 +197,13 @@ export async function play(options: PlayOptions): Promise<Play> {
     screen.append(element('h1', '', title), list)
     if (fix) screen.append(element('p', '', WORDS.problemFix))
     root.append(screen)
+    game = undefined
     setState('problem')
-    return { state: 'problem', game: undefined, stop }
+    return made
   }
 
-  root.replaceChildren()
-  root.classList.add('play-root')
-  setState('loading')
-  const words = element('div', 'play-words')
-  words.append(element('p', 'play-loading', WORDS.loading))
-  root.append(words)
-
-  try {
-    const loaded = await loadGame(read)
-    if (!loaded.ok) return problem(WORDS.problemTitle, loaded.diagnostics.map(lineOf), true)
-    const content = loaded.value
-
-    const stage = element('div', 'play-stage')
-    root.append(stage)
+  /** The game for a player: the goal and how to move in the strip, the level on the stage, the controls live. */
+  const begin = async (): Promise<void> => {
     const goal = element('p', 'play-goal', WORDS.goal)
     const how = element('p', 'play-how', coarse ? WORDS.touch : WORDS.keys)
     words.replaceChildren(goal, how)
@@ -176,20 +230,73 @@ export async function play(options: PlayOptions): Promise<Play> {
       goal.classList.add('play-done')
     }
 
+    let started: Game
     try {
-      game = await start({
+      started = await start({
         content,
         plugins: gamePlugins,
         mount: stage,
         controls: CONTROLS,
         host,
-        frames: watching(options.frames ?? pageFrames, observe),
+        frames: observing(frames, observe),
       })
     } catch (error) {
-      return problem(WORDS.cannotStart, [{ what: reasonOf(error) }], false)
+      problem(WORDS.cannotStart, [{ what: reasonOf(error) }], false)
+      return
     }
+    if (stopped) {
+      started.stop()
+      return
+    }
+    game = started
     setState('playing')
-    return { state: 'playing', game, stop }
+  }
+
+  /**
+   * Plays the recording by itself, with the strip saying so, and listens for what hands the page to a player.
+   * `false`, with the stage as it was, when the recording cannot be watched: the visitor then gets the game.
+   */
+  const watchIt = async (recording: Replay): Promise<boolean> => {
+    const looking = whileSeen(host, root)
+    try {
+      watching = await watch({
+        content,
+        plugins: gamePlugins,
+        mount: stage,
+        host: looking,
+        frames,
+        replay: recording,
+      })
+    } catch (error) {
+      looking.destroy()
+      console.info(`The game could not play its recording (${reasonOf(error)}), so it opens ready to play.`)
+      return false
+    }
+    seen = looking
+    words.replaceChildren(element('p', 'play-watching', WORDS.watching))
+    unlistenTakeOver = listenToTakeOver(root, () => void made.takeOver())
+    setState('watching')
+    return true
+  }
+
+  root.replaceChildren()
+  root.classList.add('play-root')
+  setState('loading')
+  words = element('div', 'play-words')
+  words.append(element('p', 'play-loading', WORDS.loading))
+  root.append(words)
+
+  try {
+    const loaded = await loadGame(read)
+    if (!loaded.ok) return problem(WORDS.problemTitle, loaded.diagnostics.map(lineOf), true)
+    content = loaded.value
+
+    stage = element('div', 'play-stage')
+    root.append(stage)
+    const recording = mode === 'watch' ? await loadRecording(content.project.start, read) : undefined
+    if (recording !== undefined && (await watchIt(recording))) return made
+    await begin()
+    return made
   } catch (error) {
     // `loadGame` reports a bad file as words; this is a read that failed in some other way.
     return problem(WORDS.cannotStart, [{ what: reasonOf(error) }], false)
