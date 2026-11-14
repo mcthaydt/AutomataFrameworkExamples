@@ -27,6 +27,15 @@ stage 6 is 12 and the Owner's review is the last 6)
 
 ### Log
 
+- 2026-11-14: Stage 4, Part C (Tasks 3 to 6), after the Owner's answers (Q1 a, Q2 a, Q3 b, Q4 a; recorded in the spec
+  addendum and the plan). The game opens watching with `?watch`: it plays `replays/level-1.json` by itself through the
+  framework's `watchReplay`, says "The game is playing by itself. Tap it to play.", and a click, tap, Enter, Space or
+  control key hands the same page to a player from the start of the level (`takeOver`); a page that frames it hears
+  `{ automata: 'state', state }` and says `{ automata: 'play' }`, each at the game's own origin only. A missing or broken
+  recording opens the ordinary game with one sentence in the console. The build copies the recording into `dist/`.
+  Rulings: the page's watching tests are in their own `watch.browser.test.ts` (play.browser.test.ts was already long);
+  the held-key test uses a key that is no control, since a control key hands over (Q2 a); `play.ts` is 304 lines, the
+  watching half's helpers already live in `watching.ts`. Nothing under `replays/` changed.
 - 2026-11-14: Stage 4, Task 2 (the plan's Part B). The framework pin moves from `874f7d5` to `cc281c9` (AutomataFramework
   pull request 29: `watchReplay` draws a recorded play with no input, which the game's `?watch` mode, Part C, uses). The
   change is the dependency, its `onlyBuiltDependencies` line and the lockfile; nothing else, so the game and both
