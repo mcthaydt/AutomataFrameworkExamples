@@ -33,3 +33,13 @@ test('it starts with what to install, then how to play, then a first change', ()
 test('it does not send anyone to npm for a package that is not there yet', () => {
   expect(readme).not.toContain('npm install @automataframework')
 })
+
+test('it says how to watch the game play itself, with the address, the file and both messages as the game writes them', () => {
+  expect(readme).toContain('## Watch it play itself')
+  expect(readme).toContain('?watch')
+  expect(readme).toContain('replays/level-1.json')
+  expect(readme).toContain(
+    JSON.stringify({ automata: 'state', state: 'watching' }, null, 1).replace(/\n\s*/g, ' '),
+  )
+  expect(readme).toContain(JSON.stringify({ automata: 'play' }, null, 1).replace(/\n\s*/g, ' '))
+})

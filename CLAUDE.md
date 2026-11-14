@@ -51,6 +51,7 @@ particular to this repo added under "This repo".
 - **Licence notices.** `public/licences.txt` (Vite copies it into `dist/`, beside the page) carries the notices of
   Fredoka and the icons, copied from each package's own `LICENSE`. Move either package's version, and copy its
   `LICENSE` there again; `tests/game/licences.test.ts` fails until you do.
+- **Watch mode.** With `?watch` in its address the game plays `replays/<first level>.json` by itself (the framework's `watchReplay`), says so, and hands over to a player on a tap, a click, Enter, Space or a control key, or when the page that frames it posts `{ automata: 'play' }`. It tells that page `{ automata: 'state', state }`. The build copies the recording into `dist/`. A missing or broken recording is never a problem screen: the game opens ready to play (the Owner's answers, 2026-11-14: it plays for everyone, again and again, with a one-second rest).
 - **Nothing is published from here.** No changesets, no API report, no release workflow. `pnpm build` makes `dist/`,
   a static folder that plays the game from any path; the Site repo builds and hosts it.
 - **`ci-screens`** is a long-lived branch CI writes pictures to (phone, tablet and desktop, upright and sideways),
