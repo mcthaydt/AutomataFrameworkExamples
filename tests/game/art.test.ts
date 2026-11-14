@@ -30,7 +30,8 @@ const levelColours = (): { sky: string; ground: string } => {
     join(import.meta.dirname, '..', '..', 'content', 'levels', 'level-1.json'),
     'utf8',
   )
-  return JSON.parse(file) as { sky: string; ground: string }
+  const { sky, ground } = JSON.parse(file) as { sky: string; ground: string }
+  return { sky, ground }
 }
 
 /** The WCAG relative luminance of `#rrggbb`. */
