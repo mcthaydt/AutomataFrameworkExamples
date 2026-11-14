@@ -25,6 +25,8 @@ stage 6 is 12 and the Owner's review is the last 6)
 
 ### Log
 
+- 2026-11-14: The Owner answered the audit's Q1: (a), the words stay as they are until M2 gives the boxes real
+  characters. Q2 (may an editor change the demo's colours) is still open, so F2 still waits.
 - 2026-11-14: Stage 5. The implementation audit is written, for `main` at `1aca8cf` (CI run 43552571486 green in
   `check` and all three `engines` jobs). It is a design audit: the code, the 33 pictures of pull request 20 and the 33
   of `main` were read against the spec's "Visual direction" and the Owner's decisions. Nothing blocks. Four things for

@@ -200,7 +200,7 @@ colour-blindness the two boxes come out as two close shades of tan (1.35 to 1). 
 hero is a little narrower, starts on the left, and is the one that moves when a key is pressed.
 
 - **(a) Leave it until M2.** The demo's boxes become real characters from the figure builder in M2, and shape then
-  tells them apart. Nothing changes now. Recommended, if M2 is next.
+  tells them apart. Nothing changes now. Recommended, if M2 is next. **The Owner's answer (2026-11-14): (a).**
 - **(b) Add a second clue to the words now**, for example "You are the pink box on the left. Push the green box." The
   words are the Owner's to give.
 - **(c) Add a second clue to the art now**, such as a different shape or size for the hero. This changes content and,
