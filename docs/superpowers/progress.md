@@ -25,6 +25,12 @@ stage 6 is 12 and the Owner's review is the last 6)
 
 ### Log
 
+- 2026-11-14: Stage 4, a second deviation the coordinator asked for: the fonts (the Owner: 2A, one font). The screens'
+  one font is Fredoka (`@fontsource/fredoka` 5.3.0, the `latin-600` file); IBM Plex Sans Condensed and JetBrains Mono
+  and the "measuring font" for a problem's file path are gone, so a path is told apart by its quieter colour. Nothing
+  is set below 18 pixels any more (the touch labels and the path line were 15), and `font-synthesis: none` stops a
+  browser faking a weight. The Korean and Chinese partner fonts (M PLUS Rounded 1c, Jua, ZCOOL KuaiLe) join with the
+  first translation, since the words exist in English only so far. Goldens untouched.
 - 2026-11-14: Stage 4, the last part of palette No. 276 for the art (Examples pull request 19): `level-1.json` sets
   `sky` Black `#111314` and `ground` Seashell Pink `#fdd4bd`. Chosen from the four colours of the palette so both boxes
   stand clear of the sky behind them: the pink hero is 7.3 to 1 and the green crate 11.1 to 1 against Black (against

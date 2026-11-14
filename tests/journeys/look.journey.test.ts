@@ -78,7 +78,7 @@ for (const [name, size] of sizes) {
     const look = await pageLook(page)
     expect(look.body).toBe(PAPER)
     expect(look.strip).toBe(PAPER)
-    expect(await fontLoaded(page, 'IBM Plex Sans Condensed', '600')).toBe(true)
+    expect(await fontLoaded(page, 'Fredoka', '600')).toBe(true)
     expect(look.sideways, 'nothing scrolls sideways').toBe(false)
 
     if (!size.touch) return

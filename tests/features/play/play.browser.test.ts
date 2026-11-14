@@ -97,7 +97,7 @@ const fontLoaded = (family: string, weight: string): boolean =>
 
 /** Draws with the label font once, so its file has been asked for and arrived before a test looks at the words. */
 const labelFontReady = async (): Promise<void> => {
-  await document.fonts.load("600 18px 'IBM Plex Sans Condensed'")
+  await document.fonts.load("600 18px 'Fredoka'")
 }
 
 /** The WCAG contrast ratio of two computed `rgb()` colours. */
@@ -113,7 +113,7 @@ function contrast(a: string, b: string): number {
   return ((hi ?? 0) + 0.05) / ((lo ?? 0) + 0.05)
 }
 
-/** The first family of an element's font, without quotes: WebKit writes `IBM Plex Sans Condensed`, the others quote it. */
+/** The first family of an element's font, without quotes: WebKit writes `Fredoka`, the others quote it. */
 const firstFamily = (element: Element): string =>
   (getComputedStyle(element).fontFamily.split(',')[0] ?? '').replace(/["']/g, '').trim()
 
@@ -277,9 +277,11 @@ test('the words are chalk on black paper, in the label font', async () => {
   expect(getComputedStyle(words).backgroundColor).toBe(PAPER)
   expect(getComputedStyle(goal).color).toBe(CHALK)
   expect(getComputedStyle(how).color).toBe(PENCIL)
-  expect(firstFamily(goal)).toBe('IBM Plex Sans Condensed')
-  expect(fontLoaded('IBM Plex Sans Condensed', '600')).toBe(true)
+  expect(firstFamily(goal)).toBe('Fredoka')
+  expect(fontLoaded('Fredoka', '600')).toBe(true)
   expect(getComputedStyle(goal).textTransform).toBe('none')
+  // Fredoka has no Korean or Chinese, and a faked bold would blur the partner fonts those will use later.
+  expect(getComputedStyle(goal).fontSynthesisWeight).toBe('none')
 })
 
 test('every word can be read: each text and its ground reach 4.5 to 1', () => {
@@ -305,6 +307,9 @@ test('a touch button is a paper chip with a chalk edge', async () => {
     expect(style.borderTopLeftRadius).toBe('2px')
     expect(style.color).toBe(CHALK)
     expect(style.textTransform).toBe('uppercase')
+    // The label is as big as the words: nothing on the screen is set smaller than 18 pixels.
+    expect(Number.parseFloat(style.fontSize), b.textContent ?? '').toBeGreaterThanOrEqual(18)
+    expect((style.fontFamily.split(',')[0] ?? '').replace(/["']/g, '').trim()).toBe('Fredoka')
     expect(style.transitionDuration).toBe('0s')
     expect(b.offsetWidth).toBeGreaterThanOrEqual(64)
     expect(b.offsetHeight).toBeGreaterThanOrEqual(64)
@@ -394,21 +399,21 @@ test('a long file name does not push the problem screen wider than the screen', 
   expect(screen.scrollWidth).toBeLessThanOrEqual(screen.clientWidth)
 })
 
-test('a problem says where in the measuring font and what in plain words', async () => {
+test('a problem says where and what, both in the one font and both 18 pixels or more', async () => {
   await begin({
     files: { [LEVEL]: '{ "format": 1,', 'content/characters/crate.json': undefined },
   })
-  await document.fonts.load("400 15px 'JetBrains Mono'")
+  await labelFontReady()
   const items = [...root.querySelectorAll('.play-problem li')]
   expect(items).toHaveLength(2)
   for (const item of items) {
     const where = item.querySelector('.play-where')
     const what = item.querySelector('.play-what')
     if (where === null || what === null) throw new Error(`no two parts in "${item.textContent}"`)
-    expect(firstFamily(where)).toBe('JetBrains Mono')
+    expect(firstFamily(where)).toBe('Fredoka')
     expect(getComputedStyle(where).color).toBe(PENCIL)
-    expect(getComputedStyle(where).fontSize).toBe('15px')
-    expect(firstFamily(what)).toBe('IBM Plex Sans Condensed')
+    expect(getComputedStyle(where).fontSize).toBe('18px')
+    expect(firstFamily(what)).toBe('Fredoka')
     expect(getComputedStyle(what).color).toBe(CHALK)
     expect(getComputedStyle(what).fontSize).toBe('18px')
     expect(getComputedStyle(where).display).toBe('inline')
@@ -419,7 +424,7 @@ test('a problem says where in the measuring font and what in plain words', async
     'content/levels/level-1.json: This file is not valid JSON. Check for a missing comma, quote or bracket.',
     'content/characters/crate.json: This file is listed in automata.toml but is missing.',
   ])
-  expect(fontLoaded('JetBrains Mono', '400')).toBe(true)
+  expect(fontLoaded('Fredoka', '600')).toBe(true)
 })
 
 test('a game that cannot start has one plain line and no place', async () => {

@@ -86,15 +86,15 @@ test('the label font and the icons are files beside the page', async () => {
   // The buttons (and so their pictures) are only drawn once a finger is on the screen.
   await page.touchscreen.tap(195, 422)
   const found = opened
-  await expect.poll(() => answeredOk(found, /ibm-plex-sans-condensed-latin-600-normal.*\.woff2$/)).toBe(true)
+  await expect.poll(() => answeredOk(found, /fredoka-latin-600-normal.*\.woff2$/)).toBe(true)
   await expect.poll(() => answeredOk(found, /arrow-left.*\.svg$/)).toBe(true)
   expectOnlyOwnFiles(found)
 })
 
-test("the problem screen's fonts are files beside the page", async () => {
+test("the problem screen's font and picture are files beside the page", async () => {
   opened = await openGame({ size: 'phone-390x844', files: { [LEVEL]: '{ "format": 1,' } })
   const found = opened
-  await expect.poll(() => answeredOk(found, /jetbrains-mono-latin-400-normal.*\.woff2$/)).toBe(true)
+  await expect.poll(() => answeredOk(found, /fredoka-latin-600-normal.*\.woff2$/)).toBe(true)
   await expect.poll(() => answeredOk(found, /warning.*\.svg$/)).toBe(true)
   expectOnlyOwnFiles(found)
 })

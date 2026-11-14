@@ -24,18 +24,17 @@ test('the commit allowed to build is the commit that is pinned', () =>
 test('the game depends on nothing but the framework', () =>
   expect(Object.keys(manifest.dependencies)).toEqual(['@automataframework/framework']))
 
-// The Blueprint look's fonts and icons are build inputs: CSS names them, Vite copies the files into `dist/`, and no code
-// imports them. The Owner approved these three (2026-11-14) at these versions; anything else needs a new yes.
-test("the look's three packages are build inputs at exact versions, and there are no others", () => {
+// The look's font and icons are build inputs: CSS names them, Vite copies the files into `dist/`, and no code
+// imports them. The Owner approved these two (2026-11-14: the icons, and Fredoka as the one font) at these versions;
+// anything else needs a new yes.
+test("the look's two packages are build inputs at exact versions, and there are no others", () => {
   expect(manifest.devDependencies).toMatchObject({
-    '@fontsource/ibm-plex-sans-condensed': '5.3.0',
-    '@fontsource/jetbrains-mono': '5.3.0',
+    '@fontsource/fredoka': '5.3.0',
     '@phosphor-icons/core': '2.1.1',
   })
   expect(Object.keys(manifest.devDependencies).sort()).toEqual([
     '@biomejs/biome',
-    '@fontsource/ibm-plex-sans-condensed',
-    '@fontsource/jetbrains-mono',
+    '@fontsource/fredoka',
     '@phosphor-icons/core',
     '@types/node',
     '@vitest/browser-playwright',

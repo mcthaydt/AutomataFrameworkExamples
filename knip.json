@@ -3,9 +3,5 @@
   "ignoreExportsUsedInFile": true,
   "entry": ["scripts/*.ts", "tests/**/*.test.ts", "src/index.ts", "src/headless.ts"],
   "project": ["src/**/*.ts", "tests/**/*.ts"],
-  "ignoreDependencies": [
-    "@fontsource/ibm-plex-sans-condensed",
-    "@fontsource/jetbrains-mono",
-    "@phosphor-icons/core"
-  ]
+  "ignoreDependencies": ["@fontsource/fredoka", "@phosphor-icons/core"]
 }
