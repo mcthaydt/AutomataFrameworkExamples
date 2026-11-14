@@ -67,7 +67,11 @@ export interface Opened {
 
 let browser: Browser | undefined
 const launch = async (): Promise<Browser> => {
-  browser ??= await BROWSERS[ENGINE].launch()
+  // Chromium's local network checks refuse to let a page that no server answered for (the stranger's page, made by a
+  // route) frame the game on loopback. That is about the test's made-up page, not the game, so it is switched off.
+  browser ??= await BROWSERS[ENGINE].launch(
+    ENGINE === 'chromium' ? { args: ['--disable-features=LocalNetworkAccessChecks'] } : {},
+  )
   return browser
 }
 
