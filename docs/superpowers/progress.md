@@ -25,6 +25,8 @@ stage 6 is 12 and the Owner's review is the last 6)
 
 ### Log
 
+- 2026-11-14: The Owner answered the audit's Q2: (c), an editor may change the demo's colours and the words stop
+  naming colours. The new words are the Owner's and not yet given; F2 waits only for them.
 - 2026-11-14: The Owner answered the audit's Q1: (a), the words stay as they are until M2 gives the boxes real
   characters. Q2 (may an editor change the demo's colours) is still open, so F2 still waits.
 - 2026-11-14: Stage 5. The implementation audit is written, for `main` at `1aca8cf` (CI run 43552571486 green in

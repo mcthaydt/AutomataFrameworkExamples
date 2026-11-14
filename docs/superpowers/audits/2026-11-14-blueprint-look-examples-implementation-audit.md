@@ -216,10 +216,14 @@ palette No. 276.
 - **(b) No: the demo's colours are fixed while its words name them.** The test stays, and `CLAUDE.md` gains one line
   saying a colour change fails CI on purpose. An Edit-level recolour then turns `main` red until it is put back.
 - **(c) Yes, and the words stop naming colours**, so no recolour can make them untrue. The words are the Owner's to
-  give; this also bears on Q1.
+  give; this also bears on Q1. **The Owner's answer (2026-11-14): (c).** The new words are the Owner's and are not
+  yet given; stage 6 waits for them and does not write its own. Once they are in, `art.test.ts` holds the rule (each
+  box stands clear of the sky) on the real files and no exact colour, and Q1's worry is answered too, since the
+  words no longer lean on colour. A fact for whoever words it: the hero is 0.8 tiles wide and 1 tall, the crate 1 by
+  1, so "small" and "big" are only just true today; the hero starts on the left and is the one that moves.
 
 ## For stage 6
 
 Apply F1, F3 and F4 (the spec's sentence goes to the coordinator). Apply N1 and N8 with them, since each is one line.
-F2 waits for Q2. N2 is worth doing if F1 is being touched anyway. Nothing here needs a framework change or a pin move,
+F2 follows Q2's answer, (c), and waits only for the Owner's new words. N2 is worth doing if F1 is being touched anyway. Nothing here needs a framework change or a pin move,
 and no golden may move.
