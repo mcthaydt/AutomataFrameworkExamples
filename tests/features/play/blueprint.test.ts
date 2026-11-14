@@ -14,7 +14,7 @@ test("the five colours are the spec's", () => {
     '--hatch: #222425',
     '--chalk: #b6bfc1',
     '--pencil: #8d9496',
-    '--marker: #00b49b',
+    '--marker: #f15a30',
   ])
     expect(blueprint.toLowerCase()).toContain(token)
 })

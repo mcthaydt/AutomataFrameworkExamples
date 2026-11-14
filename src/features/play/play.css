@@ -1,5 +1,5 @@
 /* The page around the game: the words in a strip at the top, the stage the game draws on below it, the touch buttons and
-   the screen for a game that cannot start. The look is Blueprint's, in palette No. 340 (the Owner, 2026-11-14): grey words on black paper, with sea green
+   the screen for a game that cannot start. The look is Blueprint's, in palette No. 340 (the Owner, 2026-11-14): grey words on black paper, with peach red
    only for the touch buttons while a thumb holds one. Every colour is a token from blueprint.css; nothing here names a colour. The
    game's own art (the canvas) is never restyled. The root takes its size from whatever holds it, so the same code fills
    a window or a frame. The words have a strip of their own, so they never lie over the level (held sideways on a phone
@@ -7,7 +7,7 @@
    once. */
 .play-root {
   /* What the framework's touch buttons read (its seven `--automata-touch-*` properties): a paper-coloured chip with a chalk
-     edge at rest, sea green with paper-coloured words under a thumb. */
+     edge at rest, peach red with paper-coloured words under a thumb. */
   --automata-touch-background: var(--paper);
   --automata-touch-color: var(--chalk);
   --automata-touch-border: 1px solid var(--chalk);

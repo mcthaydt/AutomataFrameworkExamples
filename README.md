@@ -56,7 +56,7 @@ what is wrong if something is.
 ## The look
 
 The game's own screens (the words at the top, the touch buttons and the screen that says a file is broken) use the
-project's Blueprint look: grey words on black paper (palette No. 340 of *A Dictionary of Color Combinations*), with sea green only on a touch button while a thumb holds it. The
+project's Blueprint look: grey words on black paper (palette No. 340 of *A Dictionary of Color Combinations*), with peach red only on a touch button while a thumb holds it. The
 game's art (the level, the hero and the crate) does not: it always shows as it is. The five colours and the two fonts
 are in one file, `src/features/play/blueprint.css`; change a colour there and every screen follows.
 
