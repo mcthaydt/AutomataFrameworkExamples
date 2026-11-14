@@ -25,6 +25,10 @@ stage 6 is 12 and the Owner's review is the last 6)
 
 ### Log
 
+- 2026-11-14: Stage 4, Task 2 (the plan's Part B). The framework pin moves from `9109fa3` to `984c4e4` (AutomataFramework
+  pull request 21: the touch buttons read their look from seven `--automata-touch-*` CSS properties and carry the
+  classes `automata-touch` and `automata-touch-button` and `data-action`). The change is the dependency, its
+  `onlyBuiltDependencies` line and the lockfile; nothing else, so the game and both goldens must look and play as before.
 - 2026-11-14: Stage 3. The plan audit is written, and its findings are already in the plan. The plan is true to the
   spec's "Visual direction" on colour, dark, fonts, icons, the art and the end-to-end tests. One blocking finding: the
   game says "Push the yellow box" and the plan made the buttons yellow, so a held button was a bigger yellow box than
