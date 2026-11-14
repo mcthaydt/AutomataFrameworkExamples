@@ -26,7 +26,7 @@ const overlaps = (a: Box, b: Box): boolean =>
 /**
  * The box around every red-ish pixel of a picture, or `undefined` if there are none. "Red-ish" is red well above green
  * and blue: it takes in the hero and the hero seen through a button, and none of the sky, the walls, the yellow crate
- * or the grey buttons. The picture is read in a page of its own, with the browser's own decoder.
+ * or the see-through buttons. The picture is read in a page of its own, with the browser's own decoder.
  */
 async function redBox(page: Page, png: Buffer): Promise<Box | undefined> {
   const reader = await page.context().newPage()
@@ -64,6 +64,20 @@ async function redBox(page: Page, png: Buffer): Promise<Box | undefined> {
   }
 }
 
+/**
+ * The hero, with the buttons hidden from the picture but still measured. A solid button would hide the part of the hero
+ * under it, the red box would shrink to what still shows, and the check would pass on the very overlap it is there to
+ * catch.
+ */
+async function heroSeen(page: Page): Promise<Box | undefined> {
+  const hide = await page.addStyleTag({ content: '.automata-touch { visibility: hidden !important }' })
+  try {
+    return await redBox(page, await page.screenshot())
+  } finally {
+    await hide.evaluate((node) => node.parentNode?.removeChild(node))
+  }
+}
+
 const touchSizes = (Object.keys(SIZES) as (keyof typeof SIZES)[]).filter((name) => SIZES[name].touch)
 
 for (const name of touchSizes) {
@@ -76,7 +90,7 @@ for (const name of touchSizes) {
     for (const label of ['Left', 'Right', 'Jump']) await page.getByRole('button', { name: label }).waitFor()
     await untilTick(page, 30)
 
-    const hero = await redBox(page, await page.screenshot())
+    const hero = await heroSeen(page)
     expect(hero, 'the hero is on screen').toBeDefined()
     if (hero === undefined) return
     for (const label of ['Left', 'Right', 'Jump']) {
@@ -86,3 +100,22 @@ for (const name of touchSizes) {
     }
   })
 }
+
+test('the check bites: a button put over the hero is reported', async () => {
+  opened = await openGame({ size: 'phone-390x844' })
+  const { page } = opened
+  await page.touchscreen.tap(195, 422)
+  await page.getByRole('button', { name: 'Jump' }).waitFor()
+  await untilTick(page, 30)
+  const hero = await heroSeen(page)
+  expect(hero, 'the hero is on screen').toBeDefined()
+  if (hero === undefined) return
+  // Jump, moved to where the hero starts. The solid button would hide the hero in a picture, so only the buttons'
+  // boxes (measured with the buttons hidden from the picture) can say it is there.
+  await page.addStyleTag({
+    content: `.automata-touch-button[data-action='jump'] { position: fixed; left: ${hero.x}px; top: ${hero.y}px }`,
+  })
+  const box = await page.getByRole('button', { name: 'Jump' }).boundingBox()
+  expect(box).not.toBeNull()
+  if (box !== null) expect(overlaps(hero, box)).toBe(true)
+})

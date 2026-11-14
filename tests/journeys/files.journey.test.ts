@@ -68,7 +68,33 @@ test('a missing file is named', async () => {
   )
 })
 
-// These two need the screens to use the fonts and icons, which Task 4 does: a browser asks for a file only when
-// something on the page draws with it.
-test.todo('the label font and the icons are files beside the page')
-test.todo("the problem screen's fonts are files beside the page")
+/** What a page asked for must come from its own origin as a file, never from another site or as data. */
+function expectOnlyOwnFiles(page: Opened): void {
+  const own = new URL(page.page.url()).origin
+  for (const url of page.requested) {
+    expect(url.startsWith('data:'), `${url} is carried as data`).toBe(false)
+    expect(new URL(url).origin, `${url} is from another site`).toBe(own)
+  }
+}
+
+const answeredOk = (found: Opened, pattern: RegExp): boolean =>
+  found.answered.some((a) => a.status === 200 && pattern.test(a.url))
+
+test('the label font and the icons are files beside the page', async () => {
+  opened = await openGame({ size: 'phone-390x844' })
+  const { page } = opened
+  // The buttons (and so their pictures) are only drawn once a finger is on the screen.
+  await page.touchscreen.tap(195, 422)
+  const found = opened
+  await expect.poll(() => answeredOk(found, /ibm-plex-sans-condensed-latin-600-normal.*\.woff2$/)).toBe(true)
+  await expect.poll(() => answeredOk(found, /arrow-left.*\.svg$/)).toBe(true)
+  expectOnlyOwnFiles(found)
+})
+
+test("the problem screen's fonts are files beside the page", async () => {
+  opened = await openGame({ size: 'phone-390x844', files: { [LEVEL]: '{ "format": 1,' } })
+  const found = opened
+  await expect.poll(() => answeredOk(found, /jetbrains-mono-latin-400-normal.*\.woff2$/)).toBe(true)
+  await expect.poll(() => answeredOk(found, /warning.*\.svg$/)).toBe(true)
+  expectOnlyOwnFiles(found)
+})
