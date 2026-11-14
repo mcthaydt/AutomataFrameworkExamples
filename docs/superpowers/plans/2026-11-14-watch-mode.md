@@ -31,7 +31,15 @@ findings S1 to S7 and N1 to N7 are written into the tasks below, each marked "au
 - **Does not cover:** sound (the game has none; a watching game is silent when it does, M2); choosing which recording
   is watched (it is the first level's); the editors; any change to the site's words outside the game's sheet.
 
-## Open for the Owner (the tasks marked "waits for" do not start without the answer)
+## The Owner's answers (2026-11-14)
+
+**Q1 (a), Q2 (a), Q3 (b), Q4 (a).** The game says "The game is playing by itself. Tap it to play." while it watches; a
+tap or a click on the moving game starts it; it plays itself for everyone, including visitors who asked for less motion
+or to save data (so `mayWatch` is always true and Task 8's motion and data tests are the (b) ones); and it plays again
+and again with a one-second rest (`rounds` is left out). They are written into the spec addendum too. The table below
+is kept as it was planned.
+
+## Open for the Owner (answered above; the tasks marked "waits for" waited for the answer)
 
 The questions and their options are in the spec's "Open for the Owner". Nothing here picks one. The plan is written
 so each answer changes only the lines marked with it:

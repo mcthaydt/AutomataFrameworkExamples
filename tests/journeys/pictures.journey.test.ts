@@ -4,7 +4,7 @@
 import { afterAll, afterEach, expect, test } from 'vitest'
 import { WORDS } from '#src/features/play/words.ts'
 import { pinnedFiles } from '../fixtures/pinned-level.ts'
-import { closeBrowser, fontsReady, type Opened, openGame, SIZES, untilTick } from './open.ts'
+import { closeBrowser, fontsReady, type Opened, openGame, SIZES, untilTick, untilWatchTick } from './open.ts'
 
 const OUT = 'tests/journeys/__screenshots__'
 
@@ -82,5 +82,18 @@ for (const name of ['phone-844x390', 'tablet-820x1180', 'tablet-1180x820'] as co
     opened = await openGame({ size: name, files: { 'content/levels/level-1.json': '{ "format": 1,' } })
     await fontsReady(opened.page)
     await opened.page.screenshot({ path: `${OUT}/problem-${name.split('-')[1]}.png` })
+  })
+}
+
+// The game before anyone has pressed Play: playing its own recording, with the words that say so. No touch buttons.
+for (const name of Object.keys(SIZES) as (keyof typeof SIZES)[]) {
+  test(`how it looks watching at ${name}`, async () => {
+    opened = await openGame({ size: name, search: '?watch' })
+    const { page } = opened
+    await untilWatchTick(page, 60)
+    expect(await page.getByText(WORDS.watching, { exact: true }).isVisible()).toBe(true)
+    expect(await page.getByRole('button').count(), 'no touch buttons while it plays itself').toBe(0)
+    await fontsReady(page)
+    await page.screenshot({ path: `${OUT}/watching-${name}.png` })
   })
 }

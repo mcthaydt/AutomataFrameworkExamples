@@ -77,6 +77,25 @@ are in one file, `src/features/play/blueprint.css`; change a colour there and ev
 - The engines disagree: `node and webkit disagree from tick 120: ...`. The same play must come out the same in every
   engine, so this is a bug to find, never to ignore.
 
+## Watch it play itself
+
+Open the game's address with `?watch` on the end (with `pnpm dev`, that is `http://localhost:5173/?watch`, or whatever
+address `pnpm dev` printed). The game plays its own recording, `replays/level-1.json`, by itself, with no one at the
+controls, and says so in the words at the top. A click, a tap, Enter, Space or an arrow key starts the game for real,
+from the beginning of the level, with nothing reloaded. It plays again and again, resting a second between plays, and
+stands still while it is scrolled out of the window or the tab is hidden. A game with no recording, or a broken one,
+simply opens ready to play, and says why in the browser's console.
+
+The recording is the same file the checks use (see the next section), and the game plays whatever the content is now,
+so if you move the crate, it plays the same keys against the new level. A page that frames the game (the website's
+home page does) hears and says two messages, both at the game's own origin and from no one else:
+
+- the game tells the page its state: `{ "automata": "state", "state": "watching" }`, then `"playing"` (or `"problem"`);
+- the page hands the game over: `{ "automata": "play" }`.
+
+In the browser's console, `window.automataWatch` is the recording that is playing (`sim.tick`, `rounds`) and
+`window.automataGame` is the game once a player has it.
+
 ## The recording
 
 `replays/level-1.json` is the recorded play of the level. It is the repo's golden file: once it holds hashes it changes

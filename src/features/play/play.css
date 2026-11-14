@@ -64,6 +64,21 @@
   pointer-events: none;
 }
 
+/* While the game plays itself the whole of it is one big button: a tap or a click anywhere on it starts the game. A finger
+   dragged across it must still scroll the page, so touch is left to the browser. */
+.play-root[data-state="watching"] {
+  cursor: pointer;
+  touch-action: auto;
+}
+
+/* The page keeps a swipe from pulling or bouncing the page while a game is played (`overscroll-behavior: none` in
+   `index.html`). Watching is not playing: when a page frames the game, a wheel or a finger over it must go on to scroll
+   that page, and that rule would stop it in some browsers. */
+html:has(#game[data-state="watching"]),
+body:has(#game[data-state="watching"]) {
+  overscroll-behavior: auto;
+}
+
 .play-words p {
   margin: 0;
   /* Short lines of even length, never one stray word alone on the last line. */

@@ -1,5 +1,6 @@
 // The built game reads its files when it opens, so a changed or broken file is what the page shows. These are the
 // editor's whole job in one place: change a file, and the game plays the change.
+import { readFileSync } from 'node:fs'
 import { parseContent, verifyReplay, writeContent } from '@automataframework/framework/headless'
 import { afterAll, afterEach, expect, test } from 'vitest'
 import { WORDS } from '#src/features/play/words.ts'
@@ -97,4 +98,13 @@ test("the problem screen's font and picture are files beside the page", async ()
   await expect.poll(() => answeredOk(found, /fredoka-latin-600-normal.*\.woff2$/)).toBe(true)
   await expect.poll(() => answeredOk(found, /warning.*\.svg$/)).toBe(true)
   expectOnlyOwnFiles(found)
+})
+
+test('the recording is a file beside the page', async () => {
+  opened = await openGame()
+  const answer = await opened.page.request.get(new URL('replays/level-1.json', opened.page.url()).href)
+  expect(answer.status()).toBe(200)
+  expect(await answer.text()).toBe(
+    readFileSync(new URL('../../replays/level-1.json', import.meta.url), 'utf8'),
+  )
 })

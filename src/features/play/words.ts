@@ -5,6 +5,8 @@
 export const WORDS = {
   loading: 'Loading the game…',
   goal: 'You are the box on the left. Push the other box.',
+  // Shown in place of `goal` and `keys` while the game plays its recording by itself, before anyone has pressed Play.
+  watching: 'The game is playing by itself. Tap it to play.',
   // Shown in place of `goal` once the crate has been pushed, so a player knows they did what they were asked.
   done: 'You pushed the box. Well done!',
   keys: 'Hold the left or right arrow key to move. Press Space to jump.',
