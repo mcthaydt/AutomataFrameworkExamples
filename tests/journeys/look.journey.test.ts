@@ -1,5 +1,5 @@
 // The Blueprint look on the built page, in each browser, at every size: dark paper, the label font, the buttons as paper
-// chips that turn sea green under a thumb, a broken file said on the same paper, and a page that still plays when its font
+// chips that turn peach red under a thumb, a broken file said on the same paper, and a page that still plays when its font
 // files never arrive. Layout and focus are checked here because a screenshot proves neither.
 import type { Page } from 'playwright'
 import { afterAll, afterEach, expect, test } from 'vitest'
@@ -25,7 +25,7 @@ afterAll(closeBrowser)
 
 const PAPER = 'rgb(17, 19, 20)'
 const CHALK = 'rgb(182, 191, 193)'
-const MARKER = 'rgb(0, 180, 155)'
+const MARKER = 'rgb(241, 90, 48)'
 const LEVEL = 'content/levels/level-1.json'
 const LABELS = ['Left', 'Right', 'Jump'] as const
 
@@ -102,7 +102,7 @@ for (const [name, size] of sizes) {
 }
 
 for (const [name, size] of sizes.filter(([, s]) => s.touch)) {
-  test(`at ${name}, holding Jump turns it sea green and the hero jumps`, async () => {
+  test(`at ${name}, holding Jump turns it peach red and the hero jumps`, async () => {
     opened = await openGame({ size: name })
     const { page } = opened
     await page.touchscreen.tap(size.width / 2, size.height / 2)

@@ -82,7 +82,7 @@ const PAPER = 'rgb(17, 19, 20)'
 const HATCH = 'rgb(34, 36, 37)'
 const CHALK = 'rgb(182, 191, 193)'
 const PENCIL = 'rgb(141, 148, 150)'
-const MARKER = 'rgb(0, 180, 155)'
+const MARKER = 'rgb(241, 90, 48)'
 
 /**
  * Whether a face of this family and weight has really been fetched. Never `document.fonts.check`: by its rules it is
@@ -311,7 +311,7 @@ test('a touch button is a paper chip with a chalk edge', async () => {
   }
 })
 
-test('a held button turns sea green with paper words', async () => {
+test('a held button turns peach red with paper words', async () => {
   await begin()
   const jump = touchButtons().find((b) => b.textContent === 'Jump')
   if (jump === undefined) throw new Error('no Jump button')

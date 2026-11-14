@@ -3,9 +3,9 @@
 
 export const WORDS = {
   loading: 'Loading the game…',
-  goal: 'You are the red box. Push the yellow box.',
+  goal: 'You are the pink box. Push the green box.',
   // Shown in place of `goal` once the crate has been pushed, so a player knows they did what they were asked.
-  done: 'You pushed the yellow box. Well done!',
+  done: 'You pushed the green box. Well done!',
   keys: 'Hold the left or right arrow key to move. Press Space to jump.',
   touch: 'Hold Left or Right to move. Tap Jump to jump.',
   problemTitle: 'This game has a problem and cannot start.',

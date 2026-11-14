@@ -44,7 +44,7 @@ particular to this repo added under "This repo".
   Owner approved them (2026-11-14). Only `src/features/play/*.css` names them, never a `.ts` file, so knip, which does
   not read CSS, would call them unused: they are under `ignoreDependencies` in `knip.json` for that reason alone.
 - **The look.** The game's own screens (the words strip, the touch buttons, the problem screen, the loading and "well
-  done" messages) use the project's Blueprint look, dark only, in palette No. 340 (Black, Neutral Gray, Sea Green; the Owner, 2026-11-14); the game's art never does. The five colours and the two
+  done" messages) use the project's Blueprint look, dark only, in palette No. 340 (Black, Neutral Gray, Peach Red; the Owner, 2026-11-14); the game's art never does. The five colours and the two
   font families are in `src/features/play/blueprint.css` and nowhere else (a test fails on any other colour), and the
   framework's touch buttons are dressed through its `--automata-touch-*` CSS properties, never by reaching into the
   framework.

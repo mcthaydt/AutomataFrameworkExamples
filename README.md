@@ -3,7 +3,7 @@
 The demo game, made with [AutomataFramework](https://github.com/mcthaydt/AutomataFramework) the way an outside game
 would be: only the published package, nothing from inside it. Later this repo also holds the website's small examples.
 
-The game is a small physics platformer. Right now it is one level: you are the red box, and you push the yellow box.
+The game is a small physics platformer. Right now it is one level: you are the pink box, and you push the green box.
 
 ## Start here
 
@@ -34,7 +34,7 @@ run:
 pnpm content:write
 ```
 
-and reload the page. The yellow box starts further along. That is the whole loop: edit a content file, write it the
+and reload the page. The green box starts further along. That is the whole loop: edit a content file, write it the
 standard way, look. An editor makes the same change, and so can an agent.
 
 **4. Share it.** Open a pull request. The checks run the game in Chromium, WebKit and Firefox and say in plain words
@@ -56,7 +56,7 @@ what is wrong if something is.
 ## The look
 
 The game's own screens (the words at the top, the touch buttons and the screen that says a file is broken) use the
-project's Blueprint look: grey words on black paper (palette No. 340 of *A Dictionary of Color Combinations*), with sea green only on a touch button while a thumb holds it. The
+project's Blueprint look: grey words on black paper (palette No. 340 of *A Dictionary of Color Combinations*), with peach red only on a touch button while a thumb holds it. The
 game's art (the level, the hero and the crate) does not: it always shows as it is. The five colours and the two fonts
 are in one file, `src/features/play/blueprint.css`; change a colour there and every screen follows.
 
