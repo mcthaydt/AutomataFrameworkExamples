@@ -1,6 +1,6 @@
 // The touch buttons must never sit on the hero. They take the bottom of the screen once a finger touches it, and the
 // framework fits the level above them. The proof looks at what a player sees: a picture of the page, in which the hero
-// is the one red thing, and the buttons are boxes on the page. Held sideways on a phone, the level fills the height,
+// is the one pink thing, and the buttons are boxes on the page. Held sideways on a phone, the level fills the height,
 // which is where the buttons once covered the hero's starting place.
 import type { Page } from 'playwright'
 import { afterAll, afterEach, expect, test } from 'vitest'
@@ -24,11 +24,11 @@ const overlaps = (a: Box, b: Box): boolean =>
   a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height
 
 /**
- * The box around every red-ish pixel of a picture, or `undefined` if there are none. "Red-ish" is red well above green
- * and blue: it takes in the hero and the hero seen through a button, and none of the sky, the walls, the yellow crate
+ * The box around every pink-ish pixel of a picture, or `undefined` if there are none. "Pink-ish" is red well above green
+ * and blue: it takes in the hero and the hero seen through a button, and none of the sky, the walls, the green crate
  * or the see-through buttons. The picture is read in a page of its own, with the browser's own decoder.
  */
-async function redBox(page: Page, png: Buffer): Promise<Box | undefined> {
+async function heroBox(page: Page, png: Buffer): Promise<Box | undefined> {
   const reader = await page.context().newPage()
   try {
     return await reader.evaluate(async (base64) => {
@@ -66,13 +66,13 @@ async function redBox(page: Page, png: Buffer): Promise<Box | undefined> {
 
 /**
  * The hero, with the buttons hidden from the picture but still measured. A solid button would hide the part of the hero
- * under it, the red box would shrink to what still shows, and the check would pass on the very overlap it is there to
+ * under it, the pink box would shrink to what still shows, and the check would pass on the very overlap it is there to
  * catch.
  */
 async function heroSeen(page: Page): Promise<Box | undefined> {
   const hide = await page.addStyleTag({ content: '.automata-touch { visibility: hidden !important }' })
   try {
-    return await redBox(page, await page.screenshot())
+    return await heroBox(page, await page.screenshot())
   } finally {
     await hide.evaluate((node) => node.parentNode?.removeChild(node))
   }

@@ -25,6 +25,15 @@ stage 6 is 12 and the Owner's review is the last 6)
 
 ### Log
 
+- 2026-11-14: Stage 4, a deviation the coordinator asked for: one more pull request in the execution stage (Examples
+  pull request 17), the example game's art in palette No. 276 (the Owner: B for the example games). The hero is
+  Eosine Pink `#f37f94` and the crate Yellow Green `#afd472`; the words say "You are the pink box. Push the green box."
+  (the Owner chose "green box" for the crate; "pink box" follows from the hero's new colour and is for him to
+  overrule). Only two content files and the words change, so both goldens stay as they are. The sky and the ground
+  are the framework's constants (`SKY_COLOR`, `TILE_COLOR`) and no level can set them, so they keep their old colours
+  until the framework gains a way to set them. The page's words exist in English only so far, so there are no other
+  languages to change. A held touch button is Sea Green (palette No. 340) and the crate is now green too: the two
+  greens differ (teal and lime), and the question of whether that is enough is open.
 - 2026-11-14: Stage 4 done (Tasks 3 to 6, Examples pull request 14). The game's own screens take the Blueprint look in
   palette No. 340 of *A Dictionary of Color Combinations* (the Owner: D for the demo's screens): black paper
   `#111314`, Neutral Gray words `#b6bfc1`, Sea Green `#00b49b` on a touch button only while it is held, and a panel and

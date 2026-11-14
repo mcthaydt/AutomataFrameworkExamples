@@ -3,7 +3,7 @@
 The demo game, made with [AutomataFramework](https://github.com/mcthaydt/AutomataFramework) the way an outside game
 would be: only the published package, nothing from inside it. Later this repo also holds the website's small examples.
 
-The game is a small physics platformer. Right now it is one level: you are the red box, and you push the yellow box.
+The game is a small physics platformer. Right now it is one level: you are the pink box, and you push the green box.
 
 ## Start here
 
@@ -34,7 +34,7 @@ run:
 pnpm content:write
 ```
 
-and reload the page. The yellow box starts further along. That is the whole loop: edit a content file, write it the
+and reload the page. The green box starts further along. That is the whole loop: edit a content file, write it the
 standard way, look. An editor makes the same change, and so can an agent.
 
 **4. Share it.** Open a pull request. The checks run the game in Chromium, WebKit and Firefox and say in plain words
