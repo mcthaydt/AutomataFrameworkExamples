@@ -25,6 +25,10 @@ stage 6 is 12 and the Owner's review is the last 6)
 
 ### Log
 
+- 2026-11-14: The framework pin moves from `984c4e4` to `874f7d5` (AutomataFramework pull request 25: a level file may
+  set `sky` and `ground` colours, both optional and the old light blue and slate when left out). The change is the
+  dependency, its `onlyBuiltDependencies` line and the lockfile; nothing else, so the game and both goldens must look
+  and play as before. The next pull request puts the colours of palette No. 276 into `level-1.json`.
 - 2026-11-14: Stage 4, a deviation the coordinator asked for: one more pull request in the execution stage (Examples
   pull request 17), the example game's art in palette No. 276 (the Owner: B for the example games). The hero is
   Eosine Pink `#f37f94` and the crate Yellow Green `#afd472`; the words say "You are the pink box. Push the green box."

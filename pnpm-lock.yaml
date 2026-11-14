@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@automataframework/framework':
-        specifier: github:mcthaydt/AutomataFramework#984c4e4733e20cd69c1c59bb9d8ad92955bd8571
-        version: https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/984c4e4733e20cd69c1c59bb9d8ad92955bd8571
+        specifier: github:mcthaydt/AutomataFramework#874f7d5f7bc399bcfb763f8d134270430e80d074
+        version: https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/874f7d5f7bc399bcfb763f8d134270430e80d074
     devDependencies:
       '@biomejs/biome':
         specifier: 2.5.15
@@ -48,8 +48,8 @@ importers:
 
 packages:
 
-  '@automataframework/framework@https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/984c4e4733e20cd69c1c59bb9d8ad92955bd8571':
-    resolution: {gitHosted: true, integrity: sha512-C+Jmmr8Ky3WceEnhHCAz6Jj9/HmKCMrlKWiWKo4fOwiJLjd4pY2tN30mBX2sQLoHg/bOXwI8XTx6kp5Vp27Jbg==, tarball: https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/984c4e4733e20cd69c1c59bb9d8ad92955bd8571}
+  '@automataframework/framework@https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/874f7d5f7bc399bcfb763f8d134270430e80d074':
+    resolution: {gitHosted: true, integrity: sha512-Q/K+ea9OnarglMrQbJc+v8F2DBxD4G9gxIbRUd0WxI8qo97wnBMCwxCb4rlLW9BEtinjr2b22oMiZyNa7ObGvA==, tarball: https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/874f7d5f7bc399bcfb763f8d134270430e80d074}
     version: 0.1.0
     engines: {node: '>=24.21.0'}
 
@@ -1103,7 +1103,7 @@ packages:
 
 snapshots:
 
-  '@automataframework/framework@https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/984c4e4733e20cd69c1c59bb9d8ad92955bd8571':
+  '@automataframework/framework@https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/874f7d5f7bc399bcfb763f8d134270430e80d074':
     dependencies:
       '@dimforge/rapier2d-deterministic-compat': 0.21.0
       koota: 0.6.6
