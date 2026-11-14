@@ -143,8 +143,9 @@ export async function openGame(
   const gate = new Promise<void>((resolve) => {
     release = resolve
   })
-  // A page that is not the game's, at an address nobody serves: the route answers for it, so no DNS is involved.
-  const outerOrigin = framed?.from === 'other' ? 'http://outer.test' : base.origin
+  // A page that is not the game's, at an address nobody serves: the route answers for it, so nothing listens there. It is
+  // another loopback address, not another host: Chromium keeps a public page from framing a loopback one.
+  const outerOrigin = framed?.from === 'other' ? `http://127.0.0.2:${base.port}` : base.origin
   const outerUrl = `${outerOrigin}${base.pathname}outer-page.html`
   await page.route('**/*', async (route) => {
     if (block?.test(route.request().url()) === true) return route.abort()
