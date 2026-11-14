@@ -25,6 +25,13 @@ stage 6 is 12 and the Owner's review is the last 6)
 
 ### Log
 
+- 2026-11-14: Stage 4, the last part of palette No. 276 for the art (Examples pull request 19): `level-1.json` sets
+  `sky` Black `#111314` and `ground` Seashell Pink `#fdd4bd`. Chosen from the four colours of the palette so both boxes
+  stand clear of the sky behind them: the pink hero is 7.3 to 1 and the green crate 11.1 to 1 against Black (against
+  Seashell they would be 1.9 and 1.2 to 1), and the ground is 13.7 to 1; a test holds each to 3 to 1 at least. Only
+  the level file changes. The tiles' colour is part of the sim's state, so the `level-1` replay hash moves with the
+  content (the check accepts "the content changed" and compares the engines); `test-game.json` and both golden files
+  are untouched.
 - 2026-11-14: The framework pin moves from `984c4e4` to `874f7d5` (AutomataFramework pull request 25: a level file may
   set `sky` and `ground` colours, both optional and the old light blue and slate when left out). The change is the
   dependency, its `onlyBuiltDependencies` line and the lockfile; nothing else, so the game and both goldens must look
