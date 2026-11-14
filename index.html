@@ -3,6 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- Dark only: the page is paper from the first paint, and a phone's own bars follow. -->
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#111314" />
     <title>Crate Game</title>
     <!-- No icon yet, and none asked for: without this a browser asks the server for /favicon.ico and logs a 404. -->
     <link rel="icon" href="data:," />
@@ -11,7 +14,8 @@
       body {
         margin: 0;
         height: 100%;
-        background: #1b1b24;
+        background: #111314;
+        color-scheme: dark;
         overscroll-behavior: none;
       }
       /* No `display` here: the page's own stylesheet makes this a flex column (the words, then the game), and an id rule

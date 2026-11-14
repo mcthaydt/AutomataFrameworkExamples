@@ -1,0 +1,19 @@
+/* The Blueprint look's raw materials: the two fonts, the five colours (palette No. 340 of A Dictionary of Color Combinations:
+   Black, Neutral Gray, Sea Green, with the panel and the quiet words mixed from the first two) and the two families, and nothing that paints.
+   Every rule that paints is in play.css and takes its colours from here, so a colour is changed in one place. The font
+   files and the icons are real files that Vite copies into dist/, beside the page: the Site's policy
+   (`default-src 'self'`) blocks anything fetched from another site or carried inside the stylesheet itself. */
+@import "@fontsource/ibm-plex-sans-condensed/latin-600.css";
+@import "@fontsource/jetbrains-mono/latin-400.css";
+
+/* On the root, so the framework's touch buttons (which sit inside it) inherit them. */
+.play-root {
+  --paper: #111314;
+  --hatch: #222425;
+  --chalk: #b6bfc1;
+  --pencil: #8d9496;
+  --marker: #00b49b;
+  /* Families only: a rule that uses one writes its own weight and size. */
+  --label: "IBM Plex Sans Condensed", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --measure: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}

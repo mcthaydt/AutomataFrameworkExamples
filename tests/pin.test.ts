@@ -6,6 +6,7 @@ import { expect, test } from 'vitest'
 // line allows it) and the lockfile.
 interface Manifest {
   readonly dependencies: Readonly<Record<string, string>>
+  readonly devDependencies: Readonly<Record<string, string>>
   readonly pnpm: { readonly onlyBuiltDependencies: readonly string[] }
 }
 const manifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as Manifest
@@ -22,3 +23,26 @@ test('the commit allowed to build is the commit that is pinned', () =>
 
 test('the game depends on nothing but the framework', () =>
   expect(Object.keys(manifest.dependencies)).toEqual(['@automataframework/framework']))
+
+// The Blueprint look's fonts and icons are build inputs: CSS names them, Vite copies the files into `dist/`, and no code
+// imports them. The Owner approved these three (2026-11-14) at these versions; anything else needs a new yes.
+test("the look's three packages are build inputs at exact versions, and there are no others", () => {
+  expect(manifest.devDependencies).toMatchObject({
+    '@fontsource/ibm-plex-sans-condensed': '5.3.0',
+    '@fontsource/jetbrains-mono': '5.3.0',
+    '@phosphor-icons/core': '2.1.1',
+  })
+  expect(Object.keys(manifest.devDependencies).sort()).toEqual([
+    '@biomejs/biome',
+    '@fontsource/ibm-plex-sans-condensed',
+    '@fontsource/jetbrains-mono',
+    '@phosphor-icons/core',
+    '@types/node',
+    '@vitest/browser-playwright',
+    'knip',
+    'playwright',
+    'typescript',
+    'vite',
+    'vitest',
+  ])
+})

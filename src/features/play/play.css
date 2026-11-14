@@ -1,15 +1,30 @@
-/* The page around the game: the words in a strip at the top, the stage the game draws on below it, and the screen for
-   a game that cannot start. The root takes its size from whatever holds it, so the same code fills a window or a frame.
-   The words have a strip of their own, so they never lie over the level (held sideways on a phone the level fills the
-   height, and words over it would hide its top). */
+/* The page around the game: the words in a strip at the top, the stage the game draws on below it, the touch buttons and
+   the screen for a game that cannot start. The look is Blueprint's, in palette No. 340 (the Owner, 2026-11-14): grey words on black paper, with sea green
+   only for the touch buttons while a thumb holds one. Every colour is a token from blueprint.css; nothing here names a colour. The
+   game's own art (the canvas) is never restyled. The root takes its size from whatever holds it, so the same code fills
+   a window or a frame. The words have a strip of their own, so they never lie over the level (held sideways on a phone
+   the level fills the height, and words over it would hide its top). Nothing moves: a held button changes colour at
+   once. */
 .play-root {
+  /* What the framework's touch buttons read (its seven `--automata-touch-*` properties): a paper-coloured chip with a chalk
+     edge at rest, sea green with paper-coloured words under a thumb. */
+  --automata-touch-background: var(--paper);
+  --automata-touch-color: var(--chalk);
+  --automata-touch-border: 1px solid var(--chalk);
+  --automata-touch-radius: 2px;
+  --automata-touch-font: 600 15px / 1.1 var(--label);
+  --automata-touch-pressed-background: var(--marker);
+  --automata-touch-pressed-color: var(--paper);
+
   position: relative;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   width: 100%;
   height: 100%;
-  font-family: system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--chalk);
+  font: 600 18px / 1.3 var(--label);
 }
 
 /* What is left under the words. The touch buttons are laid over the bottom of it by the framework, which keeps the level
@@ -29,17 +44,15 @@
 }
 
 /* The strip: inside the safe area, never taking a touch meant for the game. The buttons are at the bottom of the stage,
-   so the words are never under one. */
+   so the words are never under one. A chalk line along its bottom edge is where the game begins. */
 .play-words {
   flex: none;
   box-sizing: border-box;
   padding: max(8px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 8px
     max(14px, env(safe-area-inset-left));
-  background: #f5f9fc;
-  color: #1b1b24;
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.3;
+  border-bottom: 1px solid var(--chalk);
+  background: var(--paper);
+  color: var(--chalk);
   text-align: center;
   pointer-events: none;
 }
@@ -52,19 +65,85 @@
 
 .play-words .play-how {
   margin-top: 4px;
+  color: var(--pencil);
 }
 
-/* A game that cannot start: plain words on white, readable on a phone, scrolling if the list is long. */
+/* One picture drawn in its word's own colour: a box filled with the colour, cut to the picture's shape by a mask. A
+   picture always comes with a word. */
+.play-words .play-done::before,
+.play-problem h1::before,
+.play-root .automata-touch-button::before {
+  content: "";
+  display: block;
+  background: currentColor;
+  mask-position: center;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+}
+
+/* "Well done": a tick before the words, on the same line. */
+.play-words .play-done::before {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  vertical-align: -4px;
+  mask-image: url("@phosphor-icons/core/assets/regular/check-circle.svg");
+  -webkit-mask-image: url("@phosphor-icons/core/assets/regular/check-circle.svg");
+}
+
+/* The touch buttons, drawn by the framework: its colours, edge, corners and font come from the properties above. Here
+   are the parts a property cannot say: the picture above the word, the capitals, and no motion at all. */
+.play-root .automata-touch-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: none;
+}
+
+.play-root .automata-touch-button::before {
+  width: 28px;
+  height: 28px;
+}
+
+.play-root .automata-touch-button[data-action="left"]::before {
+  mask-image: url("@phosphor-icons/core/assets/regular/arrow-left.svg");
+  -webkit-mask-image: url("@phosphor-icons/core/assets/regular/arrow-left.svg");
+}
+
+.play-root .automata-touch-button[data-action="right"]::before {
+  mask-image: url("@phosphor-icons/core/assets/regular/arrow-right.svg");
+  -webkit-mask-image: url("@phosphor-icons/core/assets/regular/arrow-right.svg");
+}
+
+.play-root .automata-touch-button[data-action="jump"]::before {
+  mask-image: url("@phosphor-icons/core/assets/regular/arrow-fat-up.svg");
+  -webkit-mask-image: url("@phosphor-icons/core/assets/regular/arrow-fat-up.svg");
+}
+
+/* Where the keyboard is: a 3 px chalk ring, 2 px away, the same ring as the site's. */
+.play-root .automata-touch-button:focus-visible {
+  outline: 3px solid var(--chalk);
+  outline-offset: 2px;
+}
+
+/* A game that cannot start: plain words on the same paper, readable on a phone, scrolling if the list is long. */
 .play-problem {
   position: absolute;
   inset: 0;
   box-sizing: border-box;
   overflow: auto;
   padding: 24px 16px;
-  background: #ffffff;
-  color: #1b1b24;
-  font-size: 18px;
-  line-height: 1.4;
+  background: var(--paper);
+  color: var(--chalk);
+  font: 600 18px / 1.4 var(--label);
 }
 
 .play-problem h1 {
@@ -73,14 +152,42 @@
   line-height: 1.25;
 }
 
-.play-problem ul {
-  margin: 0 0 16px;
-  padding-left: 24px;
+/* The warning above the title, 28 px. */
+.play-problem h1::before {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 8px;
+  mask-image: url("@phosphor-icons/core/assets/regular/warning.svg");
+  -webkit-mask-image: url("@phosphor-icons/core/assets/regular/warning.svg");
 }
 
+.play-problem ul {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+/* Each problem on its own panel. */
 .play-problem li {
   margin-bottom: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--chalk);
+  border-radius: 2px;
+  background: var(--hatch);
   overflow-wrap: anywhere;
+}
+
+/* Where it is (the file and the place in it) in the measuring font, then what is wrong in plain words. Both stay
+   inline so the line reads in one piece. A sentence is never set in the measuring font. */
+.play-where {
+  color: var(--pencil);
+  font: 400 15px / 1.4 var(--measure);
+  font-variant-numeric: tabular-nums;
+}
+
+.play-what {
+  color: var(--chalk);
+  font: 600 18px / 1.4 var(--label);
 }
 
 .play-problem p {

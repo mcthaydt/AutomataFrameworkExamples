@@ -4,7 +4,7 @@
 import { afterAll, afterEach, expect, test } from 'vitest'
 import { WORDS } from '#src/features/play/words.ts'
 import { pinnedFiles } from '../fixtures/pinned-level.ts'
-import { closeBrowser, type Opened, openGame, SIZES, untilTick } from './open.ts'
+import { closeBrowser, fontsReady, type Opened, openGame, SIZES, untilTick } from './open.ts'
 
 const OUT = 'tests/journeys/__screenshots__'
 
@@ -40,6 +40,7 @@ for (const [name, size] of Object.entries(SIZES) as [
         expect(box !== null && overlaps(words, box), 'the words sit under no button').toBe(false)
       }
     }
+    await fontsReady(page)
     await page.screenshot({ path: `${OUT}/${name}.png` })
   })
 }
@@ -49,6 +50,7 @@ test('how it looks when a file is broken', async () => {
     size: 'phone-390x844',
     files: { 'content/levels/level-1.json': '{ "format": 1,' },
   })
+  await fontsReady(opened.page)
   await opened.page.screenshot({ path: `${OUT}/problem-390x844.png` })
 })
 
@@ -60,5 +62,25 @@ test('how it looks when the crate has been pushed', async () => {
   await untilTick(page, 180)
   await page.keyboard.up('ArrowRight')
   expect(await page.getByText(WORDS.done, { exact: true }).isVisible()).toBe(true)
+  await fontsReady(page)
   await page.screenshot({ path: `${OUT}/done-390x844.png` })
 })
+
+test('how it looks with Jump held', async () => {
+  opened = await openGame({ size: 'phone-390x844' })
+  const { page } = opened
+  await page.touchscreen.tap(195, 422)
+  const jump = page.getByRole('button', { name: 'Jump' })
+  await jump.dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 1, bubbles: true })
+  await untilTick(page, 30)
+  await fontsReady(page)
+  await page.screenshot({ path: `${OUT}/held-390x844.png` })
+})
+
+for (const name of ['phone-844x390', 'tablet-820x1180', 'tablet-1180x820'] as const) {
+  test(`how it looks when a file is broken at ${name}`, async () => {
+    opened = await openGame({ size: name, files: { 'content/levels/level-1.json': '{ "format": 1,' } })
+    await fontsReady(opened.page)
+    await opened.page.screenshot({ path: `${OUT}/problem-${name.split('-')[1]}.png` })
+  })
+}

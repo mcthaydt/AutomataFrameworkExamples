@@ -30,6 +30,12 @@ export interface Opened {
   readonly page: Page
   /** Console errors and uncaught errors seen so far. */
   readonly errors: string[]
+  /** The address each error came from, in step with `errors` (`''` for an uncaught error or a browser that gives none). */
+  readonly errorUrls: string[]
+  /** Every address the page asked for so far (not the empty `data:,` icon link). */
+  readonly requested: string[]
+  /** Every answer the page got so far: the address and the status. */
+  readonly answered: { readonly url: string; readonly status: number }[]
   /** Content-Security-Policy violations the page reported, as "directive: blocked thing". Empty unless `csp` was set. */
   readonly violations: string[]
   close(): Promise<void>
@@ -57,6 +63,8 @@ export async function openGame(
     files?: Readonly<Record<string, string | undefined>>
     /** A Content-Security-Policy to put on the page, as a host would; the page's violations come back in `violations`. */
     csp?: string
+    /** Addresses to answer with a failed request, as when a font file is slow or blocked. */
+    block?: RegExp
   } = {},
 ): Promise<Opened> {
   const size = SIZES[options.size ?? 'desktop-1280x720']
@@ -66,10 +74,23 @@ export async function openGame(
   })
   const page = await context.newPage()
   const errors: string[] = []
+  const errorUrls: string[] = []
   page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text())
+    if (message.type() !== 'error') return
+    errors.push(message.text())
+    errorUrls.push(message.location().url)
   })
-  page.on('pageerror', (error) => errors.push(error.message))
+  page.on('pageerror', (error) => {
+    errors.push(error.message)
+    errorUrls.push('')
+  })
+
+  const requested: string[] = []
+  const answered: { url: string; status: number }[] = []
+  page.on('request', (request) => {
+    if (request.url() !== 'data:,') requested.push(request.url())
+  })
+  page.on('response', (response) => answered.push({ url: response.url(), status: response.status() }))
 
   const violations: string[] = []
   const { csp } = options
@@ -86,7 +107,9 @@ export async function openGame(
 
   const base = new URL(inject('siteUrl'))
   const files = options.files ?? {}
+  const { block } = options
   await page.route('**/*', async (route) => {
+    if (block?.test(route.request().url()) === true) return route.abort()
     // A host sends the policy with the page itself; every other file is served as it is.
     if (csp !== undefined && route.request().resourceType() === 'document') {
       const response = await route.fetch()
@@ -103,7 +126,27 @@ export async function openGame(
   await page.waitForSelector('#game[data-state="playing"], #game[data-state="problem"]', {
     state: 'attached',
   })
-  return { page, errors, violations, close: () => context.close() }
+  return { page, errors, errorUrls, requested, answered, violations, close: () => context.close() }
+}
+
+/** Waits until every font the page asked for has arrived (or failed), so a measurement is taken with the final text. */
+export async function fontsReady(page: Page): Promise<void> {
+  await page.evaluate(() => document.fonts.ready.then(() => undefined))
+}
+
+/**
+ * Whether a face of this family and weight has really been fetched. Never `document.fonts.check`: by its rules it is
+ * also `true` when no face of that name was declared at all, so it would pass with the import lost.
+ */
+export function fontLoaded(page: Page, family: string, weight: string): Promise<boolean> {
+  return page.evaluate(
+    ([name, wanted]) =>
+      [...document.fonts].some(
+        (face) =>
+          face.family.replace(/["']/g, '') === name && face.weight === wanted && face.status === 'loaded',
+      ),
+    [family, weight] as const,
+  )
 }
 
 /** The play so far, from the page. */

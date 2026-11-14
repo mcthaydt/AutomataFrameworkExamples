@@ -7,7 +7,12 @@ const config: UserConfig = defineConfig({
   // A multi-page app answers a file that is not there with 404, never with the page: a missing game file must be
   // noticed, not hidden behind `index.html`.
   appType: 'mpa',
-  build: { target: 'es2023' },
+  build: {
+    target: 'es2023',
+    // Fonts and icons stay files beside the page: the Site's policy blocks `data:` fonts and images in a stylesheet,
+    // and Vite would otherwise carry every small one inside the CSS.
+    assetsInlineLimit: 0,
+  },
 })
 
 export default config
