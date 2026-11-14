@@ -27,7 +27,7 @@
     "test:journeys": "vitest run --project journeys"
   },
   "dependencies": {
-    "@automataframework/framework": "github:mcthaydt/AutomataFramework#874f7d5f7bc399bcfb763f8d134270430e80d074"
+    "@automataframework/framework": "github:mcthaydt/AutomataFramework#cc281c9015d310ac103cdf6da99c784bb4a57aca"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
@@ -43,7 +43,7 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "@automataframework/framework@https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/874f7d5f7bc399bcfb763f8d134270430e80d074"
+      "@automataframework/framework@https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/cc281c9015d310ac103cdf6da99c784bb4a57aca"
     ]
   }
 }
