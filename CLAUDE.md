@@ -39,13 +39,13 @@ particular to this repo added under "This repo".
   changed"); the second is a play of a game built inside the tests, which no edit can reach, so a change to the
   game's code that alters the play fails in every engine. The merge session stops on a golden moved without a commit
   naming it, and these are the two files it watches.
-- **Three build-time packages, named only in CSS.** `@fontsource/ibm-plex-sans-condensed`, `@fontsource/jetbrains-mono`
-  and `@phosphor-icons/core` (exact versions, in `devDependencies`) give the game's own screens the Blueprint look; the
-  Owner approved them (2026-11-14). Only `src/features/play/*.css` names them, never a `.ts` file, so knip, which does
+- **Two build-time packages, named only in CSS.** `@fontsource/fredoka` and `@phosphor-icons/core` (exact versions, in
+  `devDependencies`) give the game's own screens the Blueprint look; the Owner approved them (2026-11-14: the icons, and
+  Fredoka as the one font, never smaller than 18 pixels; its Korean and Chinese partners join with the first translation). Only `src/features/play/*.css` names them, never a `.ts` file, so knip, which does
   not read CSS, would call them unused: they are under `ignoreDependencies` in `knip.json` for that reason alone.
 - **The look.** The game's own screens (the words strip, the touch buttons, the problem screen, the loading and "well
-  done" messages) use the project's Blueprint look, dark only, in palette No. 340 (Black, Neutral Gray, Peach Red; the Owner, 2026-11-14); the game's art never does. The five colours and the two
-  font families are in `src/features/play/blueprint.css` and nowhere else (a test fails on any other colour), and the
+  done" messages) use the project's Blueprint look, dark only, in palette No. 340 (Black, Neutral Gray, Peach Red; the Owner, 2026-11-14); the game's art never does. The five colours and the one
+  font family are in `src/features/play/blueprint.css` and nowhere else (a test fails on any other colour), and the
   framework's touch buttons are dressed through its `--automata-touch-*` CSS properties, never by reaching into the
   framework.
 - **Nothing is published from here.** No changesets, no API report, no release workflow. `pnpm build` makes `dist/`,

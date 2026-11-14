@@ -4,8 +4,7 @@
   "entry": ["scripts/*.ts", "tests/**/*.test.ts", "src/index.ts", "src/headless.ts"],
   "project": ["src/**/*.ts", "tests/**/*.ts"],
   "ignoreDependencies": [
-    "@fontsource/ibm-plex-sans-condensed",
-    "@fontsource/jetbrains-mono",
+    "@fontsource/fredoka",
     "@phosphor-icons/core"
   ]
 }
