@@ -10,11 +10,11 @@ const page = read('../../../index.html')
 
 test("the five colours are the spec's", () => {
   for (const token of [
-    '--paper: #0a1f3c',
-    '--hatch: #0e2a50',
-    '--chalk: #eaf2fa',
-    '--pencil: #8fb0d3',
-    '--marker: #ffd447',
+    '--paper: #111314',
+    '--hatch: #222425',
+    '--chalk: #b6bfc1',
+    '--pencil: #8d9496',
+    '--marker: #00b49b',
   ])
     expect(blueprint.toLowerCase()).toContain(token)
 })
@@ -23,7 +23,7 @@ test('no colour is written anywhere but the token file', () => {
   expect(rules).not.toMatch(/#[0-9a-f]{3,8}\b/i)
   expect(rules).not.toMatch(/\b(?:rgba?|hsla?)\(/i)
   // The page itself needs one colour before any stylesheet loads: the paper (as the background and as the browser's bar).
-  expect(page.match(/#[0-9a-f]{3,8}\b/gi)).toEqual(['#0A1F3C', '#0A1F3C'])
+  expect(page.match(/#[0-9a-f]{3,8}\b/gi)).toEqual(['#111314', '#111314'])
   // A colour's name (`white`) would slip past the two checks above, so every colour-bearing value must be a token.
   const colourProperty =
     /^\s*(color|background(?:-color)?|border(?:-(?:top|bottom|left|right))?(?:-color)?|outline(?:-color)?)\s*:\s*([^;]+);/gm

@@ -1,5 +1,5 @@
-// The Blueprint look on the built page, in each browser, at every size: dark paper, the label font, the buttons as navy
-// chips that turn yellow under a thumb, a broken file said on the same paper, and a page that still plays when its font
+// The Blueprint look on the built page, in each browser, at every size: dark paper, the label font, the buttons as paper
+// chips that turn sea green under a thumb, a broken file said on the same paper, and a page that still plays when its font
 // files never arrive. Layout and focus are checked here because a screenshot proves neither.
 import type { Page } from 'playwright'
 import { afterAll, afterEach, expect, test } from 'vitest'
@@ -23,9 +23,9 @@ afterEach(async () => {
 })
 afterAll(closeBrowser)
 
-const PAPER = 'rgb(10, 31, 60)'
-const CHALK = 'rgb(234, 242, 250)'
-const MARKER = 'rgb(255, 212, 71)'
+const PAPER = 'rgb(17, 19, 20)'
+const CHALK = 'rgb(182, 191, 193)'
+const MARKER = 'rgb(0, 180, 155)'
 const LEVEL = 'content/levels/level-1.json'
 const LABELS = ['Left', 'Right', 'Jump'] as const
 
@@ -102,7 +102,7 @@ for (const [name, size] of sizes) {
 }
 
 for (const [name, size] of sizes.filter(([, s]) => s.touch)) {
-  test(`at ${name}, holding Jump turns it yellow and the hero jumps`, async () => {
+  test(`at ${name}, holding Jump turns it sea green and the hero jumps`, async () => {
     opened = await openGame({ size: name })
     const { page } = opened
     await page.touchscreen.tap(size.width / 2, size.height / 2)
@@ -123,7 +123,7 @@ for (const [name, size] of sizes.filter(([, s]) => s.touch)) {
 }
 
 for (const [name, size] of sizes) {
-  test(`at ${name}, a broken file is said on blueprint paper and fits the screen`, async () => {
+  test(`at ${name}, a broken file is said on the dark paper and fits the screen`, async () => {
     opened = await openGame({ size: name, files: { [LEVEL]: '{ "format": 1,' } })
     const { page } = opened
     await fontsReady(page)
@@ -210,8 +210,18 @@ test('with the fonts blocked, the game still starts and the words are still abov
     expect(words.y + words.height, 'the words end where the game begins').toBeLessThanOrEqual(canvas.y + 0.5)
     for (const b of await buttonsLook(page)) expect(overlaps(b.box, words), b.label).toBe(false)
   }
-  // A browser's words for a failed request do not name the file, so what is compared is where each error came from.
-  for (const url of errorUrls) expect(block.test(url), `an error from ${url}`).toBe(true)
+  // A failed request is logged by each browser in its own words, and some do not say which file: Chromium and WebKit
+  // give the address; Firefox may give none, and then its words are about a font that did not load. Anything else
+  // (an uncaught error, a message about the game) is a real fault.
+  const { errors } = opened
+  for (const [i, url] of errorUrls.entries()) {
+    const aboutTheBlockedFont =
+      block.test(url) || (url === '' && /font|failed to load|network|net::/i.test(errors[i] ?? ''))
+    expect(
+      aboutTheBlockedFont,
+      `an error that is not about the blocked fonts: ${url} ${errors[i] ?? ''}`,
+    ).toBe(true)
+  }
 })
 
 test('at 320 wide, the three buttons fit side by side', async () => {

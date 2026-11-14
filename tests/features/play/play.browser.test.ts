@@ -78,11 +78,11 @@ const inside = (inner: DOMRect, outer: DOMRect): boolean =>
   inner.bottom <= outer.bottom + 0.5
 
 /** The five colours of the look, as the browser reports a computed colour. */
-const PAPER = 'rgb(10, 31, 60)'
-const HATCH = 'rgb(14, 42, 80)'
-const CHALK = 'rgb(234, 242, 250)'
-const PENCIL = 'rgb(143, 176, 211)'
-const MARKER = 'rgb(255, 212, 71)'
+const PAPER = 'rgb(17, 19, 20)'
+const HATCH = 'rgb(34, 36, 37)'
+const CHALK = 'rgb(182, 191, 193)'
+const PENCIL = 'rgb(141, 148, 150)'
+const MARKER = 'rgb(0, 180, 155)'
 
 /**
  * Whether a face of this family and weight has really been fetched. Never `document.fonts.check`: by its rules it is
@@ -267,7 +267,7 @@ test('pushing the crate changes the words to say so', async () => {
   expect(text('.play-goal')).toBe(WORDS.done)
 })
 
-test('the words are chalk on blueprint paper, in the label font', async () => {
+test('the words are chalk on black paper, in the label font', async () => {
   await begin()
   await labelFontReady()
   const words = root.querySelector('.play-words')
@@ -293,7 +293,7 @@ test('every word can be read: each text and its ground reach 4.5 to 1', () => {
     expect(contrast(text, ground), `${text} on ${ground}`).toBeGreaterThanOrEqual(4.5)
 })
 
-test('a touch button is a navy chip with a chalk edge', async () => {
+test('a touch button is a paper chip with a chalk edge', async () => {
   await begin()
   const buttons = touchButtons()
   expect(buttons.map((b) => b.textContent)).toEqual(['Left', 'Right', 'Jump'])
@@ -311,7 +311,7 @@ test('a touch button is a navy chip with a chalk edge', async () => {
   }
 })
 
-test('a held button turns yellow with navy words', async () => {
+test('a held button turns sea green with paper words', async () => {
   await begin()
   const jump = touchButtons().find((b) => b.textContent === 'Jump')
   if (jump === undefined) throw new Error('no Jump button')
