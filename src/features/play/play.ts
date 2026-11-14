@@ -27,6 +27,8 @@ import { listenToTakeOver, loadRecording } from './watching.ts'
 import { WORDS } from './words.ts'
 
 export { CONTROLS } from './controls.ts'
+export { listenForPlay, PLAY_MESSAGE, tellParent } from './handover.ts'
+export { modeOf } from './mode.ts'
 export { readFrom } from './read.ts'
 export { WORDS } from './words.ts'
 

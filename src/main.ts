@@ -2,9 +2,7 @@
 // beside the page, so the same build works from any path. With `?watch` in the address the game first plays its own
 // recording, and a page that frames it can tell it to play (see `features/play/handover.ts`).
 import type { Game, Watch } from '@automataframework/framework'
-import { listenForPlay, tellParent } from './features/play/handover.ts'
-import { modeOf } from './features/play/mode.ts'
-import { type Play, play, readFrom } from './features/play/play.ts'
+import { listenForPlay, modeOf, type Play, play, readFrom, tellParent } from './features/play/play.ts'
 
 declare global {
   interface Window {
