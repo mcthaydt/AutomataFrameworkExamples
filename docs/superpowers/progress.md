@@ -203,6 +203,7 @@ Milestones, for this repo:
 
 ### Log
 
+- 2026-11-14: `commit-authors` (the plan W audit, AutomataFramework PR 100): the check also fails the "by" form of the credit line and its italic footer, and "created", "made", "written" or "authored" with or by it. The script and its test are the framework's, line for line. No Owner question.
 - 2026-11-13: The pin moved from `2a8b09f` to `9109fa357193f57e2d12271c6e6b58dbd783b427` (AutomataFramework pull
   request 19, "stop zod's eval probe before anything else loads"). Under the Site's strict CSP
   (`script-src 'self' 'wasm-unsafe-eval'`) Firefox logged a blocked eval from `/play/assets/headless-*.js`: zod probes
