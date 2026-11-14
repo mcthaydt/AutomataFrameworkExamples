@@ -10,7 +10,7 @@ framework's own tracker are in AutomataFramework
 Spec: the section "Visual direction" of the spec linked above (the Owner, 2026-11-14).
 Plan: [`plans/2026-11-14-blueprint-look-examples.md`](plans/2026-11-14-blueprint-look-examples.md)
 
-Overall: **18%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
+Overall: **68%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
 stage 6 is 12 and the Owner's review is the last 6)
 
 | Stage | State | Output |
@@ -18,13 +18,23 @@ stage 6 is 12 and the Owner's review is the last 6)
 | 1. Spec | Done (in AutomataFramework, pull request 20) | the spec's "Visual direction" |
 | 2. Plan | Done, 100% (in review) | `plans/2026-11-14-blueprint-look-examples.md` |
 | 3. Plan audit | Done, 100% (in review) | `audits/2026-11-14-blueprint-look-examples-plan-audit.md` |
-| 4. Execution | Not started: waits for the Owner's answer to Q1 | three pull requests in order (the framework's button properties, the pin move, the look), or the look alone if Q1 is (c) |
+| 4. Execution | Done, 100% (in review; each of six tasks is 16% of the stage, the close 4%) | three pull requests: AutomataFramework 21 (the button properties), Examples 13 (the pin move), Examples 14 (the look, in palette No. 340) |
 | 5. Implementation audit | Not started | |
 | 6. Fixes | Not started | |
 | 7. Owner review | Not started | |
 
 ### Log
 
+- 2026-11-14: Stage 4 done (Tasks 3 to 6, Examples pull request 14). The game's own screens take the Blueprint look in
+  palette No. 340 of *A Dictionary of Color Combinations* (the Owner: D for the demo's screens): black paper
+  `#111314`, Neutral Gray words `#b6bfc1`, Sea Green `#00b49b` on a touch button only while it is held, and a panel and
+  quiet-words shade mixed from the first two. Peach Red is not used. The Owner's answer to Q1 was (a): buttons are quiet
+  at rest, coloured only when held; sea green rather than yellow keeps a held button from being taken for the yellow
+  crate. All checks are green in Chromium, Firefox and WebKit. The pictures (`ci-screens`, `pr-14/`) show: the words
+  and the three buttons read at once on a phone upright and sideways, a held Jump is plainly sea green and not like the
+  crate, "well done" has a tick, a broken file says on black paper which file and what to do, and the level, hero and
+  crate are exactly as before. Both goldens are unchanged. Still to do, as its own pull request: the example games' own
+  art takes palette No. 276 and the words say "green box" (the Owner, 2026-11-14).
 - 2026-11-14: Stage 4, Task 2 (the plan's Part B). The framework pin moves from `9109fa3` to `984c4e4` (AutomataFramework
   pull request 21: the touch buttons read their look from seven `--automata-touch-*` CSS properties and carry the
   classes `automata-touch` and `automata-touch-button` and `data-action`). The change is the dependency, its
