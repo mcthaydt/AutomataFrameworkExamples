@@ -14,6 +14,7 @@ import {
 } from '@automataframework/framework'
 import { gamePlugins } from '../plugins/plugins.ts'
 import { CONTROLS } from './controls.ts'
+import './blueprint.css'
 import './play.css'
 import { WORDS } from './words.ts'
 

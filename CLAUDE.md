@@ -39,6 +39,10 @@ particular to this repo added under "This repo".
   changed"); the second is a play of a game built inside the tests, which no edit can reach, so a change to the
   game's code that alters the play fails in every engine. The merge session stops on a golden moved without a commit
   naming it, and these are the two files it watches.
+- **Three build-time packages, named only in CSS.** `@fontsource/ibm-plex-sans-condensed`, `@fontsource/jetbrains-mono`
+  and `@phosphor-icons/core` (exact versions, in `devDependencies`) give the game's own screens the Blueprint look; the
+  Owner approved them (2026-11-14). Only `src/features/play/*.css` names them, never a `.ts` file, so knip, which does
+  not read CSS, would call them unused: they are under `ignoreDependencies` in `knip.json` for that reason alone.
 - **Nothing is published from here.** No changesets, no API report, no release workflow. `pnpm build` makes `dist/`,
   a static folder that plays the game from any path; the Site repo builds and hosts it.
 - **`ci-screens`** is a long-lived branch CI writes pictures to (phone, tablet and desktop, upright and sideways),
