@@ -4,7 +4,7 @@
 // which is where the buttons once covered the hero's starting place.
 import type { Page } from 'playwright'
 import { afterAll, afterEach, expect, test } from 'vitest'
-import { closeBrowser, type Opened, openGame, SIZES, untilTick } from './open.ts'
+import { closeBrowser, fontsReady, type Opened, openGame, SIZES, untilTick } from './open.ts'
 
 let opened: Opened | undefined
 afterEach(async () => {
@@ -89,6 +89,7 @@ for (const name of touchSizes) {
     await page.touchscreen.tap(size.width / 2, size.height / 2)
     for (const label of ['Left', 'Right', 'Jump']) await page.getByRole('button', { name: label }).waitFor()
     await untilTick(page, 30)
+    await fontsReady(page)
 
     const hero = await heroSeen(page)
     expect(hero, 'the hero is on screen').toBeDefined()
@@ -107,6 +108,7 @@ test('the check bites: a button put over the hero is reported', async () => {
   await page.touchscreen.tap(195, 422)
   await page.getByRole('button', { name: 'Jump' }).waitFor()
   await untilTick(page, 30)
+  await fontsReady(page)
   const hero = await heroSeen(page)
   expect(hero, 'the hero is on screen').toBeDefined()
   if (hero === undefined) return
