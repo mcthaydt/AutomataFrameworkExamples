@@ -4,7 +4,16 @@
 import { afterAll, afterEach, expect, test } from 'vitest'
 import { WORDS } from '#src/features/play/words.ts'
 import { pinnedFiles } from '../fixtures/pinned-level.ts'
-import { closeBrowser, fontsReady, type Opened, openGame, SIZES, untilTick, untilWatchTick } from './open.ts'
+import {
+  closeBrowser,
+  fontsReady,
+  type Opened,
+  openGame,
+  SIZES,
+  untilTick,
+  untilWatchTick,
+  WATCHING_WORDS,
+} from './open.ts'
 
 const OUT = 'tests/journeys/__screenshots__'
 
@@ -91,7 +100,7 @@ for (const name of Object.keys(SIZES) as (keyof typeof SIZES)[]) {
     opened = await openGame({ size: name, search: '?watch' })
     const { page } = opened
     await untilWatchTick(page, 60)
-    expect(await page.getByText(WORDS.watching, { exact: true }).isVisible()).toBe(true)
+    expect(await page.getByText(WATCHING_WORDS).isVisible()).toBe(true)
     expect(await page.getByRole('button').count(), 'no touch buttons while it plays itself').toBe(0)
     await fontsReady(page)
     await page.screenshot({ path: `${OUT}/watching-${name}.png` })

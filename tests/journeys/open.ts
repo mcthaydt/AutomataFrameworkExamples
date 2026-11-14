@@ -26,6 +26,9 @@ export const SIZES = {
   'desktop-1280x720': { width: 1280, height: 720, touch: false },
 } as const
 
+/** What the strip says while the game plays itself: "Tap" for a finger, "Click" for a mouse (see `words.ts`). */
+export const WATCHING_WORDS: RegExp = /^The game is playing by itself\. (Tap|Click) it to play\.$/
+
 /** Where a journey looks at the game: the page itself, or the frame it sits in when a page frames it. */
 export type Surface = Page | Frame
 

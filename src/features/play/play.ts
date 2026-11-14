@@ -275,7 +275,7 @@ export async function play(options: PlayOptions): Promise<Play> {
       return false
     }
     seen = looking
-    words.replaceChildren(element('p', 'play-watching', WORDS.watching))
+    words.replaceChildren(element('p', 'play-watching', coarse ? WORDS.watching : WORDS.watchingClick))
     unlistenTakeOver = listenToTakeOver(root, () => void made.takeOver())
     setState('watching')
     return true
