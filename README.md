@@ -81,7 +81,7 @@ are in one file, `src/features/play/blueprint.css`; change a colour there and ev
 
 Open the game's address with `?watch` on the end (with `pnpm dev`, that is `http://localhost:5173/?watch`, or whatever
 address `pnpm dev` printed). The game plays its own recording, `replays/level-1.json`, by itself, with no one at the
-controls, and says so in the words at the top. A click, a tap, Enter, Space or an arrow key starts the game for real,
+controls, and says so in the words at the top ("Tap it to play." on a touch screen, "Click it to play." on a computer). A click, a tap, Enter, Space or an arrow key starts the game for real,
 from the beginning of the level, with nothing reloaded. It plays again and again, resting a second between plays, and
 stands still while it is scrolled out of the window or the tab is hidden. A game with no recording, or a broken one,
 simply opens ready to play, and says why in the browser's console.

@@ -22,10 +22,12 @@ stage 6 is 12 and the Owner's review is the last 6)
 | 3. Plan audit | Done, 100%; fixes written into the plan | `audits/2026-11-14-watch-mode-plan-audit.md` |
 | 4. Execution | Done, 100%: Parts A to C merged, Part D green at `e40fbeb` and going to the merge session | AutomataFramework 29 (`watchReplay`); here 25 (the pin) and 26 (the `?watch` mode); AutomataFrameworkSite 22 (the embed) |
 | 5. Implementation audit | Done, 100% (in review) | `audits/2026-11-14-watch-mode-implementation-audit.md` |
-| 6. Fixes | Not started | |
+| 6. Fixes | In progress: the Owner's answers to Q-A, Q-C and F4 are in (all three b); this pull request has the "Click" words (Q-A) and F3; F1 is AutomataFramework pull request 49; Q-C and the idle load are the Site's; the binary loader waits on the Owner's yes to swapping the Rapier package | `audits/2026-11-14-watch-mode-implementation-audit.md` |
 | 7. Owner review | Not started | |
 
 ### Log
+
+- 2026-11-14: Stage 6, this pull request. **Q-A (b):** a screen no finger touches says "The game is playing by itself. Click it to play."; one that is touched keeps "Tap" (`WORDS.watching` and `WORDS.watchingClick`, chosen by the same `(pointer: coarse)` the keys and touch words use). **F3:** the built game's size, measured from Vite's own listing in this repo's `check` job at `6b4b65a`: **1,540 kB gzipped** over the files it lists (the physics engine alone is 1,315 kB, sent as base64 text), plus a 16 kB font and the recording; the Site's tracker has the same line. Not a test result: a number read from the build log.
 
 - 2026-11-14: Stage 5. All four parts read against the spec, the plan and its audit; every check green, no golden
   moved, S1 to S7 all landed. Should fix: F1, `watchReplay`'s `rounds` plays past the recording's end when a frame

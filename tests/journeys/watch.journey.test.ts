@@ -16,6 +16,7 @@ import {
   tickOf,
   untilTick,
   untilWatchTick,
+  WATCHING_WORDS,
   watchTickOf,
 } from './open.ts'
 
@@ -45,7 +46,7 @@ test('with ?watch the game plays itself: the picture moves and nobody pressed an
   await untilWatchTick(page, 90)
   const second = await page.locator('canvas').screenshot()
   expect(first.equals(second), 'the canvas is drawn, and the picture changed').toBe(false)
-  expect(await page.getByText(WORDS.watching, { exact: true }).isVisible()).toBe(true)
+  expect(await page.getByText(WATCHING_WORDS).isVisible()).toBe(true)
   expect(await page.locator('button').count(), 'no touch buttons while watching').toBe(0)
   expect(errors).toEqual([])
   expect(answered.filter((a) => a.status >= 400)).toEqual([])
@@ -61,7 +62,10 @@ for (const [name, size] of Object.entries(SIZES) as [
     await untilWatchTick(page, 30)
     await fontsReady(page)
     const words = page.locator('.play-watching')
-    expect(await words.innerText()).toBe(WORDS.watching)
+    // A screen no finger touches says "Click"; one that is touched says "Tap" (the engines differ in whether a test's
+    // touch emulation counts as a coarse pointer, so a touch size may say either).
+    expect(await words.innerText()).toMatch(WATCHING_WORDS)
+    if (!SIZES[name].touch) expect(await words.innerText()).toBe(WORDS.watchingClick)
     expect(
       Number.parseFloat(await words.evaluate((e) => getComputedStyle(e).fontSize)),
     ).toBeGreaterThanOrEqual(18)

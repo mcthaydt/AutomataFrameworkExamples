@@ -100,8 +100,15 @@ test('in watch mode the game plays the recording by itself', async () => {
   expect(root.querySelector('.play-goal')).toBeNull()
 })
 
-test('while it plays itself the words say so, and only that', async () => {
+test('while it plays itself the words say so, and only that: "Click" on a screen no finger touches', async () => {
   await watchIt()
+  expect(text('.play-watching')).toBe(WORDS.watchingClick)
+  expect(root.querySelector('.play-how')).toBeNull()
+  expect(WORDS.watchingClick).toBe('The game is playing by itself. Click it to play.')
+})
+
+test('on a screen touched with a finger the words say "Tap"', async () => {
+  await watchIt({ coarse: true })
   expect(text('.play-watching')).toBe(WORDS.watching)
   expect(root.querySelector('.play-how')).toBeNull()
   expect(WORDS.watching).toBe('The game is playing by itself. Tap it to play.')
