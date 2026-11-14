@@ -62,9 +62,9 @@ test('a hidden host stays hidden whatever the root does', async () => {
   host.hide()
   window.scrollTo(0, 4000)
   seen = whileSeen(host, root)
-  // The root is in view, and the host still says no. A second observer, made after the first, hears of the root being in
-  // view in the same delivery and after it, so when it has spoken the first has had its say (two animation frames
-  // were not always enough on a slow machine).
+  // The root is in view, and the host still says no. The observer's word is not exposed while the host says no, and
+  // browsers do not promise which of two observers hears first, so this waits for a second observer to see the root
+  // and then for two frames, and the check after the host returns does not depend on that wait being enough.
   await new Promise<void>((resolve) => {
     const second = new IntersectionObserver((entries) => {
       if (!entries.some((entry) => entry.isIntersecting)) return
@@ -73,12 +73,13 @@ test('a hidden host stays hidden whatever the root does', async () => {
     })
     second.observe(root)
   })
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
   expect(seen.visible()).toBe(false)
   // The host coming back is what makes it visible, which shows the root was in view all along.
   const told: boolean[] = []
   seen.onVisibility((visible) => told.push(visible))
   host.show()
-  expect(seen.visible()).toBe(true)
+  await vi.waitFor(() => expect(seen?.visible()).toBe(true))
   expect(told).toEqual([true])
 })
 
