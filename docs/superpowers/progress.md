@@ -10,7 +10,7 @@ framework's own tracker are in AutomataFramework
 Spec: the section "Visual direction" of the spec linked above (the Owner, 2026-11-14).
 Plan: [`plans/2026-11-14-blueprint-look-examples.md`](plans/2026-11-14-blueprint-look-examples.md)
 
-Overall: **82%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
+Overall: **94%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
 stage 6 is 12 and the Owner's review is the last 6)
 
 | Stage | State | Output |
@@ -18,12 +18,28 @@ stage 6 is 12 and the Owner's review is the last 6)
 | 1. Spec | Done (in AutomataFramework, pull request 20) | the spec's "Visual direction" |
 | 2. Plan | Done, 100% (in review) | `plans/2026-11-14-blueprint-look-examples.md` |
 | 3. Plan audit | Done, 100% (in review) | `audits/2026-11-14-blueprint-look-examples-plan-audit.md` |
-| 4. Execution | Done, 100% (in review; each of six tasks is 16% of the stage, the close 4%) | three pull requests: AutomataFramework 21 (the button properties), Examples 13 (the pin move), Examples 14 (the look, in palette No. 340) |
-| 5. Implementation audit | Done, 100% (in review) | `audits/2026-11-14-blueprint-look-examples-implementation-audit.md` |
-| 6. Fixes | Not started | |
+| 4. Execution | Done, 100% (merged; each of six tasks is 16% of the stage, the close 4%) | eight pull requests: AutomataFramework 21 (the button properties) and 25 (the level's sky and ground); Examples 13 and 18 (the pin moves), 14 (the look, in palette No. 340), 17 (the hero and crate colours), 19 (the level's colours) and 20 (Fredoka) |
+| 5. Implementation audit | Done, 100% (merged, Examples 21) | `audits/2026-11-14-blueprint-look-examples-implementation-audit.md` |
+| 6. Fixes | Done, 100% (in review) | F1 to F4 and N1, N2, N8 and the comment notes, in one pull request here; the spec's one line in a small pull request in AutomataFramework |
 | 7. Owner review | Not started | |
 
 ### Log
+
+- 2026-11-14: Stage 6. The audit's F1 to F4 are applied, and nothing waits for the Owner. F1: the tests' own level
+  (`pinned-level.ts`) has the Black sky and Seashell Pink ground, with `tests/game/pinned-level.test.ts` holding the two
+  colours written out. F2: the words are the Owner's, "You are the box on the left. Push the other box." and "You
+  pushed the box. Well done!" (there is no flag), the README says "a box on the left" and "the other box", and
+  `tests/game/art.test.ts` no longer pins a colour on the real files: it holds that the hero, the crate and the ground
+  each stand 3 to 1 clear of the sky, and that no sentence names a colour. F3: `public/licences.txt` carries the
+  Fredoka and Phosphor notices, held by `tests/game/licences.test.ts`, with one line in `CLAUDE.md`. F4: the plan's boxes
+  are ticked and it opens with what changed after it was written, this tracker's stage 4 row lists all eight pull
+  requests, and the stale comments (`play.ts`, `blueprint.test.ts`, the "label font" ones, how the two mixes are made in
+  `blueprint.css`) are corrected; the spec's one line (Peach Red, not Sea Green, on a held button) is a small pull
+  request in AutomataFramework. Also from the audit's notes: N1 (the file's name on a panel, pencil on hatch, joins the
+  readable-pairs test), N2 (the layout journey finds the hero by its own colour, read from `hero.json`, instead of "more
+  red than not") and N8 (the problem title says `font-weight: 600`). The Owner's Q1 answer, (a), stands: colour-blind
+  help waits for M2. No test was run here; both goldens are untouched, and the pinned level's play moves only in
+  hashes nothing records.
 
 - 2026-11-14: The Owner's final words, with no flag: "You are the box on the left. Push the other box." and "You
   pushed the box. Well done!" Nothing in the audit waits for the Owner any more; stage 6 can apply F1 to F4.
@@ -111,7 +127,7 @@ Owner's review is the last 6; stage 1, the spec, was done in AutomataFramework)
 | 2. Plan (M1, Examples) | Done, 100% (in review) | `plans/2026-11-13-m1-thin-thread-examples.md` |
 | 3. Plan audit | Done, 100% (in review) | `audits/2026-11-13-m1-examples-plan-audit.md` |
 | 4. Execution | Done, 100% (in review) | the plan, ticked as it goes (each task is 14% of the stage, the close 2%) |
-| 5. Implementation audit | Done, 100% (in review) | `audits/2026-11-13-m1-examples-implementation-audit.md` |
+| 5. Implementation audit | Done, 100% (merged, Examples 21) | `audits/2026-11-13-m1-examples-implementation-audit.md` |
 | 6. Fixes | Done, 100% (in review) | F1 to F4 of the implementation audit, in pull request 7 |
 | 7. Owner review | Not started | |
 

@@ -8,7 +8,9 @@ const blueprint = read('../../../src/features/play/blueprint.css')
 const rules = read('../../../src/features/play/play.css')
 const page = read('../../../index.html')
 
-test("the five colours are the spec's", () => {
+// Three colours are the palette's own (No. 340: Black, Neutral Gray, Peach Red); the other two are mixes of the first two,
+// made in `blueprint.css`.
+test("the five colours are the look's", () => {
   for (const token of [
     '--paper: #111314',
     '--hatch: #222425',

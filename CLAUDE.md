@@ -48,6 +48,9 @@ particular to this repo added under "This repo".
   font family are in `src/features/play/blueprint.css` and nowhere else (a test fails on any other colour), and the
   framework's touch buttons are dressed through its `--automata-touch-*` CSS properties, never by reaching into the
   framework.
+- **Licence notices.** `public/licences.txt` (Vite copies it into `dist/`, beside the page) carries the notices of
+  Fredoka and the icons, copied from each package's own `LICENSE`. Move either package's version, and copy its
+  `LICENSE` there again; `tests/game/licences.test.ts` fails until you do.
 - **Nothing is published from here.** No changesets, no API report, no release workflow. `pnpm build` makes `dist/`,
   a static folder that plays the game from any path; the Site repo builds and hosts it.
 - **`ci-screens`** is a long-lived branch CI writes pictures to (phone, tablet and desktop, upright and sideways),
@@ -186,6 +189,7 @@ src/headless.ts               everything that needs no page: the sim side of the
 src/main.ts                   the page's script
 src/lib/                      shared helpers, no feature logic
 src/features/<feature>/       <feature>.ts entry, <part>.ts one job per file
+public/                       files served as they are: licences.txt
 scripts/                      thin CLI wrappers
 tests/architecture.test.ts    imports go down, no cycles, no tests in src, only the framework is imported
 tests/architecture/           the rules that test reads (rules.ts) and a test of the rules

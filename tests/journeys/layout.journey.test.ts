@@ -1,7 +1,8 @@
 // The touch buttons must never sit on the hero. They take the bottom of the screen once a finger touches it, and the
 // framework fits the level above them. The proof looks at what a player sees: a picture of the page, in which the hero
-// is the one pink thing, and the buttons are boxes on the page. Held sideways on a phone, the level fills the height,
+// is the one thing in the hero's own colour, and the buttons are boxes on the page. Held sideways on a phone, the level fills the height,
 // which is where the buttons once covered the hero's starting place.
+import { readFileSync } from 'node:fs'
 import type { Page } from 'playwright'
 import { afterAll, afterEach, expect, test } from 'vitest'
 import { closeBrowser, fontsReady, type Opened, openGame, SIZES, untilTick } from './open.ts'
@@ -12,6 +13,19 @@ afterEach(async () => {
   opened = undefined
 })
 afterAll(closeBrowser)
+
+/**
+ * The hero's colour, as the real file has it: an editor may recolour the hero, and the picture is then searched for the
+ * new colour. As `[red, green, blue]`.
+ */
+const heroColour: readonly [number, number, number] = (() => {
+  const file = readFileSync(new URL('../../content/characters/hero.json', import.meta.url), 'utf8')
+  const hex = (JSON.parse(file) as { color: string }).color
+  return [1, 3, 5].map((i) => Number.parseInt(hex.slice(i, i + 2), 16)) as unknown as [number, number, number]
+})()
+
+/** How far (as a distance in red, green and blue) a pixel may be from the hero's colour and still count as the hero. */
+const HERO_REACH = 24
 
 interface Box {
   readonly x: number
@@ -24,41 +38,44 @@ const overlaps = (a: Box, b: Box): boolean =>
   a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height
 
 /**
- * The box around every pink-ish pixel of a picture, or `undefined` if there are none. "Pink-ish" is red well above green
- * and blue: it takes in the hero and the hero seen through a button, and none of the sky, the walls, the green crate
- * or the see-through buttons. The picture is read in a page of its own, with the browser's own decoder.
+ * The box around every pixel of the hero's own colour in a picture (within `HERO_REACH`), or `undefined` if there are
+ * none. Nothing else the page draws is that near it: not the sky, the ground, the walls, the crate or a held button.
+ * The picture is read in a page of its own, with the browser's own decoder.
  */
 async function heroBox(page: Page, png: Buffer): Promise<Box | undefined> {
   const reader = await page.context().newPage()
   try {
-    return await reader.evaluate(async (base64) => {
-      const image = new Image()
-      image.src = `data:image/png;base64,${base64}`
-      await image.decode()
-      const canvas = document.createElement('canvas')
-      canvas.width = image.width
-      canvas.height = image.height
-      const context = canvas.getContext('2d')
-      if (context === null) throw new Error('No 2D canvas to read the picture with.')
-      context.drawImage(image, 0, 0)
-      const { data } = context.getImageData(0, 0, canvas.width, canvas.height)
-      let left = canvas.width
-      let top = canvas.height
-      let right = -1
-      let bottom = -1
-      for (let y = 0; y < canvas.height; y++) {
-        for (let x = 0; x < canvas.width; x++) {
-          const at = (y * canvas.width + x) * 4
-          const [r, g, b] = [data[at] ?? 0, data[at + 1] ?? 0, data[at + 2] ?? 0]
-          if (r - Math.max(g, b) < 50) continue
-          left = Math.min(left, x)
-          top = Math.min(top, y)
-          right = Math.max(right, x)
-          bottom = Math.max(bottom, y)
+    return await reader.evaluate(
+      async ({ base64, hero, reach }) => {
+        const image = new Image()
+        image.src = `data:image/png;base64,${base64}`
+        await image.decode()
+        const canvas = document.createElement('canvas')
+        canvas.width = image.width
+        canvas.height = image.height
+        const context = canvas.getContext('2d')
+        if (context === null) throw new Error('No 2D canvas to read the picture with.')
+        context.drawImage(image, 0, 0)
+        const { data } = context.getImageData(0, 0, canvas.width, canvas.height)
+        let left = canvas.width
+        let top = canvas.height
+        let right = -1
+        let bottom = -1
+        for (let y = 0; y < canvas.height; y++) {
+          for (let x = 0; x < canvas.width; x++) {
+            const at = (y * canvas.width + x) * 4
+            const [r, g, b] = [data[at] ?? 0, data[at + 1] ?? 0, data[at + 2] ?? 0]
+            if (Math.hypot(r - hero[0], g - hero[1], b - hero[2]) > reach) continue
+            left = Math.min(left, x)
+            top = Math.min(top, y)
+            right = Math.max(right, x)
+            bottom = Math.max(bottom, y)
+          }
         }
-      }
-      return right < 0 ? undefined : { x: left, y: top, width: right - left + 1, height: bottom - top + 1 }
-    }, png.toString('base64'))
+        return right < 0 ? undefined : { x: left, y: top, width: right - left + 1, height: bottom - top + 1 }
+      },
+      { base64: png.toString('base64'), hero: heroColour, reach: HERO_REACH },
+    )
   } finally {
     await reader.close()
   }
@@ -66,7 +83,7 @@ async function heroBox(page: Page, png: Buffer): Promise<Box | undefined> {
 
 /**
  * The hero, with the buttons hidden from the picture but still measured. A solid button would hide the part of the hero
- * under it, the pink box would shrink to what still shows, and the check would pass on the very overlap it is there to
+ * under it, the hero would shrink to what still shows, and the check would pass on the very overlap it is there to
  * catch.
  */
 async function heroSeen(page: Page): Promise<Box | undefined> {

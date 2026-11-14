@@ -8,8 +8,10 @@
 /* On the root, so the framework's touch buttons (which sit inside it) inherit them. */
 .play-root {
   --paper: #111314;
-  --hatch: #222425;
   --chalk: #b6bfc1;
+  /* Two mixes, from the palette's own Black and Neutral Gray, the only place this is written down: the panel (hatch) is
+     10% of the way from paper to chalk, and the quiet words (pencil) 75% of the way. */
+  --hatch: #222425;
   --pencil: #8d9496;
   --marker: #f15a30;
   /* Families only: a rule that uses one writes its own weight and size. */
