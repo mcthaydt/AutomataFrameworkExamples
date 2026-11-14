@@ -5,6 +5,38 @@ framework's own tracker are in AutomataFramework
 ([spec](https://github.com/mcthaydt/AutomataFramework/blob/main/docs/superpowers/specs/2026-11-13-2d-first-layer-design.md),
 [tracker](https://github.com/mcthaydt/AutomataFramework/blob/main/docs/superpowers/progress.md)).
 
+## Cycle 3: the game plays itself before Play ("watch" mode)
+
+Spec: [`2026-11-14-watch-mode-design.md`](https://github.com/mcthaydt/AutomataFramework/blob/main/docs/superpowers/specs/2026-11-14-watch-mode-design.md)
+in AutomataFramework, an addendum to the first layer's spec (the Owner, 2026-11-14: the site shows the game playing
+its recorded play before Play is pressed).
+Plan: [`plans/2026-11-14-watch-mode.md`](plans/2026-11-14-watch-mode.md)
+
+Overall: **12%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
+stage 6 is 12 and the Owner's review is the last 6)
+
+| Stage | State | Output |
+|---|---|---|
+| 1. Spec | Written; four questions open for the Owner (Q1 to Q4) | the addendum linked above |
+| 2. Plan | Done, 100% (in review) | `plans/2026-11-14-watch-mode.md` |
+| 3. Plan audit | Not started | |
+| 4. Execution | Not started | four pull requests in order: AutomataFramework (`watchReplay`), here (the pin move), here (the `?watch` mode), AutomataFrameworkSite (the embed) |
+| 5. Implementation audit | Not started | |
+| 6. Fixes | Not started | |
+| 7. Owner review | Not started | |
+
+### Log
+
+- 2026-11-14: Stage 2. The first layer's spec does not say what a visitor sees before Play, so a short addendum was
+  written first (in AutomataFramework) and the plan follows it. Found while planning: the framework cannot draw a
+  replay yet (`startGame` always makes its own input and its loop is not exported), so the plan adds one function,
+  `watchReplay`, to the framework; `dist/` does not carry `replays/`, so the build copies the first level's recording;
+  the page and the game need two messages to hand over without a reload. Nine tasks in four parts, with journeys in
+  three browsers in this repo and on the Site (against the stand-in and the real game). Four questions for the Owner
+  were sent to the coordinator and none is decided: the game's words while it plays itself, whether a tap on the
+  moving game starts it, what visitors who asked for less motion see, and how long it plays. Tasks 1, 2, 3, 5 and 7
+  wait for no answer. No dependency is added, no golden moves, and no test was run.
+
 ## Cycle 2: the Blueprint look for the game's own screens
 
 Spec: the section "Visual direction" of the spec linked above (the Owner, 2026-11-14).
