@@ -2,6 +2,7 @@
 // (`tests/fixtures/test-game.ts`) is the one played, so no editor's change to the real level can break these.
 import { Player, parseContent, Transform, writeContent } from '@automataframework/framework'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
+import { userEvent } from 'vitest/browser'
 import { type Play, type PlayOptions, play, readFrom, WORDS } from '#src/features/play/play.ts'
 import { manualFrames } from '../../fixtures/frames.ts'
 import { readTestGame, testGameFiles } from '../../fixtures/test-game.ts'
@@ -75,6 +76,55 @@ const inside = (inner: DOMRect, outer: DOMRect): boolean =>
   inner.right <= outer.right + 0.5 &&
   inner.top >= outer.top - 0.5 &&
   inner.bottom <= outer.bottom + 0.5
+
+/** The five colours of the look, as the browser reports a computed colour. */
+const PAPER = 'rgb(10, 31, 60)'
+const HATCH = 'rgb(14, 42, 80)'
+const CHALK = 'rgb(234, 242, 250)'
+const PENCIL = 'rgb(143, 176, 211)'
+const MARKER = 'rgb(255, 212, 71)'
+
+/**
+ * Whether a face of this family and weight has really been fetched. Never `document.fonts.check`: by its rules it is
+ * also `true` when no face of that name was declared at all, so it would pass with the import lost and the system font
+ * on screen.
+ */
+const fontLoaded = (family: string, weight: string): boolean =>
+  [...document.fonts].some(
+    (face) =>
+      face.family.replace(/["']/g, '') === family && face.weight === weight && face.status === 'loaded',
+  )
+
+/** Draws with the label font once, so its file has been asked for and arrived before a test looks at the words. */
+const labelFontReady = async (): Promise<void> => {
+  await document.fonts.load("600 18px 'IBM Plex Sans Condensed'")
+}
+
+/** The WCAG contrast ratio of two computed `rgb()` colours. */
+function contrast(a: string, b: string): number {
+  const light = (colour: string): number => {
+    const [r = 0, g = 0, bl = 0] = (colour.match(/\d+/g) ?? []).map((n) => {
+      const c = Number(n) / 255
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+    })
+    return 0.2126 * r + 0.7152 * g + 0.0722 * bl
+  }
+  const [hi, lo] = [light(a), light(b)].sort((x, y) => y - x)
+  return ((hi ?? 0) + 0.05) / ((lo ?? 0) + 0.05)
+}
+
+/** A touch landing on, or lifting from, one element. */
+const touchOn = (target: Element, type: 'pointerdown' | 'pointerup'): void => {
+  target.dispatchEvent(
+    new PointerEvent(type, { pointerId: 7, pointerType: 'touch', bubbles: true, cancelable: true }),
+  )
+}
+
+/** A touch brings the framework's buttons up (this file says "no touch screen", so they start hidden). */
+const touchButtons = (): HTMLButtonElement[] => {
+  pointer('pointerdown', 'touch')
+  return [...root.querySelectorAll('button')]
+}
 
 test('play fills the root (the words, then the game under them), starts the game and says so', async () => {
   const { play: made } = await begin()
@@ -211,6 +261,170 @@ test('pushing the crate changes the words to say so', async () => {
   // And it stays said.
   run(frames, 30)
   expect(text('.play-goal')).toBe(WORDS.done)
+})
+
+test('the words are chalk on blueprint paper, in the label font', async () => {
+  await begin()
+  await labelFontReady()
+  const words = root.querySelector('.play-words')
+  const goal = root.querySelector('.play-goal')
+  const how = root.querySelector('.play-how')
+  if (words === null || goal === null || how === null) throw new Error('no words')
+  expect(getComputedStyle(words).backgroundColor).toBe(PAPER)
+  expect(getComputedStyle(goal).color).toBe(CHALK)
+  expect(getComputedStyle(how).color).toBe(PENCIL)
+  expect(getComputedStyle(goal).fontFamily.startsWith('"IBM Plex Sans Condensed"')).toBe(true)
+  expect(fontLoaded('IBM Plex Sans Condensed', '600')).toBe(true)
+  expect(getComputedStyle(goal).textTransform).toBe('none')
+})
+
+test('every word can be read: each text and its ground reach 4.5 to 1', () => {
+  for (const [text, ground] of [
+    [CHALK, PAPER],
+    [PENCIL, PAPER],
+    [MARKER, PAPER],
+    [PAPER, MARKER],
+    [CHALK, HATCH],
+  ] as const)
+    expect(contrast(text, ground), `${text} on ${ground}`).toBeGreaterThanOrEqual(4.5)
+})
+
+test('a touch button is a navy chip with a chalk edge', async () => {
+  await begin()
+  const buttons = touchButtons()
+  expect(buttons.map((b) => b.textContent)).toEqual(['Left', 'Right', 'Jump'])
+  for (const b of buttons) {
+    const style = getComputedStyle(b)
+    expect(style.backgroundColor, b.textContent ?? '').toBe(PAPER)
+    expect(style.borderTopWidth).toBe('1px')
+    expect(style.borderTopColor).toBe(CHALK)
+    expect(style.borderTopLeftRadius).toBe('2px')
+    expect(style.color).toBe(CHALK)
+    expect(style.textTransform).toBe('uppercase')
+    expect(style.transitionDuration).toBe('0s')
+    expect(b.offsetWidth).toBeGreaterThanOrEqual(64)
+    expect(b.offsetHeight).toBeGreaterThanOrEqual(64)
+  }
+})
+
+test('a held button turns yellow with navy words', async () => {
+  await begin()
+  const jump = touchButtons().find((b) => b.textContent === 'Jump')
+  if (jump === undefined) throw new Error('no Jump button')
+  touchOn(jump, 'pointerdown')
+  expect(getComputedStyle(jump).backgroundColor).toBe(MARKER)
+  expect(getComputedStyle(jump).color).toBe(PAPER)
+  touchOn(jump, 'pointerup')
+  expect(getComputedStyle(jump).backgroundColor).toBe(PAPER)
+  expect(getComputedStyle(jump).color).toBe(CHALK)
+})
+
+test('every button has its picture above its word', async () => {
+  await begin()
+  for (const b of touchButtons()) {
+    const picture = getComputedStyle(b, '::before')
+    expect(picture.width, b.textContent ?? '').toBe('28px')
+    expect(picture.display).toBe('block')
+    const mask = picture.maskImage || picture.getPropertyValue('-webkit-mask-image')
+    expect(mask, b.textContent ?? '').not.toBe('none')
+    expect(mask).not.toBe('')
+  }
+})
+
+test("the keyboard's place on a button is ringed in chalk", async () => {
+  await begin()
+  const [first] = touchButtons()
+  if (first === undefined) throw new Error('no buttons')
+  first.focus({ focusVisible: true })
+  // A browser that ignores that option needs a real key press to say "the keyboard is here".
+  for (let tries = 0; tries < 6 && !(document.activeElement?.matches(':focus-visible') ?? false); tries++)
+    await userEvent.keyboard('{Tab}')
+  const focused = document.activeElement
+  if (!(focused instanceof HTMLButtonElement) || !focused.matches(':focus-visible'))
+    throw new Error('the keyboard did not reach a button')
+  const style = getComputedStyle(focused)
+  expect(style.outlineColor).toBe(CHALK)
+  expect(style.outlineWidth).toBe('3px')
+  expect(style.outlineStyle).toBe('solid')
+  expect(style.outlineOffset).toBe('2px')
+})
+
+test('pushing the crate marks the words as done', async () => {
+  const { play: made, frames } = await begin({ files: { [LEVEL]: levelWithCrate() } })
+  if (made.game === undefined) throw new Error('the game did not start')
+  expect(root.querySelector('.play-goal')?.classList.contains('play-done')).toBe(false)
+  key('keydown', 'ArrowRight')
+  frames.at(0)
+  run(frames, 120)
+  key('keyup', 'ArrowRight')
+  expect(text('.play-goal')).toBe(WORDS.done)
+  expect(root.querySelector('.play-goal')?.classList.contains('play-done')).toBe(true)
+})
+
+test('the problem screen is the same paper, with each problem on its own panel', async () => {
+  root.style.width = '390px'
+  await begin({
+    files: {
+      [LEVEL]: '{ "format": 1,',
+      'content/characters/crate.json': undefined,
+    },
+  })
+  const screen = root.querySelector<HTMLElement>('.play-problem')
+  if (screen === null) throw new Error('no problem screen')
+  expect(getComputedStyle(screen).backgroundColor).toBe(PAPER)
+  expect(getComputedStyle(screen).color).toBe(CHALK)
+  const items = [...screen.querySelectorAll('li')]
+  expect(items).toHaveLength(2)
+  for (const item of items) {
+    expect(getComputedStyle(item).backgroundColor).toBe(HATCH)
+    expect(getComputedStyle(item).borderTopWidth).toBe('1px')
+  }
+})
+
+test('a long file name does not push the problem screen wider than the screen', async () => {
+  root.style.width = '390px'
+  const longName = `content/levels/${'a'.repeat(120)}.json`
+  await begin({ read: () => Promise.reject(new Error(longName)) })
+  const screen = root.querySelector<HTMLElement>('.play-problem')
+  if (screen === null) throw new Error('no problem screen')
+  expect(screen.scrollWidth).toBeLessThanOrEqual(screen.clientWidth)
+})
+
+test('a problem says where in the measuring font and what in plain words', async () => {
+  await begin({
+    files: { [LEVEL]: '{ "format": 1,', 'content/characters/crate.json': undefined },
+  })
+  await document.fonts.load("400 15px 'JetBrains Mono'")
+  const items = [...root.querySelectorAll('.play-problem li')]
+  expect(items).toHaveLength(2)
+  for (const item of items) {
+    const where = item.querySelector('.play-where')
+    const what = item.querySelector('.play-what')
+    if (where === null || what === null) throw new Error(`no two parts in "${item.textContent}"`)
+    expect(getComputedStyle(where).fontFamily.startsWith('"JetBrains Mono"')).toBe(true)
+    expect(getComputedStyle(where).color).toBe(PENCIL)
+    expect(getComputedStyle(where).fontSize).toBe('15px')
+    expect(getComputedStyle(what).fontFamily.startsWith('"IBM Plex Sans Condensed"')).toBe(true)
+    expect(getComputedStyle(what).color).toBe(CHALK)
+    expect(getComputedStyle(what).fontSize).toBe('18px')
+    expect(getComputedStyle(where).display).toBe('inline')
+    expect(getComputedStyle(what).display).toBe('inline')
+  }
+  // The words of a line are exactly what `formatDiagnostic` gives, so everything that reads them is unchanged.
+  expect(items.map((item) => item.textContent)).toEqual([
+    'content/levels/level-1.json: This file is not valid JSON. Check for a missing comma, quote or bracket.',
+    'content/characters/crate.json: This file is listed in automata.toml but is missing.',
+  ])
+  expect(fontLoaded('JetBrains Mono', '400')).toBe(true)
+})
+
+test('a game that cannot start has one plain line and no place', async () => {
+  await begin({ start: () => Promise.reject(new Error('No WebGL')) })
+  const items = [...root.querySelectorAll('.play-problem li')]
+  expect(items).toHaveLength(1)
+  expect(items[0]?.querySelector('.play-where')).toBeNull()
+  expect(items[0]?.textContent).toBe('No WebGL')
+  expect(items[0]?.querySelector('.play-what')?.textContent).toBe('No WebGL')
 })
 
 test('a game that does not load shows every problem in order, and no canvas', async () => {
