@@ -14,7 +14,7 @@ The build is what the plan asked for, with every plan-audit finding applied (B1,
 together. CI on `bc922f8` (run 43522330339) is green in all five jobs: `check` ran 57 Node tests in 11 files; each
 engine job ran 20 browser tests in 3 files, 5 Node replay tests in 2 files and 14 journeys in 3 files. The recorded
 play of level 1 ends on `77be68a6e1859241` in Node, Chromium, WebKit and Firefox (each engine job's log says so), and
-the strict test-game recording passes in all four. All 20 commits are by Dawson McThay, none carries AI attribution,
+the strict test-game recording passes in all four. All 20 commits are by McThayDT, none carries AI attribution,
 and no strategy text is in the tree. The pictures on `ci-screens` under `pr-3/` were looked at, all 21 of them.
 
 Nothing here blocks merging pull request 3. There are **four should-fix findings** for Stage 6 (Fixes), F1 to F4.

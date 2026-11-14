@@ -85,8 +85,8 @@ Checked while this plan was written (an install in a scratch folder, not a test)
   screen that fails is a defect. The words stay at the top for the whole game, which on a phone held sideways costs a
   share of a short screen: that is deliberate in M1 (a player who looks away and back still needs them), and M2's
   title and pause screens take over the job (audit S4).
-- Comments say why. Conventional Commits. The author is Dawson McThay
-  (`git config --global user.name "Dawson McThay" && git config --global user.email "107786093+mcthaydt@users.noreply.github.com"`).
+- Comments say why. Conventional Commits. The author is McThayDT
+  (`git config --global user.name "McThayDT" && git config --global user.email "107786093+mcthaydt@users.noreply.github.com"`).
   No AI attribution in commits, pull request bodies or docs. The pull request body is edited only with the GitHub MCP
   tool and its credit line reads "Requested by **McThayDT**".
 - No dependency beyond the Tech Stack line. A task that needs one stops and asks.
