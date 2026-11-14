@@ -12,14 +12,14 @@ in AutomataFramework, an addendum to the first layer's spec (the Owner, 2026-11-
 its recorded play before Play is pressed).
 Plan: [`plans/2026-11-14-watch-mode.md`](plans/2026-11-14-watch-mode.md)
 
-Overall: **12%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
+Overall: **18%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
 stage 6 is 12 and the Owner's review is the last 6)
 
 | Stage | State | Output |
 |---|---|---|
 | 1. Spec | Written; four questions open for the Owner (Q1 to Q4) | the addendum linked above |
-| 2. Plan | Done, 100% (in review) | `plans/2026-11-14-watch-mode.md` |
-| 3. Plan audit | Not started | |
+| 2. Plan | Done, 100% | `plans/2026-11-14-watch-mode.md` |
+| 3. Plan audit | Done, 100% (in review); fixes written into the plan | `audits/2026-11-14-watch-mode-plan-audit.md` |
 | 4. Execution | Not started | four pull requests in order: AutomataFramework (`watchReplay`), here (the pin move), here (the `?watch` mode), AutomataFrameworkSite (the embed) |
 | 5. Implementation audit | Not started | |
 | 6. Fixes | Not started | |
@@ -36,6 +36,14 @@ stage 6 is 12 and the Owner's review is the last 6)
   were sent to the coordinator and none is decided: the game's words while it plays itself, whether a tap on the
   moving game starts it, what visitors who asked for less motion see, and how long it plays. Tasks 1, 2, 3, 5 and 7
   wait for no answer. No dependency is added, no golden moves, and no test was run.
+- 2026-11-14: Stage 3. The plan was audited against the addendum and the real code of all three repos (the framework
+  at `13fb0a3`). Nothing blocks besides Q1 to Q4, which the audit leaves alone. Seven should-fix findings, all written
+  into the plan: a finished watch would start again when the tab came back (S1); looping needs a parity test of a
+  level restored to tick 0, in Node too (S2); the watching play is exposed as `window.automataWatch`, so journeys wait
+  on its tick and rounds, not on pixels (S3); a frame scrolled off its page gets a journey (S4); `copy-game.ts`
+  imports `mode.ts` itself, since the play entry loads CSS (S5); the Site's frame `load` no longer means "playing"
+  for a watching frame, and `problem` after a hand-over shows the game's words (S6); `main.ts` listens for `play`
+  before the game is ready (S7). Seven notes (N1 to N7). No test was run.
 
 ## Cycle 2: the Blueprint look for the game's own screens
 

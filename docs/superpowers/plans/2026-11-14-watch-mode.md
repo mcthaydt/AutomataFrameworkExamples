@@ -19,6 +19,9 @@ in AutomataFramework (an addendum to the first layer's spec), with the site's de
 ([`2026-11-14-home-design-audit.md`](https://github.com/mcthaydt/AutomataFrameworkSite/blob/main/docs/superpowers/audits/2026-11-14-home-design-audit.md),
 "The Owner's answers", Q3). Principles served: 1 (agent-first), 6 (the stack carries over), and the onboarding rule.
 
+**Plan audit:** [`audits/2026-11-14-watch-mode-plan-audit.md`](../audits/2026-11-14-watch-mode-plan-audit.md). Its
+findings S1 to S7 and N1 to N7 are written into the tasks below, each marked "audit" where it lands.
+
 ## What this plan covers, and what it does not
 
 - **Covers:** `watchReplay` in AutomataFramework (Part A); the pin move (Part B) and the game's `?watch` mode (Part C)
@@ -102,8 +105,9 @@ Stop and report to the coordinator if any of these is not true. Do not work arou
 - Create: `src/features/game/watch.ts`
 - Modify: `src/features/game/game.ts` (re-export, as it does `loop.ts`'s), `docs/api/framework.api.md`
   (`pnpm build && pnpm api-report --update`), `README.md` (a short "Watch a recorded play" beside the replay section),
+  `tests/install/consumer.ts` (`watchReplay` beside `startGame`, so the packed declarations are proven; audit N5),
   `docs/superpowers/progress.md`
-- Test: `tests/features/game/watch.browser.test.ts`
+- Test: `tests/features/game/watch.browser.test.ts`, `tests/features/game/watch-rounds.parity.test.ts` (audit S2)
 
 **Interfaces:**
 - Consumes: `createGameSim`, `GameSimOptions`, `createRenderer`, `createLoop`, `Frames`, `Host`, `Replay`, `Sim`.
@@ -124,26 +128,34 @@ export interface WatchOptions extends GameSimOptions {
 }
 export interface Watch {
   readonly sim: Sim
-  /** How many rounds have finished. */
+  /** How many rounds have finished (a getter). */
   readonly rounds: number
   /** Stops the loop, removes the canvas and disposes the sim. Safe to call twice. */
   stop(): void
 }
-/** Thrown before anything is put on the page; the message says what does not match, in words. */
+/** Thrown before anything is put on the page; the message says what does not match, in words. Sets `name`. */
 export class WatchSetupError extends Error {}
 export function watchReplay(options: WatchOptions): Promise<Watch>
 ```
 
 How it works, where the signature leaves a choice: the sim is made with `seed: options.seed ?? replay.seed`; a
 `replay.tickHz` or seed that is not the sim's is a `WatchSetupError` (the words of `verifyReplay`'s `wrong-setup`),
-and a changed `contentHash` is not an error. A snapshot is taken at tick 0. Each step sends the replay's commands for
-`sim.tick` (as `playReplay` does) until `replay.ticks`; then `restTicks` steps do nothing; then, if rounds remain,
-`sim.restore(snapshot)` and the next step's delta resyncs the renderer. When no round remains the loop stops and the
-last picture stays. Still while `host.visible()` is false, as `startGame` is. No `createInput`, no recorder,
-`setInset` never called.
+and a changed `contentHash` is not an error. `GameSimOptions` has no tick rate, so the comparison is made after
+`createGameSim` and before `createRenderer`, and the sim is disposed before the error is thrown (audit N3). A snapshot
+is taken at tick 0. Each step sends the replay's commands for `sim.tick`, read exactly as `playReplay` reads them
+(every command whose `tick` equals `sim.tick`, in file order; audit N4), until `replay.ticks`. Step by step (audit
+N2): `rounds` counts up on the step that reaches `replay.ticks`; if no round remains the loop stops at once, with no
+rest after the last round, and the last picture stays; otherwise the next `restTicks` steps do nothing (no
+`sim.step`, no `renderer.apply`), and the step after them calls `sim.restore(snapshot)` and then plays tick 0's
+commands, ending at tick 1 with a resync delta (`restore` sets the sim's full resync, and the scene clears its entries
+on one). Still while `host.visible()` is false, as `startGame` is; but a `finished` flag beside `stopped` keeps the
+loop stopped once no round remains, so a hidden-then-shown page never starts a finished watch again (audit S1). No
+`createInput`, no recorder, `setInset` never called.
 
 - [ ] **Step 1: Write the failing tests** with the fixture game, `heroPlugin`, `manualFrames` and a replay recorded in
-  the test (`createRecorder`, hold `right` from tick 5 for 60 ticks, 90 ticks in all):
+  the test (`createRecorder`, hold `right` from tick 5 for 60 ticks, 90 ticks in all). Frames are counted as
+  `game.browser.test.ts` counts them: `frames.at(0)` first, which only sets the clock, then `run(frames, n)` for `n`
+  steps (audit N1):
 
 ```ts
 test('the replay plays by itself and ends on its recorded hash')
@@ -160,6 +172,15 @@ test('content that changed since the recording still plays')            // resol
 test('a replay for another tick rate or seed is refused in words')      // rejects WatchSetupError; mount is empty
 test('a replay of no ticks holds the first picture')                    // resolves; sim.tick stays 0
 test('stop removes the canvas, and may be called twice')
+test('a finished watch stays still when the page is hidden and shown again')   // rounds: 1; audit S1
+```
+
+  And, with no page, `watch-rounds.parity.test.ts` (Node and the three browsers; audit S2):
+
+```ts
+test('a level restored to its tick-0 snapshot plays the replay to the same hash again')
+//   createGameSim(fixture game, heroPlugin); snapshot at tick 0; the replay above (recorded on a second sim);
+//   playReplay → finalHash; sim.restore(snapshot); playReplay again → the same finalHash, equal to replay.finalHash
 ```
 
 - [ ] **Step 2: Push; the three `engines` jobs fail** on "watchReplay is not exported".
@@ -214,7 +235,9 @@ export function recordingPath(start: string): string
   equal the repo's `replays/level-1.json`.
 - [ ] **Step 2: Push; they fail.**
 - [ ] **Step 3: Implement.** `copy-game.ts` also copies `recordingPath(project.value.start)` when the file exists
-  (a game with no recording still builds) and says so in its last line.
+  (a game with no recording still builds) and says so in its last line. It imports `../src/features/play/mode.ts`
+  itself, not the feature's entry, with a comment saying why: `play.ts` imports CSS and the framework's browser entry,
+  which Node cannot load. `mode.ts` imports nothing. The architecture test reads only `src/` (audit S5).
 - [ ] **Step 4: Push; they pass. Commit** as `feat: the game's address says watch or play, and the recording ships`.
 
 ### Task 4: The page watches, and hands over
@@ -245,6 +268,7 @@ export interface PlayOptions {            // added to today's
 export interface Play {
   readonly state: 'watching' | 'playing' | 'problem'   // now a getter: it changes on hand-over
   readonly game: Game | undefined                      // `undefined` while watching
+  readonly watch: Watch | undefined                    // the recording while watching, else `undefined` (audit S3)
   /** Watching: stops the recording and starts the level with the controls live. Otherwise does nothing. */
   takeOver(): Promise<void>
   stop(): void
@@ -271,21 +295,25 @@ Behaviour that the signatures leave open:
   rounds })`, where `rounds` is Q4's answer ((a) left out, (b) `3`, (c) `1`). No goal, no "well done", no `observe`.
 - **Q1:** the words strip while watching is (a) one line, `WORDS.watching`; (b) not in the page at all, so the stage
   takes the whole root; (c) today's `goal` and `how`. `WORDS.watching` is the Owner's sentence, word for word.
-- **Q2 (a):** a `click` on the root, or a `keydown` of Enter, Space or any key in `CONTROLS`, calls `takeOver`. A
+- **Q2 (a):** a `click` on the root, or a `keydown` on `window` (the root never has the keyboard while watching;
+  audit N6) of Enter, Space or any key in `CONTROLS`, calls `takeOver`. A
   `click` and not a `pointerdown`, so a dragging finger scrolls; while watching the root has `touch-action: auto` and
   `cursor: pointer`. **Q2 (b):** neither listener exists.
 - `takeOver` stops the watch, empties the stage, puts back `goal` and `how`, and calls `start` exactly as `play`
   mode does (a fresh sim at tick 0, touch buttons, the recorder). A second call while the first runs returns the
   same promise. If `start` throws, the "could not start" screen, as today.
-- `main.ts` passes `mode: modeOf(location.search)`, `onState: (state) => tellParent(window, state)`, wires
-  `listenForPlay(window, () => void running.takeOver())`, and makes `window.automataGame` a getter of `running.game`.
+- `main.ts` calls `listenForPlay` **before** `play` (audit S7): the handler calls `takeOver` at once when `running`
+  exists, and otherwise marks it so `main.ts` calls `takeOver` as soon as `play` returns. Then it passes
+  `mode: modeOf(location.search)` and `onState: (state) => tellParent(window, state)`, and makes
+  `window.automataGame` a getter of `running.game` and `window.automataWatch` a getter of `running.watch`, so an
+  agent or a journey reads how far the play has got (`sim.tick`, `rounds`) and never compares pixels (audit S3).
 
 - [ ] **Step 1: Failing tests** (the test game, `manualFrames`, a replay recorded in the test from
   `tests/fixtures/test-game-play.ts`, served by `readTestGame` at `replays/level-1.json`):
 
 ```ts
 test('in watch mode the game plays the recording by itself')
-//   root.dataset.state === 'watching'; play.game === undefined; after the replay's ticks in frames the crate has
+//   root.dataset.state === 'watching'; play.game === undefined; play.watch.sim.tick rises; after the replay's ticks in frames the crate has
 //   moved more than a tile with no key pressed; no '.automata-touch' in the root; no '.play-goal' saying WORDS.goal
 test('held keys and fingers do nothing to a watching game')   // ArrowLeft held throughout: the crate still ends there
 test('takeOver starts the level from the beginning with the controls live')
@@ -306,6 +334,7 @@ test('the parent is told each state, at this origin only')
 test('play from the parent is heard once per message')
 test('play from another window, another origin, or with other data is ignored')   // {}, null, 'play', {automata:'stop'}
 test('with no parent, telling does nothing and does not throw')
+test('play heard before the game is ready is not lost')       // main.ts's order; audit S7
 
 // seen.browser.test.ts
 test('a root scrolled out of the window is not visible, and is again when scrolled back')
@@ -337,7 +366,9 @@ Waits for Q1 and Q2 (the word-for-word and tap cases only).
 **Files:**
 - Create: `tests/journeys/watch.journey.test.ts`
 - Modify: `tests/journeys/open.ts` (`openGame` takes `search?: string` and `framed?: boolean`; framed, the game is
-  an iframe in a page of the same origin that records every message it hears and can post to the frame),
+  an iframe in a page of the same origin that records every message it hears and can post to the frame; it waits for
+  `watching` as well as `playing` and `problem`, since today it waits for the last two only; `watchTickOf(page)` reads
+  `window.automataWatch?.sim.tick`),
   `tests/journeys/csp.journey.test.ts`, `tests/journeys/pictures.journey.test.ts`
 
 - [ ] **Step 1: Write the journeys** (they pass once Task 4 is in; each is run red first by asserting before the
@@ -345,15 +376,18 @@ Waits for Q1 and Q2 (the word-for-word and tap cases only).
 
 ```ts
 test('with ?watch the game plays itself: the picture moves and nobody pressed anything')
-//   #game[data-state="watching"]; two canvas screenshots 500 ms of game time apart differ (poll, no sleep);
-//   no errors; no request answered 400 or above
-test('it starts again after it ends')                    // Q4 (a)/(b): the first picture's bytes come back
+//   #game[data-state="watching"]; automataWatch.sim.tick rises with no input (poll, no sleep); one pair of canvas
+//   screenshots differs, to show the canvas is drawn; no errors; no request answered 400 or above (audit S3)
+test('it starts again after it ends')                    // Q4 (a)/(b): automataWatch.rounds reaches 1, then the tick
+                                                         // falls back below the replay's ticks (audit S3)
 test('a moved crate still plays, with no problem screen')   // files: the level with crate-1 at x 12.5
 test('with no recording the game opens ready to play')      // files: { 'replays/level-1.json': undefined }
 test('framed: the page hears watching, says play, and hears playing')
 //   heard === [{automata:'state',state:'watching'}] then, after posting PLAY_MESSAGE, a second entry 'playing';
 //   the frame did not load again (one 'load' event); ArrowRight then pushes the crate, as play.journey's does
 test('framed: junk and strangers are ignored')           // post {}, 'play', {automata:'stop'}: still watching
+test('framed: scrolled off the outer page, the game is still, and goes on when scrolled back')   // audit S4
+//   an outer page taller than the window; the tick does not change while the frame is out of it, and rises after
 test('on a phone, after hand-over a touch brings up Left, Right and Jump')
 test('turning the phone keeps the game watching')
 test('without ?watch nothing changed')                   // state 'playing' at once; no request for replays/
@@ -393,7 +427,8 @@ Waits for Q2 and Q3.
 **Files:**
 - Create: `src/features/play/watch.ts` (when to load the watching game), `src/features/play/talk.ts` (the two
   messages, the site's side)
-- Modify: `src/features/play/play.ts`, `src/styles/hero.css`, `src/features/page/page.ts`, `CLAUDE.md`
+- Modify: `src/features/play/play.ts` (its opening comment, "Nothing of the game loads until a person presses a
+  button…", too; audit N7), `src/styles/hero.css`, `src/features/page/page.ts`, `CLAUDE.md`
   ("Nothing of the game loads until…" is no longer true; say what is), `docs/superpowers/progress.md`
 - Test: `tests/features/play/play.test.ts`, `tests/features/play/watch.test.ts`, `tests/features/play/talk.test.ts`
   (new; the feature had only journeys)
@@ -432,6 +467,12 @@ What `createPlayer` does now (states on `#game`'s `data-state`, as today):
 - **Q3 (a):** `mayWatch` is false when `(prefers-reduced-motion: reduce)` matches or `navigator.connection?.saveData`
   is true; then no frame is added before Play and everything is as today. **Q3 (b):** `mayWatch` is always true.
 - A frame that says `problem`, or never says anything, leaves the picture in place; Play then loads `GAME_ADDRESS`.
+- **The frame's `load` event** (audit S6): today's `load` listener, which means "playing", is added only to a frame
+  loading `GAME_ADDRESS` (including a watching frame whose address was switched to it). A watching frame's `load`
+  does nothing; only the game's `watching` moves the page on.
+- **`problem` in `loading`** (the hand-over's `start` failed, the game's "could not start" screen): the page goes to
+  `playing`, so the game's own words show in the frame, as they do today when a game has a problem (audit S6).
+- `mayWatch` reads `(prefers-reduced-motion: reduce)` the way `motion/land.ts` does, from the window it is given.
 - With no script the picture and the `<noscript>` line are as today.
 - `hero.css`: `#game[data-state="watching"] .poster { display: none }`, the frame visible in `watching`, and
   `#game[data-state="watching"] iframe { pointer-events: none }`; Q2 (a) adds `cursor: pointer` on `#game` then.
@@ -448,6 +489,8 @@ test('tellGameToPlay posts exactly { automata: "play" } to this origin')
 test('mayWatch follows the device')                                       // Q3: reduced motion, saveData, neither
 // play.test.ts
 test('WATCH_ADDRESS is GAME_ADDRESS with ?watch')
+// Task 9 adds, in real browsers: 'a watching frame's load does not start playing' and 'a hand-over that fails shows
+// the game's words' (audit S6)
 ```
 
 - [ ] **Step 2: Push; they fail. Step 3: Implement. Step 4: Push; they pass.**
@@ -480,8 +523,9 @@ test('a turned phone keeps the game watching, then playing')
 
   The same journeys run twice, as every journey here does: against the stand-in (`ci`) and against the real game
   built from this repo's newest green commit (`site`), which is what holds the three repos together end to end.
-  Also here, since no Node test has a page: `'a game that says problem keeps the picture'` and `'a state posted by
-  the page itself, not the frame, changes nothing'`.
+  Also here, since no Node test has a page: `'a game that says problem keeps the picture'`, `'a state posted by
+  the page itself, not the frame, changes nothing'`, `'a watching frame's load does not start playing'` and `'a
+  hand-over that fails shows the game's words'` (audit S6).
 - [ ] **Step 2: Push; every check passes** with the stand-in (`ci`) and the real game (`site`, `pr-<n>-real`). Read
   the pictures on `ci-screens`: arrival at phone size shows the game's own words at a size that reads (the site
   audit's F5, which this closes).
