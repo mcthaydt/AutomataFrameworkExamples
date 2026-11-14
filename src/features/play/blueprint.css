@@ -1,7 +1,7 @@
 /* The Blueprint look's raw materials: the two fonts, the five colours and the two families, and nothing that paints.
    Every rule that paints is in play.css and takes its colours from here, so a colour is changed in one place. The font
    files and the icons are real files that Vite copies into dist/, beside the page: the Site's policy
-   (`default-src 'self'`) blocks anything fetched from another site or carried as `data:`. */
+   (`default-src 'self'`) blocks anything fetched from another site or carried inside the stylesheet itself. */
 @import "@fontsource/ibm-plex-sans-condensed/latin-600.css";
 @import "@fontsource/jetbrains-mono/latin-400.css";
 
