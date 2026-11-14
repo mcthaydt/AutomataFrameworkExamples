@@ -1,7 +1,8 @@
-// The colours of the game's own art: palette No. 276 of *A Dictionary of Color Combinations* (the Owner, 2026-11-14),
-// and the words that name them. A box the page calls "green" must be green, so the colours and the words are checked
-// together. The level's sky and ground are palette No. 276's Black and Seashell Pink, chosen so that both boxes stand
-// clear of the sky behind them (the Owner asked that nothing in the art be hard to make out).
+// The colours of the game's own art are the editors' to change (the Owner, 2026-11-14): `CLAUDE.md` says a change that
+// only touches content must pass CI, and an editor's recolour is one. So nothing here pins a colour on the real files.
+// What it holds is the rule that matters, that the hero, the crate and the ground each stand clear of the sky behind
+// them, and that the words never name a colour, so no recolour can make a word untrue. The journeys' own level, which an
+// editor cannot reach, holds the sky and ground it wears (`pinned-level.test.ts`).
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { expect, test } from 'vitest'
@@ -15,23 +16,26 @@ const colourOf = (character: string): string => {
   return (JSON.parse(file) as { color: string }).color
 }
 
-test('the hero is Eosine Pink and the crate is Yellow Green, from palette No. 276', () => {
-  expect(colourOf('hero')).toBe('#f37f94')
-  expect(colourOf('crate')).toBe('#afd472')
+test("the words are the Owner's, and none of them names a colour", () => {
+  expect(WORDS.goal).toBe('You are the box on the left. Push the other box.')
+  expect(WORDS.done).toBe('You pushed the box. Well done!')
+  for (const words of Object.values(WORDS))
+    expect(words, words).not.toMatch(
+      /\b(?:pink|green|yellow|red|blue|black|white|grey|gray|orange|purple|brown|colou?r)\b/i,
+    )
 })
 
-test('the words call the boxes by the colours they are', () => {
-  expect(WORDS.goal).toBe('You are the pink box. Push the green box.')
-  expect(WORDS.done).toBe('You pushed the green box. Well done!')
-})
+/** What the framework paints a level that sets no sky or ground (its own defaults), so an unset colour is still read. */
+const DEFAULT_SKY = '#9fd3f0'
+const DEFAULT_GROUND = '#3b4a5a'
 
 const levelColours = (): { sky: string; ground: string } => {
   const file = readFileSync(
     join(import.meta.dirname, '..', '..', 'content', 'levels', 'level-1.json'),
     'utf8',
   )
-  const { sky, ground } = JSON.parse(file) as { sky: string; ground: string }
-  return { sky, ground }
+  const { sky, ground } = JSON.parse(file) as { sky?: string; ground?: string }
+  return { sky: sky ?? DEFAULT_SKY, ground: ground ?? DEFAULT_GROUND }
 }
 
 /** The WCAG relative luminance of `#rrggbb`. */
@@ -47,10 +51,6 @@ const contrast = (a: string, b: string): number => {
   const [light, dark] = [luminance(a), luminance(b)].sort((x, y) => y - x) as [number, number]
   return (light + 0.05) / (dark + 0.05)
 }
-
-test('the level is drawn on a Black sky with a Seashell Pink ground, from palette No. 276', () => {
-  expect(levelColours()).toEqual({ sky: '#111314', ground: '#fdd4bd' })
-})
 
 test('the hero, the crate and the ground each stand clear of the sky: 3 to 1 at least', () => {
   const { sky, ground } = levelColours()
