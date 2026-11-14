@@ -10,25 +10,32 @@ framework's own tracker are in AutomataFramework
 Spec: the section "Visual direction" of the spec linked above (the Owner, 2026-11-14).
 Plan: [`plans/2026-11-14-blueprint-look-examples.md`](plans/2026-11-14-blueprint-look-examples.md)
 
-Overall: **12%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
+Overall: **18%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
 stage 6 is 12 and the Owner's review is the last 6)
 
 | Stage | State | Output |
 |---|---|---|
 | 1. Spec | Done (in AutomataFramework, pull request 20) | the spec's "Visual direction" |
 | 2. Plan | Done, 100% (in review) | `plans/2026-11-14-blueprint-look-examples.md` |
-| 3. Plan audit | Not started | |
-| 4. Execution | Not started | three pull requests in order: the framework's button properties, the pin move, the look |
+| 3. Plan audit | Done, 100% (in review) | `audits/2026-11-14-blueprint-look-examples-plan-audit.md` |
+| 4. Execution | Not started: waits for the Owner's answer to Q1 | three pull requests in order (the framework's button properties, the pin move, the look), or the look alone if Q1 is (c) |
 | 5. Implementation audit | Not started | |
 | 6. Fixes | Not started | |
 | 7. Owner review | Not started | |
 
 ### Log
 
+- 2026-11-14: Stage 3. The plan audit is written, and its findings are already in the plan. The plan is true to the
+  spec's "Visual direction" on colour, dark, fonts, icons, the art and the end-to-end tests. One blocking finding: the
+  game says "Push the yellow box" and the plan made the buttons yellow, so a held button was a bigger yellow box than
+  the crate. How the buttons look during play is now a question for the Owner (Q1, three choices), and execution
+  waits for it. Also changed in the plan: a problem's sentence is no longer set in the measuring font (only where it
+  is), a chalk ring shows where the keyboard is, "well done" has a journey, and the font packages are recorded as
+  approved. Checked by unpacking the three packages and building one page with Vite; no tests were run.
 - 2026-11-14: Stage 2. The plan is written. What it found: the touch buttons are drawn by the framework with their look
   set inline, so the look needs a small framework change first (the buttons read seven CSS properties, with today's
   look as the default), then a pin move, then the look here. The game's art, its words and both goldens do not change.
-  One thing waits for the Owner: a yes to the exact font packages the plan names.
+  One thing waited for the Owner: a yes to the exact font packages the plan names (given 2026-11-14).
 
 ## Cycle 1: the 2D first layer, this repo's share of M1
 

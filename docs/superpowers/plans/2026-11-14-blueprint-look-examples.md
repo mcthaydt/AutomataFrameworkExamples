@@ -22,8 +22,9 @@ the section "Visual direction". Principles served: 2 (touch first: the buttons a
 tablet, both ways up), 1 (the look is plain CSS files and seven documented properties an agent can read and change),
 6 (the three packages are the ones the Owner approved; nothing else is added).
 
-Read with it: this repo's `CLAUDE.md` and `docs/superpowers/progress.md`, and in AutomataFramework
-`src/features/input/touch.ts` and `tests/features/input/input.browser.test.ts`.
+Read with it: this repo's `CLAUDE.md` and `docs/superpowers/progress.md`, the plan audit
+(`docs/superpowers/audits/2026-11-14-blueprint-look-examples-plan-audit.md`, whose findings are already written into
+this plan), and in AutomataFramework `src/features/input/touch.ts` and `tests/features/input/input.browser.test.ts`.
 
 ## What this plan covers, and what it does not
 
@@ -36,13 +37,31 @@ Japanese and Chinese fonts (the game is English only until M2's languages; Noto 
 and the site (their own plans). The drawing-notes layer, the stamps and the per-editor paper tints are the editors'
 and are not used here.
 
+## Open for the Owner (answer before Task 1 starts)
+
+**Q1. What should the three touch buttons look like while the game is being played?** The game tells the player to
+"push the yellow box", which is the crate, and the look's yellow means "you can touch this". The audit's B1 has the
+reasoning.
+
+- **(a) White at rest, yellow only while held.** A navy chip with a white edge, a white arrow and a white word; it
+  turns yellow under the thumb. Below, the **resting ink** is chalk.
+- **(b) Yellow at rest, a solid yellow box while held.** Below, the **resting ink** is marker.
+- **(c) Leave the buttons as they are today.** Blueprint goes on the words strip, the loading line and the problem
+  screen only. Tasks 1 and 2 are not done and there is one pull request (Part C). In Tasks 3 to 6, leave out every
+  row, test and picture marked **(buttons)**; the older tests of the buttons stay as they are.
+
+If the Owner instead gives new words for "Push the yellow box", `words.ts` changes to exactly those words in Task 4
+(with the tests that quote them), and the buttons follow (b).
+
+Execution does not start until the coordinator passes on the Owner's answer. It never picks one by default.
+
 ## Before starting
 
 Stop and report to the coordinator if any of these is not true. Do not work around one.
 
-1. The Owner's yes covers the three package names and versions in "Tech Stack" exactly. (The fonts were approved "as
-   packages" and the icons by name; the exact font packages were chosen by this plan, so the coordinator confirms
-   them with the Owner before Task 3 starts.)
+1. The coordinator has passed on the Owner's answer to Q1. (The three packages need no further yes: the Owner
+   approved `@phosphor-icons/core` in the spec and both `@fontsource` packages at 5.3.0 on 2026-11-14. The versions
+   in "Tech Stack" are the ones to install, exactly.)
 2. AutomataFramework's `main` is at or after `9109fa357193f57e2d12271c6e6b58dbd783b427` and this repo's pin is that
    commit.
 3. `replays/level-1.json` and `replays/test-game.json` are the same as on `main` at the start of every task. They
@@ -55,16 +74,22 @@ Stop and report to the coordinator if any of these is not true. Do not work arou
   and report; a golden moves only by a commit that names it, after the Owner has seen before and after.
 - **Tokens, exactly:** paper `#0A1F3C`, hatch `#0E2A50`, chalk `#EAF2FA`, pencil `#8FB0D3`, marker `#FFD447`. No other
   colour appears in the game's CSS or in `index.html`.
-- **Marker means "you can touch this"** and nothing else: here, only the touch buttons use it.
-- **Type:** IBM Plex Sans Condensed, weight 600, for every word; capitals only for labels (the button words), never
-  for a whole sentence. JetBrains Mono, weight 400, for the lines that name a file and a place.
+- **Marker means "you can touch this"** and nothing else: here, only the touch buttons use it, as Q1's answer says.
+- **Type:** IBM Plex Sans Condensed, weight 600, for every word a person reads as a sentence or a label; capitals
+  only for labels (the button words), never for a whole sentence. JetBrains Mono, weight 400, only for where a
+  problem is (a file's name and the place in it), never for a sentence.
 - **Shape:** corners 2 px, borders 1 px chalk, no shadows (nothing here floats over a panel).
+- **No motion.** Nothing fades, slides or grows; a held button changes colour at once. (A transition added later
+  needs its reduced-motion twin, a plain fade.)
+- **The keyboard's place is always shown:** anything that can take focus shows a 3 px chalk outline, 2 px away from
+  it, on `:focus-visible` (the Site's ring).
 - **Icons:** Phosphor regular only, always with a word beside or under them.
 - **Touch targets:** the buttons stay at least 64 px by 64 px (the framework's own minimum; the spec asks 48).
 - **Dark only.** The page declares `color-scheme: dark`.
 - **Every file comes from the page's own origin** as a file: no `data:` fonts, no other host. The Site's policy
   (`default-src 'self'`) blocks anything else.
-- **Words:** `src/features/play/words.ts` does not change. Every word still passes the drunk-grandma test.
+- **Words:** `src/features/play/words.ts` does not change (unless the Owner's answer to Q1 gives new words). Every
+  word still passes the drunk-grandma test, and no button may be mistaken for the "yellow box" the words name.
 - **Dependencies:** the three packages go in `devDependencies` at exact versions (they are build inputs; the test
   "the game depends on nothing but the framework" stays true). Nothing else is added.
 - **A game imports only the framework in code.** The packages are named only in CSS (`@import`, `url()`), never in a
@@ -94,6 +119,7 @@ Stop and report to the coordinator if any of these is not true. Do not work arou
 ## Part A: AutomataFramework (one pull request)
 
 Branch from `main`. This part follows the framework repo's own rules (its `CLAUDE.md`); its tracker gets a log line.
+Parts A and B are not done if the Owner's answer to Q1 is (c).
 
 ### Task 1: The touch buttons read their look from CSS custom properties
 
@@ -200,17 +226,20 @@ Branch from `main`. This part follows the framework repo's own rules (its `CLAUD
 - Modify: `src/features/play/play.ts` (import `./blueprint.css` on the line before `./play.css`)
 - Modify: `package.json`, `pnpm-lock.yaml` (the three `devDependencies`, exact versions)
 - Modify: `vite.config.ts` (`build.assetsInlineLimit: 0`, with a comment: the Site's policy blocks `data:` fonts)
-- Modify: `knip.json` only if `pnpm knip` reports the three packages as unused (it does not read CSS): list them under
-  `ignoreDependencies`
+- Modify: `knip.json`: the three packages under `ignoreDependencies`, with a line in `CLAUDE.md` saying why (knip does
+  not read CSS, so it reports them as unused)
 - Test: `tests/pin.test.ts`, `tests/features/play/blueprint.test.ts` (new, Node), `tests/journeys/files.journey.test.ts`
 
 **Interfaces:**
 - Produces, on `.play-root` (so they reach the framework's buttons, which are inside it):
   `--paper: #0A1F3C`, `--hatch: #0E2A50`, `--chalk: #EAF2FA`, `--pencil: #8FB0D3`, `--marker: #FFD447`,
-  `--label: 600 18px/1.3 'IBM Plex Sans Condensed', system-ui, sans-serif`,
-  `--measure: 400 15px/1.4 'JetBrains Mono', ui-monospace, monospace`.
+  `--label: 'IBM Plex Sans Condensed', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif`,
+  `--measure: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace`.
+  Both are lists of families, as in the Site's plan; a rule that uses one writes its own weight and size
+  (`font: 600 18px/1.3 var(--label)`, `font: 400 15px/1.4 var(--measure)`).
 - Font faces loaded: `@import '@fontsource/ibm-plex-sans-condensed/latin-600.css'` and
-  `@import '@fontsource/jetbrains-mono/latin-400.css'`. Only these two files; each adds one `woff2` to `dist/`.
+  `@import '@fontsource/jetbrains-mono/latin-400.css'`. Only these two; each adds a `.woff2` and a `.woff` to
+  `dist/assets/` (a browser asks only for the `.woff2`), and each face is `font-display: swap`.
 
 - [ ] **Step 1: Write the failing tests.**
   - `tests/pin.test.ts`, `'the look's three packages are build inputs at exact versions, and there are no others'`:
@@ -220,35 +249,49 @@ Branch from `main`. This part follows the framework repo's own rules (its `CLAUD
   - `tests/features/play/blueprint.test.ts` (reads the two CSS files and `index.html` as text):
     `'the five colours are the spec's'` (each token line above is in `blueprint.css`);
     `'no colour is written anywhere but the token file'` (no `#` hex colour, `rgb(` or `hsl(` in `play.css`; the only
-    hex colour in `index.html` is `#0A1F3C`);
+    hex colour in `index.html` is `#0A1F3C`; and every `color`, `background`, `border` and `outline` value in
+    `play.css` holds `var(`, or is `none`, `transparent`, `currentColor` or `inherit`, so a colour's name such as
+    `white` cannot slip in);
     `'nothing is fetched from another site or carried as data'` (neither CSS file nor `index.html` contains `http:`,
     `https:` or `data:`, apart from the existing empty icon link `href="data:,"`).
-  - `tests/journeys/files.journey.test.ts`, `'the fonts and the icons are files beside the page'`: opening the built
-    game at `phone-390x844` and tapping once, the page made a request that ended 200 for a URL matching each of
-    `/ibm-plex-sans-condensed-latin-600-normal.*\.woff2$/`, `/jetbrains-mono-latin-400-normal.*\.woff2$/` (this one
-    on the broken-file screen, where the font is used) and, after Task 4, `/arrow-left.*\.svg$/`; and no request went
-    to another origin.
+  - `tests/journeys/files.journey.test.ts`, two tests, each collecting every request the page makes and how it ended:
+    `'the label font and the icons are files beside the page'`: opening the built game at `phone-390x844` and tapping
+    once, a request ended 200 for a URL matching `/ibm-plex-sans-condensed-latin-600-normal.*\.woff2$/` and
+    **(buttons)** `/arrow-left.*\.svg$/`; and
+    `'the problem screen's fonts are files beside the page'`: with the level file broken, a request ended 200 for
+    `/jetbrains-mono-latin-400-normal.*\.woff2$/` and `/warning.*\.svg$/`. In both, no request went to
+    another origin and none was for a `data:` URL but the empty icon link.
 - [ ] **Step 2: Push and see them fail** (the pin test on the missing packages, the others on the missing file and
   requests).
 - [ ] **Step 3: Implement.** `pnpm add --save-dev --save-exact` the three packages; write `blueprint.css` (the two
-  imports, then one `.play-root` rule holding the seven properties); the import in `play.ts`; the Vite line.
-  If Vite cannot resolve a package path inside a CSS `@import` or `url()`, use the relative path into `node_modules`
-  from the CSS file instead and say so in the report; do not move the import into a `.ts` file.
-- [ ] **Step 4: Push and see the Node and pin tests pass.** The font journey passes only for Plex until Task 4 uses
-  the others; mark its two later expectations with `test.todo` lines named for Task 4, not with a skipped test.
+  imports, then one `.play-root` rule holding the seven properties); the import in `play.ts`; the Vite line; the
+  knip line. (Vite 8.3.3 resolves a package's name inside a CSS `@import` and inside `url()`, and with the inline
+  limit at 0 writes each icon to `dist/assets/` as its own `.svg`; the audit built it once to see.)
+- [ ] **Step 4: Push and see the Node and pin tests pass.** A browser asks for a font or an icon only when
+  something on the page uses it, and nothing does until Task 4. So in this task both file journeys are `test.todo`
+  lines named for Task 4 (a `todo` is a whole test, not one line of one), and this task's red-then-green proof is the
+  Node and pin tests alone.
 - [ ] **Step 5: Commit** as `feat(play): the Blueprint tokens, fonts and icons, as files beside the page`.
 
 ### Task 4: The screens take the look
 
 **Files:**
 - Modify: `src/features/play/play.css`, `index.html`
-- Modify: `src/features/play/play.ts` (two small things: the goal line gets the class `play-done` when the crate has
-  been pushed; nothing else)
+- Modify: `tests/journeys/layout.journey.test.ts` **(buttons)** (the hero is found with the buttons hidden from the
+  picture; Step 3)
+- Modify: `src/features/play/play.ts` (two small things and nothing else: the goal line gets the class `play-done`
+  when the crate has been pushed; and a problem line is made of two parts, where and what, as below)
 - Test: `tests/features/play/play.browser.test.ts`
 
 **Interfaces:**
 - Consumes: Task 3's properties; Task 1's classes, `data-action` and seven properties.
 - Produces: the class `play-done` on `.play-goal` once pushed (Task 5 and the pictures look for it).
+- Produces: a problem line that names a file is
+  `<li><span class="play-where">file: place: </span><span class="play-what">message</span></li>` (`file: ` alone
+  when the diagnostic's `path` is `''`), built from the diagnostic's own `file`, `path` and `message`. The `li`'s
+  `textContent` is exactly what `formatDiagnostic` gives, so every older test of the words passes untouched; a test
+  says so. A line with no file (a game that cannot start) is one `play-what` span. `problem()` takes
+  `readonly { where?: string; what: string }[]` in place of strings.
 
 What each thing looks like. These are the decisions; the CSS follows from them.
 
@@ -259,44 +302,76 @@ What each thing looks like. These are the decisions; the CSS follows from them.
 | The second line (`.play-how`) | pencil |
 | "Well done" (`.play-goal.play-done`) | chalk, with the `check-circle` icon, 20 px, before the words |
 | "Loading the game…" | chalk on paper, as the strip |
-| A touch button, resting | fill paper, 1 px chalk edge, 2 px corners; its icon (28 px) above its word; icon and word marker; the word in capitals, `600 15px/1.1` Plex, letter-spacing 0.04em |
-| A touch button, held | fill marker; icon and word paper |
-| The buttons' icons | `left`: `arrow-left`; `right`: `arrow-right`; `jump`: `arrow-fat-up` |
-| The problem screen (`.play-problem`) | background paper, text chalk, `font: var(--label)`; the title 24 px with the `warning` icon, 28 px, above it; each problem line a hatch panel with a 1 px chalk edge and 2 px corners, set in `font: var(--measure)`, wrapping anywhere; the "fix the file" line chalk, under the list |
+| **(buttons)** A touch button, resting | fill paper, 1 px chalk edge, 2 px corners; its icon (28 px) above its word; icon and word in the resting ink (Q1: chalk for (a), marker for (b)); the word in capitals, `600 15px/1.1` Plex, letter-spacing 0.04em |
+| **(buttons)** A touch button, held | fill marker; icon and word paper; at once, no transition |
+| **(buttons)** The buttons' icons | `left`: `arrow-left`; `right`: `arrow-right`; `jump`: `arrow-fat-up` |
+| **(buttons)** A button the keyboard is on (`:focus-visible`) | a 3 px chalk outline, 2 px away |
+| The problem screen (`.play-problem`) | background paper, text chalk, `600 18px/1.4` in the label font; the title 24 px with the `warning` icon, 28 px, above it; each problem line a hatch panel with a 1 px chalk edge and 2 px corners; the "fix the file" line chalk, under the list |
+| Where a problem is (`.play-where`) | first on the line, inline; pencil, `400 15px/1.4` in the measure font, `font-variant-numeric: tabular-nums`, wrapping anywhere |
+| What is wrong (`.play-what`) | after it on the same line, wrapping; chalk, the label font at 18 px: a sentence is never set in the measure font |
 
 How the icons are drawn: a `::before` box with `background: currentColor` and the icon as its mask
 (`mask: url('@phosphor-icons/core/assets/regular/<name>.svg') center / contain no-repeat`, with the `-webkit-mask`
 twin), so an icon always has its word's colour. The buttons' rules are written against
 `.play-root .automata-touch-button` and `[data-action='…']`, and the seven `--automata-touch-*` properties are set on
-`.play-root` from the tokens (`background` paper, `color` marker, `border` `1px solid` chalk, `radius` `2px`, `font`
-`600 15px/1.1` Plex, pressed background marker, pressed colour paper).
+`.play-root` from the tokens (`background` paper, `color` the resting ink, `border` `1px solid` chalk, `radius`
+`2px`, `font` `600 15px/1.1` Plex, pressed background marker, pressed colour paper). A problem line's two spans stay
+inline, one after the other on the same wrapping line: a block or a flex box would put a line break into the page's
+`innerText`, and the older journeys read the whole line in one piece.
 
 - [ ] **Step 1: Write the failing tests** in `tests/features/play/play.browser.test.ts`. Each first awaits
-  `document.fonts.load("600 18px 'IBM Plex Sans Condensed'")`. Colours are compared as computed `rgb()` strings:
+  `document.fonts.load("600 18px 'IBM Plex Sans Condensed'")`. Two things the tests must get right:
+  - **A font is "loaded" only by `fontLoaded(family, weight)`**, a helper added to this file: true when
+    `[...document.fonts]` holds a face whose family (quotes taken off) and weight match and whose `status` is
+    `'loaded'`. Never `document.fonts.check`: by its rules it is also `true` when no face of that name was declared
+    at all, so it would pass with the import lost and the system font on screen.
+  - **The buttons are brought up with a touch.** This file makes `matchMedia` say "no touch screen", and
+    `coarse: true` changes only the words, so the framework's buttons stay hidden (and measure 0 by 0). Every test of
+    the buttons begins as `'the words never sit under a touch button'` does: `begin()`, then
+    `pointer('pointerdown', 'touch')`.
+
+  The tests. Colours are compared as computed `rgb()` strings:
   paper `rgb(10, 31, 60)`, hatch `rgb(14, 42, 80)`, chalk `rgb(234, 242, 250)`, pencil `rgb(143, 176, 211)`, marker
   `rgb(255, 212, 71)`.
   - `'the words are chalk on blueprint paper, in the label font'`: `.play-words` background paper, `.play-goal` colour
     chalk, `.play-how` colour pencil, `fontFamily` starts with `"IBM Plex Sans Condensed"`,
-    `document.fonts.check("600 18px 'IBM Plex Sans Condensed'")` is `true`, and the words' `textTransform` is `none`.
+    `fontLoaded('IBM Plex Sans Condensed', '600')` is `true`, and the words' `textTransform` is `none`.
   - `'every word can be read: each text and its ground reach 4.5 to 1'`: for (chalk, paper), (pencil, paper),
     (marker, paper), (paper, marker) and (chalk, hatch), the WCAG ratio worked out from the computed colours is at
     least 4.5.
-  - `'a touch button is a navy chip with a chalk edge, and yellow says touch me'`: on a coarse start, each button has
-    background paper, `borderTopWidth` `1px`, `borderTopColor` chalk, `borderTopLeftRadius` `2px`, colour marker,
-    `textTransform` `uppercase`; its `textContent` is still `Left`, `Right` or `Jump`; it is at least 64 by 64.
-  - `'a held button turns yellow with navy words'`: a touch `pointerdown` on Jump gives background marker and colour
-    paper; `pointerup` gives the resting pair back.
-  - `'every button has its picture above its word'`: for each button, the computed `::before` has `width` `28px`,
-    `display` `block` and a `maskImage` (or `webkitMaskImage`) that is not `none`.
+  - **(buttons)** `'a touch button is a navy chip with a chalk edge'`: after a first touch, each button has background
+    paper, `borderTopWidth` `1px`, `borderTopColor` chalk, `borderTopLeftRadius` `2px`, colour the resting ink,
+    `textTransform` `uppercase`, `transitionDuration` `0s`; its `textContent` is still `Left`, `Right` or `Jump`; it
+    is at least 64 by 64.
+  - **(buttons)** `'a held button turns yellow with navy words'`: a touch `pointerdown` on Jump gives background
+    marker and colour paper; `pointerup` gives the resting pair back.
+  - **(buttons)** `'every button has its picture above its word'`: for each button, the computed `::before` has
+    `width` `28px`, `display` `block` and a `maskImage` (or `webkitMaskImage`) that is not `none`.
+  - **(buttons)** `'the keyboard's place on a button is ringed in chalk'`: after `button.focus({ focusVisible: true })`
+    (and, where a browser ignores that option, a `Tab` key press first), the button matches `:focus-visible` and its
+    computed `outlineColor` is chalk, `outlineWidth` `3px`, `outlineStyle` `solid`, `outlineOffset` `2px`.
   - `'pushing the crate marks the words as done'`: beside the existing check of the words, `.play-goal` has the class
     `play-done` after the push and not before.
   - `'the problem screen is the same paper, with each problem on its own panel'`: `.play-problem` background paper and
-    colour chalk; each `li` background hatch, `borderTopWidth` `1px`, `fontFamily` starting with `"JetBrains Mono"`;
-    the screen's `scrollWidth` is no more than its `clientWidth` at 390 px wide with a 120-letter file path in a line.
+    colour chalk; each `li` background hatch and `borderTopWidth` `1px`; the screen's `scrollWidth` is no more than
+    its `clientWidth` at 390 px wide with a 120-letter file path in a line.
+  - `'a problem says where in the measuring font and what in plain words'`: with the two broken files of the older
+    test, each `li` holds one `.play-where` (`fontFamily` starting with `"JetBrains Mono"`, colour pencil, `fontSize`
+    `15px`) and one `.play-what` (`fontFamily` starting with `"IBM Plex Sans Condensed"`, colour chalk, `fontSize`
+    `18px`), both `display` `inline`, and each `li`'s `textContent` equals `formatDiagnostic` of its diagnostic. With `start` rejecting `new Error('No WebGL')`, the one `li` has no
+    `.play-where` and its `textContent` is `No WebGL`.
 - [ ] **Step 2: Push and see them fail** in all three `engines` jobs, each on a colour or a class, not on a missing
   element.
-- [ ] **Step 3: Implement** the table above in `play.css` and `index.html`, and the one class in `play.ts`. Replace
-  Task 3's two `test.todo` lines with their real expectations. Update the two comments that describe the old look
+- [ ] **Step 3: Implement** the table above in `play.css` and `index.html`, and the class and the two-part problem
+  line in `play.ts`. **(buttons)** Then keep the guard that keeps the buttons off the hero: `layout.journey.test.ts`
+  finds the hero by its red in a picture, and today sees it through the see-through buttons. A solid button would
+  hide the part of the hero under it, the red box would shrink to what still shows, and the journey would pass on the
+  very overlap it is there to catch. So before `page.screenshot()` the journey adds the style
+  `.automata-touch { visibility: hidden !important }` (the boxes stay, so `boundingBox()` still measures the buttons),
+  and its comment says "the hero, with the buttons hidden from the picture but still measured". Add one journey that
+  proves the guard bites: with a style that puts Jump over the hero's start
+  (`.automata-touch-button[data-action='jump'] { position: fixed; left: <hero x>px; top: <hero y>px }`), the same
+  check reports an overlap. Replace Task 3's `test.todo` lines with their real expectations. Update the two comments that describe the old look
   (`play.css`: "plain words on white"; `tests/journeys/layout.journey.test.ts`: "the grey buttons").
 - [ ] **Step 4: Push and see every check pass**, the older tests included without a change to what they expect: the
   words above the game, no button on the hero, the words under no button, the hero moving, both goldens.
@@ -306,8 +381,10 @@ twin), so an icon always has its word's colour. The buttons' rules are written a
 
 **Files:**
 - Create: `tests/journeys/look.journey.test.ts`
-- Modify: `tests/journeys/open.ts` (one helper, `fontsReady(page): Promise<void>`, that awaits `document.fonts.ready`;
-  and `openGame` takes `block?: RegExp`, a pattern of URLs to answer with a failed request)
+- Modify: `tests/journeys/open.ts` (`fontsReady(page): Promise<void>`, which awaits `document.fonts.ready`;
+  `fontLoaded(page, family, weight): Promise<boolean>`, the twin of Task 4's helper, used wherever a journey says a
+  font "is loaded"; `openGame` takes `block?: RegExp`, a pattern of URLs to answer with a failed request; and
+  `Opened` gains `errorUrls: string[]`, each console error's `location().url`, beside `errors`)
 - Modify: `tests/journeys/words.journey.test.ts`, `tests/journeys/layout.journey.test.ts` (call `fontsReady` before
   measuring)
 
@@ -317,20 +394,26 @@ Firefox), at every size in `SIZES`: the phone and the tablet, each upright and s
 - [ ] **Step 1: Write the journeys** (they are new checks of Task 4's work, so they should pass at once; a failure is
   a real defect to fix in `play.css`, then report):
   - For every size, `'at <size>, the game wears the look'`: the page's background and the strip's are paper; the
-    label font is loaded (`document.fonts.check`); nothing scrolls sideways (`scrollWidth` of the page is no more than
+    label font is loaded (`fontLoaded`); nothing scrolls sideways (`scrollWidth` of the page is no more than
     the window's width); on a touch size, after one tap, the three buttons are each at least 64 by 64, inside the
     window, overlap neither each other nor the words, show their icon (the `::before` is 28 px wide with a mask) and
-    are navy with a chalk edge.
-  - For every touch size, `'at <size>, holding Jump turns it yellow and the hero jumps'`: a touch `pointerdown`
-    dispatched on Jump gives the marker background, and the page's replay then holds a `jump` command; `pointerup`
-    gives navy back.
+    are navy with a chalk edge **(buttons: from "the three buttons" on)**.
+  - **(buttons)** For every touch size, `'at <size>, holding Jump turns it yellow and the hero jumps'`: a touch `pointerdown`
+    dispatched on Jump gives the marker background, and the page's replay then holds a `controls` command whose
+    payload has `jump` (the check `play.journey.test.ts` makes for `right`); `pointerup` gives navy back.
   - For every size, `'at <size>, a broken file is said on blueprint paper and fits the screen'`: with the level file
     broken as in the files journey, the alert is paper and chalk, its title and its fix line are visible without
     scrolling sideways, and there is no canvas.
+  - `'at desktop-1280x720, pushing the crate says well done, with a tick'`: hold the right arrow key until the words
+    are `WORDS.done`; `.play-goal` then has the class `play-done`, its `::before` is 20 px wide with a mask, and its
+    colour is chalk. This is the moment a first-time player learns they did it, so it is checked in every browser.
+  - **(buttons)** `'at tablet-1180x820, Tab shows where the keyboard is'`: after one tap, press `Tab` (in WebKit,
+    `Alt+Tab`) until a button has focus; it matches `:focus-visible` and its outline is 3 px of chalk.
   - `'with the fonts blocked, the game still starts and the words are still above it'` (phone, sideways,
     `block: /\.woff2?$/`): state `playing`, the words end where the canvas begins, the buttons overlap nothing, and
-    the only errors logged are the blocked font requests.
-  - `'at 320 wide, the three buttons fit side by side'`: open at `phone-390x844`, set the window to 320 by 568, tap;
+    the only errors logged are the blocked font requests: every entry of `errorUrls` matches `block` (a browser's
+    words for a failed request do not name the file, so the address is what is compared).
+  - **(buttons)** `'at 320 wide, the three buttons fit side by side'`: open at `phone-390x844`, set the window to 320 by 568, tap;
     no two buttons overlap, each is inside the window, and nothing scrolls sideways.
 - [ ] **Step 2: Push and see them pass** in Chromium, WebKit and Firefox.
 - [ ] **Step 3: Commit** as `test(journeys): the look holds at every size, with a held button, a broken file and no fonts`.
@@ -346,24 +429,30 @@ Firefox), at every size in `SIZES`: the phone and the tablet, each upright and s
   policy as its `public/_headers` sends it today:
   `default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'`
   and two tests under it: `'under the Site's whole policy the look loads and nothing is blocked'` (phone, one tap,
-  `fontsReady`, tick 30: no violations, no errors, the label font loaded, the Jump button's icon mask present) and
+  `fontsReady`, tick 30: no violations, no errors, the label font loaded, **(buttons)** the Jump button's icon mask
+  present) and
   `'under the Site's whole policy the problem screen loads its font'` (the broken level: no violations, and
-  `document.fonts.check("400 15px 'JetBrains Mono'")` is `true`).
+  `fontLoaded(page, 'JetBrains Mono', '400')` is `true`). Beside `SITE_WHOLE_POLICY`, a comment names the Site's
+  commit the line was copied from, so a later change there is noticed.
 - [ ] **Step 2: The pictures.** In `pictures.journey.test.ts`, call `fontsReady` before every screenshot, and add
-  three pictures: `held-390x844.png` (Jump held), `problem-844x390.png` and `problem-820x1180.png`. The existing
+  four pictures: **(buttons)** `held-390x844.png` (Jump held), `problem-844x390.png`, `problem-820x1180.png` and
+  `problem-1180x820.png`. The existing
   `screens` job copies all of them to the `ci-screens` branch under `pr-<number>/<engine>/`; the workflow does not
   change.
 - [ ] **Step 3: Push, then look at every picture** in all three browsers
   (`gh api repos/mcthaydt/AutomataFrameworkExamples/contents/pr-<number>/<engine>?ref=ci-screens`, then each file).
-  For each, answer in the tracker's log: can a drunk grandma tell who she is, what to press and that she did it? Is
-  the level, the hero and the crate exactly as before? Is there any white or grey left from the old look? Copy the
+  For each, answer in the tracker's log: can a drunk grandma tell who she is, what to press and that she did it?
+  Told to "push the yellow box", could she take a button for it, resting or held? Can she read the word on each
+  button on the phone held upright (it is 15 px now, 18 px before; 16 px is the fallback)? Is the level, the hero and the
+  crate exactly as before? Is there any white or grey left from the old look (but the buttons, if Q1 is (c))? Copy the
   pictures to the project's shared folder at `screens/examples-pr<number>/` for the Owner. A picture that fails any
-  of the three questions is a defect: fix it in `play.css` and push again.
+  of the five questions is a defect: fix it in `play.css` and push again. If the second question fails and the fix
+  would mean other colours or other words than Q1's answer gave, stop and report: that is the Owner's.
 - [ ] **Step 4: The docs.** `README.md`: one row for `blueprint.css` in "Where things are", and three plain
   sentences under a heading "The look" (the game's own screens use the project's Blueprint look; the art does not;
   the colours are in one file). `CLAUDE.md`: under "This repo", a bullet saying the same and naming the three
   build-time packages as the only ones allowed beside the framework, in CSS only. `progress.md`: this cycle's stage 4
-  state and a log entry with the pull request numbers, the test counts and what the pictures showed.
+  state (each of the six tasks is 16% of the stage and the close 4%, moved as each lands) and a log entry with the pull request numbers, the test counts and what the pictures showed.
 - [ ] **Step 5: Confirm the goldens.** `git diff main -- replays/` prints nothing, and both parity tests are green in
   four engines on the last run.
 - [ ] **Step 6: Commit** as `test(journeys): the Site's whole policy lets the look through; new pictures`, open the
@@ -372,7 +461,8 @@ Firefox), at every size in `SIZES`: the phone and the tablet, each upright and s
 
 ## When it is done
 
-- The framework's pull request, the pin move and the look are each merged by the merge session, in that order.
+- The framework's pull request, the pin move and the look are each merged by the merge session, in that order (the
+  look alone, if Q1 is (c)).
 - `main` here is green in `check` and all three `engines` jobs, and `ci-screens` holds the new pictures under `main/`.
 - `replays/level-1.json` and `replays/test-game.json` are byte for byte what they were.
 - The Site needs no change for the game to keep working inside its frame (Task 6 proves the policy); the Site's own
