@@ -12,21 +12,27 @@ in AutomataFramework, an addendum to the first layer's spec (the Owner, 2026-11-
 its recorded play before Play is pressed).
 Plan: [`plans/2026-11-14-watch-mode.md`](plans/2026-11-14-watch-mode.md)
 
-Overall: **18%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
+Overall: **82%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
 stage 6 is 12 and the Owner's review is the last 6)
 
 | Stage | State | Output |
 |---|---|---|
-| 1. Spec | Written; four questions open for the Owner (Q1 to Q4) | the addendum linked above |
+| 1. Spec | Done; the Owner answered Q1 (a), Q2 (a), Q3 (b), Q4 (a) (AutomataFramework pull request 31) | the addendum linked above |
 | 2. Plan | Done, 100% | `plans/2026-11-14-watch-mode.md` |
-| 3. Plan audit | Done, 100% (in review); fixes written into the plan | `audits/2026-11-14-watch-mode-plan-audit.md` |
-| 4. Execution | Not started | four pull requests in order: AutomataFramework (`watchReplay`), here (the pin move), here (the `?watch` mode), AutomataFrameworkSite (the embed) |
-| 5. Implementation audit | Not started | |
+| 3. Plan audit | Done, 100%; fixes written into the plan | `audits/2026-11-14-watch-mode-plan-audit.md` |
+| 4. Execution | Done, 100%: Parts A to C merged, Part D green at `e40fbeb` and going to the merge session | AutomataFramework 29 (`watchReplay`); here 25 (the pin) and 26 (the `?watch` mode); AutomataFrameworkSite 22 (the embed) |
+| 5. Implementation audit | Done, 100% (in review) | `audits/2026-11-14-watch-mode-implementation-audit.md` |
 | 6. Fixes | Not started | |
 | 7. Owner review | Not started | |
 
 ### Log
 
+- 2026-11-14: Stage 5. All four parts read against the spec, the plan and its audit; every check green, no golden
+  moved, S1 to S7 all landed. Should fix: F1, `watchReplay`'s `rounds` plays past the recording's end when a frame
+  carries more than one tick (the framework); F2, this table was stale (fixed here); F3, the game's size is not in this
+  tracker; F4, every visitor now downloads about 1.5 MB after the page loads, 1.3 MB of it Rapier sent as base64 text,
+  about 400 kB of which a binary `.wasm` would save. Five notes, two questions for the Owner (Q-A "Tap" on a computer,
+  Q-C saving data), one point back to the coordinator (Q-B). No test was run.
 - 2026-11-14: Stage 4, Part C (Tasks 3 to 6), after the Owner's answers (Q1 a, Q2 a, Q3 b, Q4 a; recorded in the spec
   addendum and the plan). The game opens watching with `?watch`: it plays `replays/level-1.json` by itself through the
   framework's `watchReplay`, says "The game is playing by itself. Tap it to play.", and a click, tap, Enter, Space or
