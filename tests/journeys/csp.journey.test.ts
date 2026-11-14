@@ -39,7 +39,7 @@ test("under the Site's whole policy the look loads and nothing is blocked", asyn
   await untilTick(page, 30)
   expect(violations, 'the policy blocked nothing').toEqual([])
   expect(errors, 'the page logged no errors').toEqual([])
-  expect(await fontLoaded(page, 'IBM Plex Sans Condensed', '600')).toBe(true)
+  expect(await fontLoaded(page, 'Fredoka', '600')).toBe(true)
   const mask = await page.getByRole('button', { name: 'Jump' }).evaluate((b) => {
     const picture = getComputedStyle(b, '::before')
     return picture.maskImage || picture.getPropertyValue('-webkit-mask-image')
@@ -56,5 +56,5 @@ test("under the Site's whole policy the problem screen loads its font", async ()
   const { page, violations } = opened
   await fontsReady(page)
   expect(violations, 'the policy blocked nothing').toEqual([])
-  expect(await fontLoaded(page, 'JetBrains Mono', '400')).toBe(true)
+  expect(await fontLoaded(page, 'Fredoka', '600')).toBe(true)
 })

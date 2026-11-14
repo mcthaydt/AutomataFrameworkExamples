@@ -36,3 +36,17 @@ test('nothing is fetched from another site or carried as data', () => {
   for (const text of [blueprint, rules]) expect(text).not.toMatch(/https?:|data:/)
   expect(page.replace('href="data:,"', '')).not.toMatch(/https?:|data:/)
 })
+
+// One font, Fredoka (the Owner, 2026-11-14), set at a size a person can read on a phone. Its Korean and Chinese partners
+// join with the first translation, so the stack names only Fredoka and the system fonts for now.
+test('the one font is Fredoka and nothing is set smaller than 18 pixels', () => {
+  expect(blueprint).toContain('@fontsource/fredoka/latin-600.css')
+  expect(blueprint).toMatch(/--label:\s*"Fredoka",/)
+  expect(blueprint).not.toMatch(/ibm-plex|jetbrains|--measure/i)
+  expect(rules).not.toMatch(/--measure/)
+  // The browser must not fake a weight Fredoka was not asked for.
+  expect(rules).toMatch(/font-synthesis:\s*none/)
+  const sizes = [...rules.matchAll(/font(?:-size)?:[^;]*?(\d+)px/g)].map((m) => Number(m[1]))
+  expect(sizes.length).toBeGreaterThan(0)
+  for (const size of sizes) expect(size).toBeGreaterThanOrEqual(18)
+})
