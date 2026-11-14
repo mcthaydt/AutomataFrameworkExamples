@@ -27,6 +27,10 @@ stage 6 is 12 and the Owner's review is the last 6)
 
 ### Log
 
+- 2026-11-14: Stage 4, Task 2 (the plan's Part B). The framework pin moves from `874f7d5` to `cc281c9` (AutomataFramework
+  pull request 29: `watchReplay` draws a recorded play with no input, which the game's `?watch` mode, Part C, uses). The
+  change is the dependency, its `onlyBuiltDependencies` line and the lockfile; nothing else, so the game and both
+  goldens must look and play as before.
 - 2026-11-14: Stage 2. The first layer's spec does not say what a visitor sees before Play, so a short addendum was
   written first (in AutomataFramework) and the plan follows it. Found while planning: the framework cannot draw a
   replay yet (`startGame` always makes its own input and its loop is not exported), so the plan adds one function,
