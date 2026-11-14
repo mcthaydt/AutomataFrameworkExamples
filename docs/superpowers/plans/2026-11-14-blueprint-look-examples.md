@@ -249,15 +249,17 @@ Parts A and B are not done if the Owner's answer to Q1 is (c).
   - `tests/features/play/blueprint.test.ts` (reads the two CSS files and `index.html` as text):
     `'the five colours are the spec's'` (each token line above is in `blueprint.css`);
     `'no colour is written anywhere but the token file'` (no `#` hex colour, `rgb(` or `hsl(` in `play.css`; the only
-    hex colour in `index.html` is `#0A1F3C`);
+    hex colour in `index.html` is `#0A1F3C`; and every `color`, `background`, `border` and `outline` value in
+    `play.css` holds `var(`, or is `none`, `transparent`, `currentColor` or `inherit`, so a colour's name such as
+    `white` cannot slip in);
     `'nothing is fetched from another site or carried as data'` (neither CSS file nor `index.html` contains `http:`,
     `https:` or `data:`, apart from the existing empty icon link `href="data:,"`).
   - `tests/journeys/files.journey.test.ts`, two tests, each collecting every request the page makes and how it ended:
     `'the label font and the icons are files beside the page'`: opening the built game at `phone-390x844` and tapping
-    once, a request ended 200 for a URL matching `/ibm-plex-sans-condensed-latin-600-normal.*\.woff2$/` and, after
-    Task 4, `/check-circle.*\.svg$/` once the crate is pushed and **(buttons)** `/arrow-left.*\.svg$/`; and
+    once, a request ended 200 for a URL matching `/ibm-plex-sans-condensed-latin-600-normal.*\.woff2$/` and
+    **(buttons)** `/arrow-left.*\.svg$/`; and
     `'the problem screen's fonts are files beside the page'`: with the level file broken, a request ended 200 for
-    `/jetbrains-mono-latin-400-normal.*\.woff2$/` and, after Task 4, `/warning.*\.svg$/`. In both, no request went to
+    `/jetbrains-mono-latin-400-normal.*\.woff2$/` and `/warning.*\.svg$/`. In both, no request went to
     another origin and none was for a `data:` URL but the empty icon link.
 - [ ] **Step 2: Push and see them fail** (the pin test on the missing packages, the others on the missing file and
   requests).
@@ -265,14 +267,18 @@ Parts A and B are not done if the Owner's answer to Q1 is (c).
   imports, then one `.play-root` rule holding the seven properties); the import in `play.ts`; the Vite line; the
   knip line. (Vite 8.3.3 resolves a package's name inside a CSS `@import` and inside `url()`, and with the inline
   limit at 0 writes each icon to `dist/assets/` as its own `.svg`; the audit built it once to see.)
-- [ ] **Step 4: Push and see the Node and pin tests pass.** The file journeys pass only for the label font until
-  Task 4 uses the rest; write the later expectations as `test.todo` lines named for Task 4, not as skipped tests.
+- [ ] **Step 4: Push and see the Node and pin tests pass.** A browser asks for a font or an icon only when
+  something on the page uses it, and nothing does until Task 4. So in this task both file journeys are `test.todo`
+  lines named for Task 4 (a `todo` is a whole test, not one line of one), and this task's red-then-green proof is the
+  Node and pin tests alone.
 - [ ] **Step 5: Commit** as `feat(play): the Blueprint tokens, fonts and icons, as files beside the page`.
 
 ### Task 4: The screens take the look
 
 **Files:**
 - Modify: `src/features/play/play.css`, `index.html`
+- Modify: `tests/journeys/layout.journey.test.ts` **(buttons)** (the hero is found with the buttons hidden from the
+  picture; Step 3)
 - Modify: `src/features/play/play.ts` (two small things and nothing else: the goal line gets the class `play-done`
   when the crate has been pushed; and a problem line is made of two parts, where and what, as below)
 - Test: `tests/features/play/play.browser.test.ts`
@@ -314,16 +320,26 @@ inline, one after the other on the same wrapping line: a block or a flex box wou
 `innerText`, and the older journeys read the whole line in one piece.
 
 - [ ] **Step 1: Write the failing tests** in `tests/features/play/play.browser.test.ts`. Each first awaits
-  `document.fonts.load("600 18px 'IBM Plex Sans Condensed'")`. Colours are compared as computed `rgb()` strings:
+  `document.fonts.load("600 18px 'IBM Plex Sans Condensed'")`. Two things the tests must get right:
+  - **A font is "loaded" only by `fontLoaded(family, weight)`**, a helper added to this file: true when
+    `[...document.fonts]` holds a face whose family (quotes taken off) and weight match and whose `status` is
+    `'loaded'`. Never `document.fonts.check`: by its rules it is also `true` when no face of that name was declared
+    at all, so it would pass with the import lost and the system font on screen.
+  - **The buttons are brought up with a touch.** This file makes `matchMedia` say "no touch screen", and
+    `coarse: true` changes only the words, so the framework's buttons stay hidden (and measure 0 by 0). Every test of
+    the buttons begins as `'the words never sit under a touch button'` does: `begin()`, then
+    `pointer('pointerdown', 'touch')`.
+
+  The tests. Colours are compared as computed `rgb()` strings:
   paper `rgb(10, 31, 60)`, hatch `rgb(14, 42, 80)`, chalk `rgb(234, 242, 250)`, pencil `rgb(143, 176, 211)`, marker
   `rgb(255, 212, 71)`.
   - `'the words are chalk on blueprint paper, in the label font'`: `.play-words` background paper, `.play-goal` colour
     chalk, `.play-how` colour pencil, `fontFamily` starts with `"IBM Plex Sans Condensed"`,
-    `document.fonts.check("600 18px 'IBM Plex Sans Condensed'")` is `true`, and the words' `textTransform` is `none`.
+    `fontLoaded('IBM Plex Sans Condensed', '600')` is `true`, and the words' `textTransform` is `none`.
   - `'every word can be read: each text and its ground reach 4.5 to 1'`: for (chalk, paper), (pencil, paper),
     (marker, paper), (paper, marker) and (chalk, hatch), the WCAG ratio worked out from the computed colours is at
     least 4.5.
-  - **(buttons)** `'a touch button is a navy chip with a chalk edge'`: on a coarse start, each button has background
+  - **(buttons)** `'a touch button is a navy chip with a chalk edge'`: after a first touch, each button has background
     paper, `borderTopWidth` `1px`, `borderTopColor` chalk, `borderTopLeftRadius` `2px`, colour the resting ink,
     `textTransform` `uppercase`, `transitionDuration` `0s`; its `textContent` is still `Left`, `Right` or `Jump`; it
     is at least 64 by 64.
@@ -347,7 +363,15 @@ inline, one after the other on the same wrapping line: a block or a flex box wou
 - [ ] **Step 2: Push and see them fail** in all three `engines` jobs, each on a colour or a class, not on a missing
   element.
 - [ ] **Step 3: Implement** the table above in `play.css` and `index.html`, and the class and the two-part problem
-  line in `play.ts`. Replace Task 3's `test.todo` lines with their real expectations. Update the two comments that describe the old look
+  line in `play.ts`. **(buttons)** Then keep the guard that keeps the buttons off the hero: `layout.journey.test.ts`
+  finds the hero by its red in a picture, and today sees it through the see-through buttons. A solid button would
+  hide the part of the hero under it, the red box would shrink to what still shows, and the journey would pass on the
+  very overlap it is there to catch. So before `page.screenshot()` the journey adds the style
+  `.automata-touch { visibility: hidden !important }` (the boxes stay, so `boundingBox()` still measures the buttons),
+  and its comment says "the hero, with the buttons hidden from the picture but still measured". Add one journey that
+  proves the guard bites: with a style that puts Jump over the hero's start
+  (`.automata-touch-button[data-action='jump'] { position: fixed; left: <hero x>px; top: <hero y>px }`), the same
+  check reports an overlap. Replace Task 3's `test.todo` lines with their real expectations. Update the two comments that describe the old look
   (`play.css`: "plain words on white"; `tests/journeys/layout.journey.test.ts`: "the grey buttons").
 - [ ] **Step 4: Push and see every check pass**, the older tests included without a change to what they expect: the
   words above the game, no button on the hero, the words under no button, the hero moving, both goldens.
@@ -357,8 +381,10 @@ inline, one after the other on the same wrapping line: a block or a flex box wou
 
 **Files:**
 - Create: `tests/journeys/look.journey.test.ts`
-- Modify: `tests/journeys/open.ts` (one helper, `fontsReady(page): Promise<void>`, that awaits `document.fonts.ready`;
-  and `openGame` takes `block?: RegExp`, a pattern of URLs to answer with a failed request)
+- Modify: `tests/journeys/open.ts` (`fontsReady(page): Promise<void>`, which awaits `document.fonts.ready`;
+  `fontLoaded(page, family, weight): Promise<boolean>`, the twin of Task 4's helper, used wherever a journey says a
+  font "is loaded"; `openGame` takes `block?: RegExp`, a pattern of URLs to answer with a failed request; and
+  `Opened` gains `errorUrls: string[]`, each console error's `location().url`, beside `errors`)
 - Modify: `tests/journeys/words.journey.test.ts`, `tests/journeys/layout.journey.test.ts` (call `fontsReady` before
   measuring)
 
@@ -368,13 +394,13 @@ Firefox), at every size in `SIZES`: the phone and the tablet, each upright and s
 - [ ] **Step 1: Write the journeys** (they are new checks of Task 4's work, so they should pass at once; a failure is
   a real defect to fix in `play.css`, then report):
   - For every size, `'at <size>, the game wears the look'`: the page's background and the strip's are paper; the
-    label font is loaded (`document.fonts.check`); nothing scrolls sideways (`scrollWidth` of the page is no more than
+    label font is loaded (`fontLoaded`); nothing scrolls sideways (`scrollWidth` of the page is no more than
     the window's width); on a touch size, after one tap, the three buttons are each at least 64 by 64, inside the
     window, overlap neither each other nor the words, show their icon (the `::before` is 28 px wide with a mask) and
     are navy with a chalk edge **(buttons: from "the three buttons" on)**.
   - **(buttons)** For every touch size, `'at <size>, holding Jump turns it yellow and the hero jumps'`: a touch `pointerdown`
-    dispatched on Jump gives the marker background, and the page's replay then holds a `jump` command; `pointerup`
-    gives navy back.
+    dispatched on Jump gives the marker background, and the page's replay then holds a `controls` command whose
+    payload has `jump` (the check `play.journey.test.ts` makes for `right`); `pointerup` gives navy back.
   - For every size, `'at <size>, a broken file is said on blueprint paper and fits the screen'`: with the level file
     broken as in the files journey, the alert is paper and chalk, its title and its fix line are visible without
     scrolling sideways, and there is no canvas.
@@ -385,7 +411,8 @@ Firefox), at every size in `SIZES`: the phone and the tablet, each upright and s
     `Alt+Tab`) until a button has focus; it matches `:focus-visible` and its outline is 3 px of chalk.
   - `'with the fonts blocked, the game still starts and the words are still above it'` (phone, sideways,
     `block: /\.woff2?$/`): state `playing`, the words end where the canvas begins, the buttons overlap nothing, and
-    the only errors logged are the blocked font requests.
+    the only errors logged are the blocked font requests: every entry of `errorUrls` matches `block` (a browser's
+    words for a failed request do not name the file, so the address is what is compared).
   - **(buttons)** `'at 320 wide, the three buttons fit side by side'`: open at `phone-390x844`, set the window to 320 by 568, tap;
     no two buttons overlap, each is inside the window, and nothing scrolls sideways.
 - [ ] **Step 2: Push and see them pass** in Chromium, WebKit and Firefox.
@@ -405,24 +432,27 @@ Firefox), at every size in `SIZES`: the phone and the tablet, each upright and s
   `fontsReady`, tick 30: no violations, no errors, the label font loaded, **(buttons)** the Jump button's icon mask
   present) and
   `'under the Site's whole policy the problem screen loads its font'` (the broken level: no violations, and
-  `document.fonts.check("400 15px 'JetBrains Mono'")` is `true`).
+  `fontLoaded(page, 'JetBrains Mono', '400')` is `true`). Beside `SITE_WHOLE_POLICY`, a comment names the Site's
+  commit the line was copied from, so a later change there is noticed.
 - [ ] **Step 2: The pictures.** In `pictures.journey.test.ts`, call `fontsReady` before every screenshot, and add
-  three pictures: **(buttons)** `held-390x844.png` (Jump held), `problem-844x390.png` and `problem-820x1180.png`. The existing
+  four pictures: **(buttons)** `held-390x844.png` (Jump held), `problem-844x390.png`, `problem-820x1180.png` and
+  `problem-1180x820.png`. The existing
   `screens` job copies all of them to the `ci-screens` branch under `pr-<number>/<engine>/`; the workflow does not
   change.
 - [ ] **Step 3: Push, then look at every picture** in all three browsers
   (`gh api repos/mcthaydt/AutomataFrameworkExamples/contents/pr-<number>/<engine>?ref=ci-screens`, then each file).
   For each, answer in the tracker's log: can a drunk grandma tell who she is, what to press and that she did it?
-  Told to "push the yellow box", could she take a button for it, resting or held? Is the level, the hero and the
+  Told to "push the yellow box", could she take a button for it, resting or held? Can she read the word on each
+  button on the phone held upright (it is 15 px now, 18 px before; 16 px is the fallback)? Is the level, the hero and the
   crate exactly as before? Is there any white or grey left from the old look (but the buttons, if Q1 is (c))? Copy the
   pictures to the project's shared folder at `screens/examples-pr<number>/` for the Owner. A picture that fails any
-  of the four questions is a defect: fix it in `play.css` and push again. If the second question fails and the fix
+  of the five questions is a defect: fix it in `play.css` and push again. If the second question fails and the fix
   would mean other colours or other words than Q1's answer gave, stop and report: that is the Owner's.
 - [ ] **Step 4: The docs.** `README.md`: one row for `blueprint.css` in "Where things are", and three plain
   sentences under a heading "The look" (the game's own screens use the project's Blueprint look; the art does not;
   the colours are in one file). `CLAUDE.md`: under "This repo", a bullet saying the same and naming the three
   build-time packages as the only ones allowed beside the framework, in CSS only. `progress.md`: this cycle's stage 4
-  state and a log entry with the pull request numbers, the test counts and what the pictures showed.
+  state (each of the six tasks is 16% of the stage and the close 4%, moved as each lands) and a log entry with the pull request numbers, the test counts and what the pictures showed.
 - [ ] **Step 5: Confirm the goldens.** `git diff main -- replays/` prints nothing, and both parity tests are green in
   four engines on the last run.
 - [ ] **Step 6: Commit** as `test(journeys): the Site's whole policy lets the look through; new pictures`, open the

@@ -16,9 +16,10 @@ word, the touch targets stay at 64 px, the game's art and both goldens are fence
 look unless a game asks for another, and the journeys run in three browsers at every size, under the Site's whole
 policy, with the fonts blocked and in a 320 px frame.
 
-It is **ready to execute once the Owner answers one question (Q1)**. There is one blocking finding (B1), which is
-that question; three should-fix findings (S1 to S3); and six notes (N1 to N6). All of them but Q1 are already written
-into the plan by the same pull request as this audit, so execution reads one document.
+It is **ready to execute once the Owner answers one question (Q1)**. There is one blocking design finding (B1), which
+is that question; three should-fix findings (S1 to S3); six notes (N1 to N6); and seven findings about the tests
+(T1 to T7) taken from an earlier audit of the same plan after checking each one. All of them but Q1 are already
+written into the plan by the same pull request as this audit, so execution reads one document.
 
 ## Method
 
@@ -129,6 +130,35 @@ problem screen. *In the plan:* Task 3's file journey is two tests, one per scree
 
 **N6. Every word here is weight 600; the Site sets sentences in 400.** Kept on purpose: the game's words are short,
 sit in a thin strip above moving art, are 600 today, and one weight is one file. No change.
+
+## The tests (from the earlier audit, each checked here)
+
+Pull request 11 holds an earlier audit of this plan
+(`audits/2026-11-14-blueprint-look-plan-audit.md` on its branch), which read the tests more closely than the look.
+Its findings were checked against the code and are right. They are written into the plan here, so that one plan
+carries both audits; which of the two pull requests is merged is the coordinator's call.
+
+- **T1 (its B1, blocking unless Q1 is (c)).** `layout.journey.test.ts` finds the hero by its red in a picture and
+  relies on seeing it through today's see-through buttons (its own comment says so). Solid buttons would hide the
+  covered part of the hero, and the journey would pass on the overlap it exists to catch. *In the plan, Task 4:* the
+  picture is taken with the buttons hidden but still measured, and one journey proves the guard still bites.
+- **T2 (its S1).** `play.browser.test.ts` tells every test there is no touch screen, so "on a coarse start" leaves
+  the buttons hidden and 0 by 0. *In the plan:* the button tests bring them up with a touch.
+- **T3 (its S2).** A browser asks for a font only when something uses it, and nothing does in Task 3. *In the plan:*
+  Task 3's file journeys are `test.todo` until Task 4.
+- **T4 (its S3).** `document.fonts.check` is also true when no face of that name was declared. *In the plan:* a
+  `fontLoaded` helper, used in every place a font is said to be loaded.
+- **T5 (its S4).** A failed request's console words do not name the file. *In the plan:* the fonts-blocked journey
+  compares addresses.
+- **T6 (its N2, N4, N5, N6, N7).** The jump journey looks for a `controls` command; the problem screen gets its
+  fourth picture; a colour's name cannot slip past the colour test; the Site's commit is noted beside the copied
+  policy; stage 4 has per-task weights. All in the plan.
+- **T7 (its N3).** The buttons' words go from 18 px to 15 px. *In the plan:* a picture question, with 16 px as the
+  fallback.
+
+Its own Q1 is the same question as this audit's, found separately. Its options differ in one way: it recommends
+keeping yellow and judging on the pictures. This audit recommends (a) below, because the spec already has a chip for
+things over art and a held button is a yellow box whatever the pictures show. Both are for the Owner.
 
 ## For the Owner
 
