@@ -156,7 +156,7 @@ implementations or incomplete integrations. Do your best work."
   the Owner CLI commands rather than click-through steps.
 - **No AI attribution anywhere.** No `Co-Authored-By: Claude`, no session-link trailer and no "Generated with Claude Code" in
   commits, pull request bodies or docs (the Owner, 2026-11-13). Before any commit, set the author with
-  `git config --global user.name "Dawson McThay" && git config --global user.email "107786093+mcthaydt@users.noreply.github.com"`.
+  `git config --global user.name "McThayDT" && git config --global user.email "107786093+mcthaydt@users.noreply.github.com"`.
 - Refresh sessions after 90 minutes.
 - Branches: `main` plus branches with CI running, five at most. The editors' save branches (`automata/<login>`) do not
   count: this repo is our test game, and the editors are a product for other teams' repos (the Owner, 2026-11-13).

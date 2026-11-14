@@ -99,7 +99,7 @@ Stop and report to the coordinator if any of these is not true. Do not work arou
 - **Tests run only in GitHub-hosted CI.** Each "run" step below means: push, then read the pull request's checks with
   `gh pr checks <number> --watch` and, for a failure, `gh run view <run> --log-failed`.
 - **No AI attribution.** Before the first commit:
-  `git config --global user.name "Dawson McThay" && git config --global user.email "107786093+mcthaydt@users.noreply.github.com"`.
+  `git config --global user.name "McThayDT" && git config --global user.email "107786093+mcthaydt@users.noreply.github.com"`.
 - **Reporting:** one line to the coordinator per task (commit, test count, surprises); at once on any stop; every
   deviation with its reason; a handoff at 90 minutes.
 
