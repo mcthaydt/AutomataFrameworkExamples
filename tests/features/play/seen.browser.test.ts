@@ -62,8 +62,17 @@ test('a hidden host stays hidden whatever the root does', async () => {
   host.hide()
   window.scrollTo(0, 4000)
   seen = whileSeen(host, root)
-  // Two animation frames: the observer has had its say by then. It is in view, and the host still says no.
-  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+  // The root is in view, and the host still says no. A second observer, made after the first, hears of the root being in
+  // view in the same delivery and after it, so when it has spoken the first has had its say (two animation frames
+  // were not always enough on a slow machine).
+  await new Promise<void>((resolve) => {
+    const second = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return
+      second.disconnect()
+      resolve()
+    })
+    second.observe(root)
+  })
   expect(seen.visible()).toBe(false)
   // The host coming back is what makes it visible, which shows the root was in view all along.
   const told: boolean[] = []
