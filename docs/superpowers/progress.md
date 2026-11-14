@@ -5,6 +5,31 @@ framework's own tracker are in AutomataFramework
 ([spec](https://github.com/mcthaydt/AutomataFramework/blob/main/docs/superpowers/specs/2026-11-13-2d-first-layer-design.md),
 [tracker](https://github.com/mcthaydt/AutomataFramework/blob/main/docs/superpowers/progress.md)).
 
+## Cycle 2: the Blueprint look for the game's own screens
+
+Spec: the section "Visual direction" of the spec linked above (the Owner, 2026-11-14).
+Plan: [`plans/2026-11-14-blueprint-look-examples.md`](plans/2026-11-14-blueprint-look-examples.md)
+
+Overall: **12%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
+stage 6 is 12 and the Owner's review is the last 6)
+
+| Stage | State | Output |
+|---|---|---|
+| 1. Spec | Done (in AutomataFramework, pull request 20) | the spec's "Visual direction" |
+| 2. Plan | Done, 100% (in review) | `plans/2026-11-14-blueprint-look-examples.md` |
+| 3. Plan audit | Not started | |
+| 4. Execution | Not started | three pull requests in order: the framework's button properties, the pin move, the look |
+| 5. Implementation audit | Not started | |
+| 6. Fixes | Not started | |
+| 7. Owner review | Not started | |
+
+### Log
+
+- 2026-11-14: Stage 2. The plan is written. What it found: the touch buttons are drawn by the framework with their look
+  set inline, so the look needs a small framework change first (the buttons read seven CSS properties, with today's
+  look as the default), then a pin move, then the look here. The game's art, its words and both goldens do not change.
+  One thing waits for the Owner: a yes to the exact font packages the plan names.
+
 ## Cycle 1: the 2D first layer, this repo's share of M1
 
 Plan: [`plans/2026-11-13-m1-thin-thread-examples.md`](plans/2026-11-13-m1-thin-thread-examples.md)
