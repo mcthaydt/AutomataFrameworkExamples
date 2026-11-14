@@ -30,7 +30,7 @@ export interface Opened {
   readonly page: Page
   /** Console errors and uncaught errors seen so far. */
   readonly errors: string[]
-  /** The address each console error came from (a browser's words for a failed request do not name the file). */
+  /** The address each error came from, in step with `errors` (`''` for an uncaught error or a browser that gives none). */
   readonly errorUrls: string[]
   /** Every address the page asked for so far (not the empty `data:,` icon link). */
   readonly requested: string[]
@@ -80,7 +80,10 @@ export async function openGame(
     errors.push(message.text())
     errorUrls.push(message.location().url)
   })
-  page.on('pageerror', (error) => errors.push(error.message))
+  page.on('pageerror', (error) => {
+    errors.push(error.message)
+    errorUrls.push('')
+  })
 
   const requested: string[] = []
   const answered: { url: string; status: number }[] = []
