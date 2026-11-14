@@ -67,3 +67,8 @@ test('a missing file is named', async () => {
     'content/characters/crate.json: This file is listed in automata.toml but is missing.',
   )
 })
+
+// These two need the screens to use the fonts and icons, which Task 4 does: a browser asks for a file only when
+// something on the page draws with it.
+test.todo('the label font and the icons are files beside the page')
+test.todo("the problem screen's fonts are files beside the page")
