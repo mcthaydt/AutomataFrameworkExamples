@@ -155,6 +155,8 @@
 
 .play-problem h1 {
   margin: 0 0 16px;
+  /* The one weight that is loaded; the browser's own style for a title (bold) would ask for one that is not. */
+  font-weight: 600;
   font-size: 24px;
   line-height: 1.25;
 }

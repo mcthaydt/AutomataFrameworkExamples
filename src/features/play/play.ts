@@ -114,7 +114,7 @@ export async function play(options: PlayOptions): Promise<Play> {
 
   /**
    * A screen of words in place of the game. `lines` are what went wrong, one per problem, in order: `where` (the file
-   * and the place in it, set in the measuring font) and `what` (a sentence for a person). Together they read exactly
+   * and the place in it, set quieter than the rest) and `what` (a sentence for a person). Together they read exactly
    * as `formatDiagnostic` gives them.
    */
   const problem = (title: string, lines: readonly ProblemLine[], fix: boolean): Play => {

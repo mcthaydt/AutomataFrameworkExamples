@@ -95,7 +95,7 @@ const fontLoaded = (family: string, weight: string): boolean =>
       face.family.replace(/["']/g, '') === family && face.weight === weight && face.status === 'loaded',
   )
 
-/** Draws with the label font once, so its file has been asked for and arrived before a test looks at the words. */
+/** Draws with the font once, so its file has been asked for and arrived before a test looks at the words. */
 const labelFontReady = async (): Promise<void> => {
   await document.fonts.load("600 18px 'Fredoka'")
 }
@@ -267,7 +267,7 @@ test('pushing the crate changes the words to say so', async () => {
   expect(text('.play-goal')).toBe(WORDS.done)
 })
 
-test('the words are chalk on black paper, in the label font', async () => {
+test('the words are chalk on black paper, in the one font', async () => {
   await begin()
   await labelFontReady()
   const words = root.querySelector('.play-words')
@@ -291,6 +291,8 @@ test('every word can be read: each text and its ground reach 4.5 to 1', () => {
     [MARKER, PAPER],
     [PAPER, MARKER],
     [CHALK, HATCH],
+    // The file's name on a problem's panel: the closest pair to the line (5.05 to 1).
+    [PENCIL, HATCH],
   ] as const)
     expect(contrast(text, ground), `${text} on ${ground}`).toBeGreaterThanOrEqual(4.5)
 })

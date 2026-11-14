@@ -1,7 +1,29 @@
 # The Blueprint Look for the Demo Game's Screens Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task, in
-> one session, with no subagents (project rule). Steps use checkbox (`- [ ]`) syntax for tracking.
+> one session, with no subagents (project rule). Steps use checkbox (`- [x]`) syntax for tracking.
+
+## What changed after this plan was written
+
+Stage 4 is done and every box below is ticked. The plan is left as it was written; the game built from it differs in
+four ways, all by the Owner's later choices (the values below are the built ones; the audit of the result is
+[`../audits/2026-11-14-blueprint-look-examples-implementation-audit.md`](../audits/2026-11-14-blueprint-look-examples-implementation-audit.md)).
+
+1. **The colours.** Not the navy and yellow tokens written here. The screens are in palette No. 340 of *A Dictionary
+   of Color Combinations* (the Owner): paper `#111314` (Black), chalk `#b6bfc1` (Neutral Gray), marker `#f15a30` (Peach
+   Red, only on a held button), with hatch `#222425` and pencil `#8d9496` mixed from paper and chalk (10% and 75% of
+   the way). The game's art is in palette No. 276: hero `#f37f94`, crate `#afd472`, and the level's sky `#111314` and
+   ground `#fdd4bd` (set by the framework's new optional `sky` and `ground`, AutomataFramework pull request 25).
+2. **The font.** One font, Fredoka (`@fontsource/fredoka` 5.3.0, the `latin-600` file), nothing set below 18 pixels,
+   `font-synthesis: none`. IBM Plex Sans Condensed, JetBrains Mono and the "measuring font" for a problem's place are
+   gone, so a place is told apart by its quieter colour. That is two packages, not three: Fredoka and
+   `@phosphor-icons/core` 2.1.1.
+3. **The words.** Not "push the yellow box". First "You are the pink box. Push the green box.", then, after the
+   implementation audit, colour-free words (the Owner): "You are the box on the left. Push the other box." and "You
+   pushed the box. Well done!", so an editor may recolour the boxes.
+4. **The pull requests.** Eight, not three: AutomataFramework 21 (the button properties) and 25 (the level's sky and
+   ground); here 13 and 18 (the pin moves), 14 (the look), 17 (the hero and crate colours), 19 (the level's colours)
+   and 20 (Fredoka).
 
 **Goal:** Give the demo game's own screens (the words strip, the touch buttons, the problem screen and the loading and
 "well done" messages) the Blueprint look, dark, with the approved fonts and icons, without touching the game's art or
@@ -153,7 +175,7 @@ Parts A and B are not done if the Owner's answer to Q1 is (c).
 - Not themable, on purpose: the minimum size, the gaps, the safe-area padding, `touch-action` and the other
   touch-safety styles.
 
-- [ ] **Step 1: Write the failing tests** in `tests/features/input/input.browser.test.ts`:
+- [x] **Step 1: Write the failing tests** in `tests/features/input/input.browser.test.ts`:
 
   - `'with nothing set, the buttons look as they always have'`: after `firstTouch()`, the computed style of
     `button('Jump')` has `backgroundColor` `rgba(20, 20, 30, 0.55)`, `color` `rgb(255, 255, 255)`,
@@ -174,11 +196,11 @@ Parts A and B are not done if the Owner's answer to Q1 is (c).
   And in `tests/docs/readme.test.ts`: `'the README names every property a game can set on the touch buttons'`: the
   README contains each entry of `TOUCH_PROPERTIES`.
 
-- [ ] **Step 2: Push and see them fail** in all three `engines` jobs (the look tests on the computed values, the class
+- [x] **Step 2: Push and see them fail** in all three `engines` jobs (the look tests on the computed values, the class
   test on `matches`) and in `check` (the README test). The older test `'the words on a button can be read over the
   sky'` must still pass untouched.
 
-- [ ] **Step 3: Implement.** In `touch.ts`, each of the seven inline values becomes `var(<property>, <fallback>)`
+- [x] **Step 3: Implement.** In `touch.ts`, each of the seven inline values becomes `var(<property>, <fallback>)`
   (`border-radius`, `border`, `background`, `color`, `font` in `BUTTON_STYLE`; the two pressed values and the two
   resting values in `paint()`), the classes and `data-action` are set where the elements are made, and
   `TOUCH_PROPERTIES` lists the names. Nothing else in the file changes. On `Control`'s doc comment, add one sentence:
@@ -186,10 +208,10 @@ Parts A and B are not done if the Owner's answer to Q1 is (c).
   showing on first touch, add the section: one paragraph in plain words, the table above, and one four-line CSS
   example that sets two of the properties on the game's element.
 
-- [ ] **Step 4: Push and see every check pass**, `pnpm api-report` included (it fails if the public surface moved; it
+- [x] **Step 4: Push and see every check pass**, `pnpm api-report` included (it fails if the public surface moved; it
   must not have).
 
-- [ ] **Step 5: Commit** as `feat(input): a game can set the touch buttons' look with CSS properties`, open the pull
+- [x] **Step 5: Commit** as `feat(input): a game can set the touch buttons' look with CSS properties`, open the pull
   request, and report to the coordinator. The merge session merges it; note the merge commit's full hash, called
   `<hooks>` below.
 
@@ -207,12 +229,12 @@ Parts A and B are not done if the Owner's answer to Q1 is (c).
 - Consumes: `<hooks>` from Task 1.
 - Produces: the classes, `data-action` and the seven properties of Task 1, available to Part C.
 
-- [ ] **Step 1:** `pnpm add @automataframework/framework@github:mcthaydt/AutomataFramework#<hooks>`, then edit the
+- [x] **Step 1:** `pnpm add @automataframework/framework@github:mcthaydt/AutomataFramework#<hooks>`, then edit the
   `onlyBuiltDependencies` line to the same hash and run `pnpm install` so the lockfile agrees.
-- [ ] **Step 2: Push.** Every check passes with no other change: `tests/pin.test.ts`, both replay goldens in four
+- [x] **Step 2: Push.** Every check passes with no other change: `tests/pin.test.ts`, both replay goldens in four
   engines (the framework change is about the buttons' look only, so a moved hash here is a stop), and every journey.
   Look at the pictures under `pr-<number>/` on `ci-screens`: the game must look exactly as on `main`.
-- [ ] **Step 3: Commit** as `chore: move the framework pin to <hooks, 7 letters>, for the touch buttons' look
+- [x] **Step 3: Commit** as `chore: move the framework pin to <hooks, 7 letters>, for the touch buttons' look
   properties`, open the pull request, report. Wait for its merge before Part C.
 
 ---
@@ -241,7 +263,7 @@ Parts A and B are not done if the Owner's answer to Q1 is (c).
   `@import '@fontsource/jetbrains-mono/latin-400.css'`. Only these two; each adds a `.woff2` and a `.woff` to
   `dist/assets/` (a browser asks only for the `.woff2`), and each face is `font-display: swap`.
 
-- [ ] **Step 1: Write the failing tests.**
+- [x] **Step 1: Write the failing tests.**
   - `tests/pin.test.ts`, `'the look's three packages are build inputs at exact versions, and there are no others'`:
     `devDependencies` holds `@fontsource/ibm-plex-sans-condensed` `5.3.0`, `@fontsource/jetbrains-mono` `5.3.0` and
     `@phosphor-icons/core` `2.1.1`, and the full list of `devDependencies` names equals the eight there today plus
@@ -261,17 +283,17 @@ Parts A and B are not done if the Owner's answer to Q1 is (c).
     `'the problem screen's fonts are files beside the page'`: with the level file broken, a request ended 200 for
     `/jetbrains-mono-latin-400-normal.*\.woff2$/` and `/warning.*\.svg$/`. In both, no request went to
     another origin and none was for a `data:` URL but the empty icon link.
-- [ ] **Step 2: Push and see them fail** (the pin test on the missing packages, the others on the missing file and
+- [x] **Step 2: Push and see them fail** (the pin test on the missing packages, the others on the missing file and
   requests).
-- [ ] **Step 3: Implement.** `pnpm add --save-dev --save-exact` the three packages; write `blueprint.css` (the two
+- [x] **Step 3: Implement.** `pnpm add --save-dev --save-exact` the three packages; write `blueprint.css` (the two
   imports, then one `.play-root` rule holding the seven properties); the import in `play.ts`; the Vite line; the
   knip line. (Vite 8.3.3 resolves a package's name inside a CSS `@import` and inside `url()`, and with the inline
   limit at 0 writes each icon to `dist/assets/` as its own `.svg`; the audit built it once to see.)
-- [ ] **Step 4: Push and see the Node and pin tests pass.** A browser asks for a font or an icon only when
+- [x] **Step 4: Push and see the Node and pin tests pass.** A browser asks for a font or an icon only when
   something on the page uses it, and nothing does until Task 4. So in this task both file journeys are `test.todo`
   lines named for Task 4 (a `todo` is a whole test, not one line of one), and this task's red-then-green proof is the
   Node and pin tests alone.
-- [ ] **Step 5: Commit** as `feat(play): the Blueprint tokens, fonts and icons, as files beside the page`.
+- [x] **Step 5: Commit** as `feat(play): the Blueprint tokens, fonts and icons, as files beside the page`.
 
 ### Task 4: The screens take the look
 
@@ -319,7 +341,7 @@ twin), so an icon always has its word's colour. The buttons' rules are written a
 inline, one after the other on the same wrapping line: a block or a flex box would put a line break into the page's
 `innerText`, and the older journeys read the whole line in one piece.
 
-- [ ] **Step 1: Write the failing tests** in `tests/features/play/play.browser.test.ts`. Each first awaits
+- [x] **Step 1: Write the failing tests** in `tests/features/play/play.browser.test.ts`. Each first awaits
   `document.fonts.load("600 18px 'IBM Plex Sans Condensed'")`. Two things the tests must get right:
   - **A font is "loaded" only by `fontLoaded(family, weight)`**, a helper added to this file: true when
     `[...document.fonts]` holds a face whose family (quotes taken off) and weight match and whose `status` is
@@ -360,9 +382,9 @@ inline, one after the other on the same wrapping line: a block or a flex box wou
     `15px`) and one `.play-what` (`fontFamily` starting with `"IBM Plex Sans Condensed"`, colour chalk, `fontSize`
     `18px`), both `display` `inline`, and each `li`'s `textContent` equals `formatDiagnostic` of its diagnostic. With `start` rejecting `new Error('No WebGL')`, the one `li` has no
     `.play-where` and its `textContent` is `No WebGL`.
-- [ ] **Step 2: Push and see them fail** in all three `engines` jobs, each on a colour or a class, not on a missing
+- [x] **Step 2: Push and see them fail** in all three `engines` jobs, each on a colour or a class, not on a missing
   element.
-- [ ] **Step 3: Implement** the table above in `play.css` and `index.html`, and the class and the two-part problem
+- [x] **Step 3: Implement** the table above in `play.css` and `index.html`, and the class and the two-part problem
   line in `play.ts`. **(buttons)** Then keep the guard that keeps the buttons off the hero: `layout.journey.test.ts`
   finds the hero by its red in a picture, and today sees it through the see-through buttons. A solid button would
   hide the part of the hero under it, the red box would shrink to what still shows, and the journey would pass on the
@@ -373,9 +395,9 @@ inline, one after the other on the same wrapping line: a block or a flex box wou
   (`.automata-touch-button[data-action='jump'] { position: fixed; left: <hero x>px; top: <hero y>px }`), the same
   check reports an overlap. Replace Task 3's `test.todo` lines with their real expectations. Update the two comments that describe the old look
   (`play.css`: "plain words on white"; `tests/journeys/layout.journey.test.ts`: "the grey buttons").
-- [ ] **Step 4: Push and see every check pass**, the older tests included without a change to what they expect: the
+- [x] **Step 4: Push and see every check pass**, the older tests included without a change to what they expect: the
   words above the game, no button on the hero, the words under no button, the hero moving, both goldens.
-- [ ] **Step 5: Commit** as `feat(play): the game's own screens take the Blueprint look`.
+- [x] **Step 5: Commit** as `feat(play): the game's own screens take the Blueprint look`.
 
 ### Task 5: Journeys for the look, in three browsers, at every size
 
@@ -391,7 +413,7 @@ inline, one after the other on the same wrapping line: a block or a flex box wou
 The journeys run against the built page, once per browser (CI's `engines` jobs set `ENGINE` to Chromium, WebKit and
 Firefox), at every size in `SIZES`: the phone and the tablet, each upright and sideways, and the desktop.
 
-- [ ] **Step 1: Write the journeys** (they are new checks of Task 4's work, so they should pass at once; a failure is
+- [x] **Step 1: Write the journeys** (they are new checks of Task 4's work, so they should pass at once; a failure is
   a real defect to fix in `play.css`, then report):
   - For every size, `'at <size>, the game wears the look'`: the page's background and the strip's are paper; the
     label font is loaded (`fontLoaded`); nothing scrolls sideways (`scrollWidth` of the page is no more than
@@ -415,8 +437,8 @@ Firefox), at every size in `SIZES`: the phone and the tablet, each upright and s
     words for a failed request do not name the file, so the address is what is compared).
   - **(buttons)** `'at 320 wide, the three buttons fit side by side'`: open at `phone-390x844`, set the window to 320 by 568, tap;
     no two buttons overlap, each is inside the window, and nothing scrolls sideways.
-- [ ] **Step 2: Push and see them pass** in Chromium, WebKit and Firefox.
-- [ ] **Step 3: Commit** as `test(journeys): the look holds at every size, with a held button, a broken file and no fonts`.
+- [x] **Step 2: Push and see them pass** in Chromium, WebKit and Firefox.
+- [x] **Step 3: Commit** as `test(journeys): the look holds at every size, with a held button, a broken file and no fonts`.
 
 ### Task 6: The Site's whole policy, and the pictures
 
@@ -425,7 +447,7 @@ Firefox), at every size in `SIZES`: the phone and the tablet, each upright and s
 - Modify: `tests/journeys/pictures.journey.test.ts`
 - Modify: `README.md`, `CLAUDE.md`, `docs/superpowers/progress.md`
 
-- [ ] **Step 1: Widen the policy journey.** Keep the existing test as it is. Add `SITE_WHOLE_POLICY`, the Site's
+- [x] **Step 1: Widen the policy journey.** Keep the existing test as it is. Add `SITE_WHOLE_POLICY`, the Site's
   policy as its `public/_headers` sends it today:
   `default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'`
   and two tests under it: `'under the Site's whole policy the look loads and nothing is blocked'` (phone, one tap,
@@ -434,12 +456,12 @@ Firefox), at every size in `SIZES`: the phone and the tablet, each upright and s
   `'under the Site's whole policy the problem screen loads its font'` (the broken level: no violations, and
   `fontLoaded(page, 'JetBrains Mono', '400')` is `true`). Beside `SITE_WHOLE_POLICY`, a comment names the Site's
   commit the line was copied from, so a later change there is noticed.
-- [ ] **Step 2: The pictures.** In `pictures.journey.test.ts`, call `fontsReady` before every screenshot, and add
+- [x] **Step 2: The pictures.** In `pictures.journey.test.ts`, call `fontsReady` before every screenshot, and add
   four pictures: **(buttons)** `held-390x844.png` (Jump held), `problem-844x390.png`, `problem-820x1180.png` and
   `problem-1180x820.png`. The existing
   `screens` job copies all of them to the `ci-screens` branch under `pr-<number>/<engine>/`; the workflow does not
   change.
-- [ ] **Step 3: Push, then look at every picture** in all three browsers
+- [x] **Step 3: Push, then look at every picture** in all three browsers
   (`gh api repos/mcthaydt/AutomataFrameworkExamples/contents/pr-<number>/<engine>?ref=ci-screens`, then each file).
   For each, answer in the tracker's log: can a drunk grandma tell who she is, what to press and that she did it?
   Told to "push the yellow box", could she take a button for it, resting or held? Can she read the word on each
@@ -448,14 +470,14 @@ Firefox), at every size in `SIZES`: the phone and the tablet, each upright and s
   pictures to the project's shared folder at `screens/examples-pr<number>/` for the Owner. A picture that fails any
   of the five questions is a defect: fix it in `play.css` and push again. If the second question fails and the fix
   would mean other colours or other words than Q1's answer gave, stop and report: that is the Owner's.
-- [ ] **Step 4: The docs.** `README.md`: one row for `blueprint.css` in "Where things are", and three plain
+- [x] **Step 4: The docs.** `README.md`: one row for `blueprint.css` in "Where things are", and three plain
   sentences under a heading "The look" (the game's own screens use the project's Blueprint look; the art does not;
   the colours are in one file). `CLAUDE.md`: under "This repo", a bullet saying the same and naming the three
   build-time packages as the only ones allowed beside the framework, in CSS only. `progress.md`: this cycle's stage 4
   state (each of the six tasks is 16% of the stage and the close 4%, moved as each lands) and a log entry with the pull request numbers, the test counts and what the pictures showed.
-- [ ] **Step 5: Confirm the goldens.** `git diff main -- replays/` prints nothing, and both parity tests are green in
+- [x] **Step 5: Confirm the goldens.** `git diff main -- replays/` prints nothing, and both parity tests are green in
   four engines on the last run.
-- [ ] **Step 6: Commit** as `test(journeys): the Site's whole policy lets the look through; new pictures`, open the
+- [x] **Step 6: Commit** as `test(journeys): the Site's whole policy lets the look through; new pictures`, open the
   pull request, and send the coordinator the summary: the three pull requests, the test counts, each deviation, and a
   link to the pictures.
 

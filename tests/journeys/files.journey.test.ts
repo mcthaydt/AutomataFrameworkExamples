@@ -80,7 +80,7 @@ function expectOnlyOwnFiles(page: Opened): void {
 const answeredOk = (found: Opened, pattern: RegExp): boolean =>
   found.answered.some((a) => a.status === 200 && pattern.test(a.url))
 
-test('the label font and the icons are files beside the page', async () => {
+test('the font and the icons are files beside the page', async () => {
   opened = await openGame({ size: 'phone-390x844' })
   const { page } = opened
   // The buttons (and so their pictures) are only drawn once a finger is on the screen.

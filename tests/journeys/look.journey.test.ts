@@ -1,4 +1,4 @@
-// The Blueprint look on the built page, in each browser, at every size: dark paper, the label font, the buttons as paper
+// The Blueprint look on the built page, in each browser, at every size: dark paper, the one font, the buttons as paper
 // chips that turn peach red under a thumb, a broken file said on the same paper, and a page that still plays when its font
 // files never arrive. Layout and focus are checked here because a screenshot proves neither.
 import type { Page } from 'playwright'
