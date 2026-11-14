@@ -2,8 +2,8 @@
 // everything; this file only shows it and says what to do. Whatever goes wrong becomes a screen of plain words, never
 // a blank canvas and never an error nobody reads.
 import {
+  type Diagnostic,
   type Frames,
-  formatDiagnostic,
   type Game,
   type Host,
   loadGame,
@@ -80,6 +80,18 @@ function element<K extends keyof HTMLElementTagNameMap>(
 const reasonOf = (error: unknown): string =>
   error instanceof Error ? error.message : error === undefined ? 'No reason was given.' : String(error)
 
+/** One problem on the screen of words: where it is, when it names a file, and what is wrong. */
+interface ProblemLine {
+  readonly where?: string
+  readonly what: string
+}
+
+/** A diagnostic split the way `formatDiagnostic` joins it: `file: place: ` then the message. */
+const lineOf = (d: Diagnostic): ProblemLine => ({
+  where: d.path === '' ? `${d.file}: ` : `${d.file}: ${d.path}: `,
+  what: d.message,
+})
+
 /** Loads the game through `read` and starts it in `root`. Never rejects: anything that goes wrong is a screen of words. */
 export async function play(options: PlayOptions): Promise<Play> {
   const { root, read, host = webHost(), start = startGame } = options
@@ -100,13 +112,23 @@ export async function play(options: PlayOptions): Promise<Play> {
     root.classList.remove('play-root')
   }
 
-  /** A screen of words in place of the game. `lines` are what went wrong, one per problem, in order. */
-  const problem = (title: string, lines: readonly string[], fix: boolean): Play => {
+  /**
+   * A screen of words in place of the game. `lines` are what went wrong, one per problem, in order: `where` (the file
+   * and the place in it, set in the measuring font) and `what` (a sentence for a person). Together they read exactly
+   * as `formatDiagnostic` gives them.
+   */
+  const problem = (title: string, lines: readonly ProblemLine[], fix: boolean): Play => {
     root.replaceChildren()
     const screen = element('div', 'play-problem')
     screen.setAttribute('role', 'alert')
     const list = element('ul', '')
-    for (const line of lines) list.append(element('li', '', line))
+    for (const line of lines) {
+      const item = element('li', '')
+      // Two plain inline spans, one after the other: a block or a flex box would put a line break into the text.
+      if (line.where !== undefined) item.append(element('span', 'play-where', line.where))
+      item.append(element('span', 'play-what', line.what))
+      list.append(item)
+    }
     screen.append(element('h1', '', title), list)
     if (fix) screen.append(element('p', '', WORDS.problemFix))
     root.append(screen)
@@ -123,7 +145,7 @@ export async function play(options: PlayOptions): Promise<Play> {
 
   try {
     const loaded = await loadGame(read)
-    if (!loaded.ok) return problem(WORDS.problemTitle, loaded.diagnostics.map(formatDiagnostic), true)
+    if (!loaded.ok) return problem(WORDS.problemTitle, loaded.diagnostics.map(lineOf), true)
     const content = loaded.value
 
     const stage = element('div', 'play-stage')
@@ -150,6 +172,8 @@ export async function play(options: PlayOptions): Promise<Play> {
       if (crate === undefined || Math.abs(crate.get(Transform).x - startX) <= PUSHED_TILES) return
       pushed = true
       goal.textContent = WORDS.done
+      // The look puts a tick before the words, so a player sees at a glance that they did it.
+      goal.classList.add('play-done')
     }
 
     try {
@@ -162,12 +186,12 @@ export async function play(options: PlayOptions): Promise<Play> {
         frames: watching(options.frames ?? pageFrames, observe),
       })
     } catch (error) {
-      return problem(WORDS.cannotStart, [reasonOf(error)], false)
+      return problem(WORDS.cannotStart, [{ what: reasonOf(error) }], false)
     }
     setState('playing')
     return { state: 'playing', game, stop }
   } catch (error) {
     // `loadGame` reports a bad file as words; this is a read that failed in some other way.
-    return problem(WORDS.cannotStart, [reasonOf(error)], false)
+    return problem(WORDS.cannotStart, [{ what: reasonOf(error) }], false)
   }
 }
