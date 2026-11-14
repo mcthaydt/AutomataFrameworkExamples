@@ -10,7 +10,7 @@ framework's own tracker are in AutomataFramework
 Spec: the section "Visual direction" of the spec linked above (the Owner, 2026-11-14).
 Plan: [`plans/2026-11-14-blueprint-look-examples.md`](plans/2026-11-14-blueprint-look-examples.md)
 
-Overall: **68%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
+Overall: **82%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
 stage 6 is 12 and the Owner's review is the last 6)
 
 | Stage | State | Output |
@@ -19,12 +19,33 @@ stage 6 is 12 and the Owner's review is the last 6)
 | 2. Plan | Done, 100% (in review) | `plans/2026-11-14-blueprint-look-examples.md` |
 | 3. Plan audit | Done, 100% (in review) | `audits/2026-11-14-blueprint-look-examples-plan-audit.md` |
 | 4. Execution | Done, 100% (in review; each of six tasks is 16% of the stage, the close 4%) | three pull requests: AutomataFramework 21 (the button properties), Examples 13 (the pin move), Examples 14 (the look, in palette No. 340) |
-| 5. Implementation audit | Not started | |
+| 5. Implementation audit | Done, 100% (in review) | `audits/2026-11-14-blueprint-look-examples-implementation-audit.md` |
 | 6. Fixes | Not started | |
 | 7. Owner review | Not started | |
 
 ### Log
 
+- 2026-11-14: The Owner's final words, with no flag: "You are the box on the left. Push the other box." and "You
+  pushed the box. Well done!" Nothing in the audit waits for the Owner any more; stage 6 can apply F1 to F4.
+- 2026-11-14: The Owner approved new words for the goal: "You are the box on the left. Push the other box to the
+  flag." Two things are open before F2 can start, both sent to the coordinator: the game has no flag, and the "done"
+  sentence (which names "the green box") has no new words yet.
+- 2026-11-14: The Owner answered the audit's Q2: (c), an editor may change the demo's colours and the words stop
+  naming colours. The new words are the Owner's and not yet given; F2 waits only for them.
+- 2026-11-14: The Owner answered the audit's Q1: (a), the words stay as they are until M2 gives the boxes real
+  characters. Q2 (may an editor change the demo's colours) is still open, so F2 still waits.
+- 2026-11-14: Stage 5. The implementation audit is written, for `main` at `1aca8cf` (CI run 43552571486 green in
+  `check` and all three `engines` jobs). It is a design audit: the code, the 33 pictures of pull request 20 and the 33
+  of `main` were read against the spec's "Visual direction" and the Owner's decisions. Nothing blocks. Four things for
+  stage 6: F1, the tests' own level (`pinned-level.ts`) never got the new sky and ground, which is why the "well done"
+  picture shows the old light blue (the game itself is right); F2, `art.test.ts` fails if an editor changes a colour,
+  against this repo's rule that a content-only change passes CI (waits for Q2); F3, the game ships Fredoka and five
+  Phosphor icons without their licence notices; F4, the spec's table, the plan's boxes, this tracker's stage 4 row
+  (eight pull requests, not three) and a few comments are behind what was built. Ten small notes. Two questions for
+  the Owner, sent to the coordinator and not decided: Q1, the words tell the boxes apart by colour alone, which is
+  hard for red-green colour-blind players; Q2, whether an editor may change the demo's colours. Every pair a person
+  reads passes the contrast test (the closest is 5.05 to 1) and the colours are exact in all three browsers. No tests
+  were run here; both goldens are untouched.
 - 2026-11-14: Stage 4, a second deviation the coordinator asked for: the fonts (the Owner: 2A, one font). The screens'
   one font is Fredoka (`@fontsource/fredoka` 5.3.0, the `latin-600` file); IBM Plex Sans Condensed and JetBrains Mono
   and the "measuring font" for a problem's file path are gone, so a path is told apart by its quieter colour. Nothing
