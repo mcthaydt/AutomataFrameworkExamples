@@ -113,6 +113,10 @@ function contrast(a: string, b: string): number {
   return ((hi ?? 0) + 0.05) / ((lo ?? 0) + 0.05)
 }
 
+/** The first family of an element's font, without quotes: WebKit writes `IBM Plex Sans Condensed`, the others quote it. */
+const firstFamily = (element: Element): string =>
+  (getComputedStyle(element).fontFamily.split(',')[0] ?? '').replace(/["']/g, '').trim()
+
 /** A touch landing on, or lifting from, one element. */
 const touchOn = (target: Element, type: 'pointerdown' | 'pointerup'): void => {
   target.dispatchEvent(
@@ -273,7 +277,7 @@ test('the words are chalk on blueprint paper, in the label font', async () => {
   expect(getComputedStyle(words).backgroundColor).toBe(PAPER)
   expect(getComputedStyle(goal).color).toBe(CHALK)
   expect(getComputedStyle(how).color).toBe(PENCIL)
-  expect(getComputedStyle(goal).fontFamily.startsWith('"IBM Plex Sans Condensed"')).toBe(true)
+  expect(firstFamily(goal)).toBe('IBM Plex Sans Condensed')
   expect(fontLoaded('IBM Plex Sans Condensed', '600')).toBe(true)
   expect(getComputedStyle(goal).textTransform).toBe('none')
 })
@@ -401,10 +405,10 @@ test('a problem says where in the measuring font and what in plain words', async
     const where = item.querySelector('.play-where')
     const what = item.querySelector('.play-what')
     if (where === null || what === null) throw new Error(`no two parts in "${item.textContent}"`)
-    expect(getComputedStyle(where).fontFamily.startsWith('"JetBrains Mono"')).toBe(true)
+    expect(firstFamily(where)).toBe('JetBrains Mono')
     expect(getComputedStyle(where).color).toBe(PENCIL)
     expect(getComputedStyle(where).fontSize).toBe('15px')
-    expect(getComputedStyle(what).fontFamily.startsWith('"IBM Plex Sans Condensed"')).toBe(true)
+    expect(firstFamily(what)).toBe('IBM Plex Sans Condensed')
     expect(getComputedStyle(what).color).toBe(CHALK)
     expect(getComputedStyle(what).fontSize).toBe('18px')
     expect(getComputedStyle(where).display).toBe('inline')
