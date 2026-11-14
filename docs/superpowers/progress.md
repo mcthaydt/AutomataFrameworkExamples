@@ -25,6 +25,8 @@ stage 6 is 12 and the Owner's review is the last 6)
 
 ### Log
 
+- 2026-11-14: The Owner's final words, with no flag: "You are the box on the left. Push the other box." and "You
+  pushed the box. Well done!" Nothing in the audit waits for the Owner any more; stage 6 can apply F1 to F4.
 - 2026-11-14: The Owner approved new words for the goal: "You are the box on the left. Push the other box to the
   flag." Two things are open before F2 can start, both sent to the coordinator: the game has no flag, and the "done"
   sentence (which names "the green box") has no new words yet.

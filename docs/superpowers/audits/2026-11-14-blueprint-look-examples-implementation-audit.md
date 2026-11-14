@@ -222,19 +222,16 @@ palette No. 276.
   words no longer lean on colour. A fact for whoever words it: the hero is 0.8 tiles wide and 1 tall, the crate 1 by
   1, so "small" and "big" are only just true today; the hero starts on the left and is the one that moves.
 
-  **The words the Owner approved (2026-11-14):** "You are the box on the left. Push the other box to the flag."
-  Two things about them are open and are not decided here; stage 6 does not start F2 until the coordinator passes on
-  the Owner's answers.
-  - *There is no flag in the game.* The level holds the walls, the floor, the hero and one crate, and "done" means
-    the crate has moved more than one tile from where it started, in either direction. Words that name a flag need
-    either a flag (a new thing in the level's file, new art, and a new rule for "done": the crate has reached it), or
-    words without one.
-  - *The "done" sentence has no new words yet.* Today it is "You pushed the green box. Well done!", which also names
-    a colour.
-  The words exist in English only so far; the other five languages follow the same sentences when they arrive.
+  **The words the Owner approved (2026-11-14), final:** "You are the box on the left. Push the other box." and, once
+  it is pushed, "You pushed the box. Well done!" A first wording named a flag; the game has none, so the Owner took
+  the words without it, and a real flag may come in M2. The words exist in English only so far; the other five
+  languages follow these sentences when they arrive. One fact, said once: "on the left" is true of the level as it is
+  (the hero starts at 2.5, the crate at 9.5), and an editor who moves the crate to the hero's left makes it untrue,
+  as a recolour made "green" untrue. No test should pin the crate's side on the real files, for the same reason as F2.
 
 ## For stage 6
 
 Apply F1, F3 and F4 (the spec's sentence goes to the coordinator). Apply N1 and N8 with them, since each is one line.
-F2 follows Q2's answer, (c), and waits only for the Owner's new words. N2 is worth doing if F1 is being touched anyway. Nothing here needs a framework change or a pin move,
+F2 follows Q2's answer, (c), with the Owner's two sentences above: change `words.ts` and the tests that quote
+them, and make `art.test.ts` hold the rule and no exact colour. N2 is worth doing if F1 is being touched anyway. Nothing here needs a framework change or a pin move,
 and no golden may move.
