@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@automataframework/framework':
-        specifier: github:mcthaydt/AutomataFramework#cc281c9015d310ac103cdf6da99c784bb4a57aca
-        version: https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/cc281c9015d310ac103cdf6da99c784bb4a57aca
+        specifier: github:mcthaydt/AutomataFramework#a3f52a5f042a299b86ef8449e55e9d30dd6a5b08
+        version: https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/a3f52a5f042a299b86ef8449e55e9d30dd6a5b08
     devDependencies:
       '@biomejs/biome':
         specifier: 2.5.15
@@ -45,8 +45,8 @@ importers:
 
 packages:
 
-  '@automataframework/framework@https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/cc281c9015d310ac103cdf6da99c784bb4a57aca':
-    resolution: {gitHosted: true, integrity: sha512-u/5oJkluzjGw9jW5Y/uUvQSmRJS2uvxsskDK446z7TH1kCVyF589nE139v+rpue0zOYsqa6u3KrjujkYPf8avQ==, tarball: https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/cc281c9015d310ac103cdf6da99c784bb4a57aca}
+  '@automataframework/framework@https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/a3f52a5f042a299b86ef8449e55e9d30dd6a5b08':
+    resolution: {gitHosted: true, integrity: sha512-rh4VS/vyX5ZvUEUS4tUMRG3cTiOMGrWtE1YI9L+zn57C4oZ3nDWzxbS3fEYUfuJH/aQCWMdM3jvBbPdQSaaCbg==, tarball: https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/a3f52a5f042a299b86ef8449e55e9d30dd6a5b08}
     version: 0.1.0
     engines: {node: '>=24.21.0'}
 
@@ -109,9 +109,6 @@ packages:
 
   '@blazediff/core@1.10.0':
     resolution: {integrity: sha512-AOQff0zgR7cGsZL+4E7hVkmujoPUpm0J9xzWGWZj5wCjd3gmxESXAPfKyuzs93VdpQNFhHlBhfOjrcZ+XTERtQ==}
-
-  '@dimforge/rapier2d-deterministic-compat@0.21.0':
-    resolution: {integrity: sha512-qVwHqqpRX73ktQRqiAa/0JdBfWdzsGHg8r8d+snaZB0WRXaTs3m7GU6jN+Qf3gEjMEUqk3Rc9q87yGXHkktTbA==}
 
   '@emnapi/core@1.11.2':
     resolution: {integrity: sha512-TC8MkTuZUtcTSiFeuC0ksCh9QIJ5+F21MvZ4Wn4ORfYaFJ/0dsiudv5tVkejgwZlwQ39jL9WWDe2lz8x0WglOA==}
@@ -1097,9 +1094,8 @@ packages:
 
 snapshots:
 
-  '@automataframework/framework@https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/cc281c9015d310ac103cdf6da99c784bb4a57aca':
+  '@automataframework/framework@https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/a3f52a5f042a299b86ef8449e55e9d30dd6a5b08':
     dependencies:
-      '@dimforge/rapier2d-deterministic-compat': 0.21.0
       koota: 0.6.6
       pixi.js: 8.22.0
       smol-toml: 1.9.0
@@ -1144,8 +1140,6 @@ snapshots:
     optional: true
 
   '@blazediff/core@1.10.0': {}
-
-  '@dimforge/rapier2d-deterministic-compat@0.21.0': {}
 
   '@emnapi/core@1.11.2':
     dependencies:
