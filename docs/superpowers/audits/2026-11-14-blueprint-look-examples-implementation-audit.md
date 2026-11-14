@@ -222,6 +222,17 @@ palette No. 276.
   words no longer lean on colour. A fact for whoever words it: the hero is 0.8 tiles wide and 1 tall, the crate 1 by
   1, so "small" and "big" are only just true today; the hero starts on the left and is the one that moves.
 
+  **The words the Owner approved (2026-11-14):** "You are the box on the left. Push the other box to the flag."
+  Two things about them are open and are not decided here; stage 6 does not start F2 until the coordinator passes on
+  the Owner's answers.
+  - *There is no flag in the game.* The level holds the walls, the floor, the hero and one crate, and "done" means
+    the crate has moved more than one tile from where it started, in either direction. Words that name a flag need
+    either a flag (a new thing in the level's file, new art, and a new rule for "done": the crate has reached it), or
+    words without one.
+  - *The "done" sentence has no new words yet.* Today it is "You pushed the green box. Well done!", which also names
+    a colour.
+  The words exist in English only so far; the other five languages follow the same sentences when they arrive.
+
 ## For stage 6
 
 Apply F1, F3 and F4 (the spec's sentence goes to the coordinator). Apply N1 and N8 with them, since each is one line.

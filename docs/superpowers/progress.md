@@ -25,6 +25,9 @@ stage 6 is 12 and the Owner's review is the last 6)
 
 ### Log
 
+- 2026-11-14: The Owner approved new words for the goal: "You are the box on the left. Push the other box to the
+  flag." Two things are open before F2 can start, both sent to the coordinator: the game has no flag, and the "done"
+  sentence (which names "the green box") has no new words yet.
 - 2026-11-14: The Owner answered the audit's Q2: (c), an editor may change the demo's colours and the words stop
   naming colours. The new words are the Owner's and not yet given; F2 waits only for them.
 - 2026-11-14: The Owner answered the audit's Q1: (a), the words stay as they are until M2 gives the boxes real
