@@ -24,6 +24,8 @@ const PAGE_FEATURES: ReadonlySet<string> = new Set(['play'])
 /** The two entries of the one package a game may import. */
 const FRAMEWORK = '@automataframework/framework'
 const FRAMEWORK_HEADLESS = '@automataframework/framework/headless'
+/** The Node entry that runs a room. Only `server.ts` at the repo root may import it; nothing under `src/` does. */
+const FRAMEWORK_SERVER = '@automataframework/framework/server'
 
 const IMPURE: readonly { readonly pattern: RegExp; readonly what: string }[] = [
   { pattern: /\bMath\.random\b/, what: 'Math.random' },
@@ -203,8 +205,15 @@ export function checkArchitecture(files: SourceFiles): Violation[] {
     }
 
     for (const spec of source.packages) {
-      // A game uses only the published package, by its two entries, never a path inside it.
-      if (spec !== FRAMEWORK && spec !== FRAMEWORK_HEADLESS) {
+      if (spec === FRAMEWORK_SERVER) {
+        // The room server needs Node, so a page must never carry it: its one file is `server.ts`, beside `src/`.
+        add(
+          file,
+          'only-server-ts-imports-the-server',
+          `${spec} is for server.ts at the repo root; code under src/ never imports it.`,
+        )
+      } else if (spec !== FRAMEWORK && spec !== FRAMEWORK_HEADLESS) {
+        // A game uses only the published package, by its entries, never a path inside it.
         add(
           file,
           'only-the-framework',
