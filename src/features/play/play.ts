@@ -257,8 +257,9 @@ export async function play(options: PlayOptions): Promise<Play> {
     // The strip: the goal, and how to do it at a keyboard or a gamepad. A touch screen has the thumbs' own hints.
     let pushed = false
     const strip: Strip = createStrip(words)
-    // Before the game runs nobody has used anything: a coarse pointer means a finger. After, the framework knows.
-    const device = (): ReturnType<Input['device']> => game?.input.device(1) ?? (coarse ? 'touch' : 'keyboard')
+    // What the player used last, once they have used something; until then a coarse pointer means a finger.
+    let used: ReturnType<Input['device']> | undefined
+    const device = (): ReturnType<Input['device']> => used ?? (coarse ? 'touch' : 'keyboard')
     const dash = content.characters[content.project.hero]?.moves?.dash === true
     drawWords = (): void => {
       if (pushed) strip.done(spoken.words('goal.pushed'))
@@ -306,8 +307,10 @@ export async function play(options: PlayOptions): Promise<Play> {
       return
     }
     game = started
-    unfollowDevice = started.input.onDevice((player) => {
-      if (player === 1) drawWords()
+    unfollowDevice = started.input.onDevice((player, kind) => {
+      if (player !== 1) return
+      used = kind
+      drawWords()
     })
     drawWords()
     setState('playing')

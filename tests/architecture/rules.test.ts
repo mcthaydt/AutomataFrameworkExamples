@@ -9,12 +9,12 @@ test('a feature may not import a feature above it', () =>
   expect(one({ 'src/features/plugins/plugins.ts': "import '../play/play.ts'" })).toEqual(['imports-go-down']))
 
 test('another feature is imported through its entry file', () =>
-  expect(one({ 'src/features/play/play.ts': "import '../plugins/extra.ts'" })).toEqual([
-    'through-the-entry',
-  ]))
+  expect(one({ 'src/features/play/play.ts': "import '../plugins/extra.ts'" })).toEqual(['through-the-entry']))
 
 test('lib imports no feature', () =>
-  expect(one({ 'src/lib/a.ts': "import '../features/plugins/plugins.ts'" })).toEqual(['lib-is-below-features']))
+  expect(one({ 'src/lib/a.ts': "import '../features/plugins/plugins.ts'" })).toEqual([
+    'lib-is-below-features',
+  ]))
 
 test('no cycles', () =>
   expect(one({ 'src/lib/a.ts': "import './b.ts'", 'src/lib/b.ts': "import './a.ts'" })).toEqual([
