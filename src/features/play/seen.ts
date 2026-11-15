@@ -27,7 +27,8 @@ export function whileSeen(host: Host, root: HTMLElement): Host & { destroy(): vo
   observer.observe(root)
   const unlisten = host.onVisibility(tell)
   return {
-    target: host.target,
+    // Everything else the host answers (its store, its language, its links) is the host's own.
+    ...host,
     visible: now,
     onVisibility(listener) {
       listeners.add(listener)

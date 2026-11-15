@@ -1,5 +1,5 @@
 // A game plays only while it can be seen: the host's word, and now whether the game's root is in the window.
-import type { Host } from '@automataframework/framework'
+import { testHost } from '@automataframework/framework'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { whileSeen } from '#src/features/play/seen.ts'
 
@@ -7,24 +7,8 @@ let root: HTMLDivElement
 let spacer: HTMLDivElement
 let seen: ReturnType<typeof whileSeen> | undefined
 
-function fakeHost(): Host & { hide(): void; show(): void } {
-  let visible = true
-  const listeners = new Set<(visible: boolean) => void>()
-  const set = (next: boolean): void => {
-    visible = next
-    for (const l of listeners) l(next)
-  }
-  return {
-    target: 'web',
-    visible: () => visible,
-    onVisibility(listener) {
-      listeners.add(listener)
-      return () => listeners.delete(listener)
-    },
-    hide: () => set(false),
-    show: () => set(true),
-  }
-}
+/** The framework's own test host: on screen until `hide`, and back on screen with `show`. */
+const fakeHost = () => testHost()
 
 beforeEach(() => {
   // A page much taller than the window, with the root far down it.

@@ -31,6 +31,7 @@ running = await play({
   root,
   read: readFrom(new URL('./', location.href)),
   mode: modeOf(location.search),
-  onState: (state) => tellParent(window, state),
+  // The page that frames the game knows three states. Choosing a language is the game's own screen, so it is `playing`.
+  onState: (state) => tellParent(window, state === 'picking' ? 'playing' : state),
 })
 if (playAsked) await running.takeOver()

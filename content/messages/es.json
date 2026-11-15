@@ -1,0 +1,25 @@
+{
+  "format": 1,
+  "id": "es",
+  "messages": {
+    "controls.jump": "Saltar",
+    "controls.left": "Izquierda",
+    "controls.right": "Derecha",
+    "goal.push": "Eres la caja de la izquierda. Empuja la otra caja.",
+    "goal.pushed": "Empujaste la caja. ¡Muy bien!",
+    "hint.arrows": "Las flechas",
+    "hint.jump": "{key} para saltar.",
+    "hint.move": "{keys} para moverte.",
+    "how.touch": "Mantén Izquierda o Derecha para moverte. Toca Saltar para saltar.",
+    "key.arrow-down": "Flecha abajo",
+    "key.arrow-left": "Flecha izquierda",
+    "key.arrow-right": "Flecha derecha",
+    "key.arrow-up": "Flecha arriba",
+    "key.space": "Espacio",
+    "page.cannot-start": "Este juego no pudo empezar en este navegador. Prueba con otro navegador.",
+    "page.problem-fix": "Arregla el archivo que aparece arriba y vuelve a cargar esta página.",
+    "page.problem-title": "Este juego tiene un problema y no puede empezar.",
+    "watch.click": "El juego está jugando solo. Haz clic para jugar.",
+    "watch.tap": "El juego está jugando solo. Tócalo para jugar."
+  }
+}
