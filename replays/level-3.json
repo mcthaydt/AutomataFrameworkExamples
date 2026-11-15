@@ -1,0 +1,276 @@
+{
+  "format": 2,
+  "framework": "0.1.0",
+  "tickHz": 60,
+  "seed": 1,
+  "contentHash": "0b4143bea85e089c",
+  "schemaHash": "e314519a838a8401",
+  "ticks": 468,
+  "commands": [
+    {
+      "tick": 10,
+      "source": 1,
+      "seq": 0,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "right"
+        ]
+      }
+    },
+    {
+      "tick": 95,
+      "source": 1,
+      "seq": 1,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "jump",
+          "right"
+        ]
+      }
+    },
+    {
+      "tick": 110,
+      "source": 1,
+      "seq": 2,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "right"
+        ]
+      }
+    },
+    {
+      "tick": 111,
+      "source": 1,
+      "seq": 3,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "jump",
+          "right"
+        ]
+      }
+    },
+    {
+      "tick": 112,
+      "source": 1,
+      "seq": 4,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "jump",
+          "left"
+        ]
+      }
+    },
+    {
+      "tick": 124,
+      "source": 1,
+      "seq": 5,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "left"
+        ]
+      }
+    },
+    {
+      "tick": 125,
+      "source": 1,
+      "seq": 6,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "jump",
+          "left"
+        ]
+      }
+    },
+    {
+      "tick": 126,
+      "source": 1,
+      "seq": 7,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "jump",
+          "right"
+        ]
+      }
+    },
+    {
+      "tick": 138,
+      "source": 1,
+      "seq": 8,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "right"
+        ]
+      }
+    },
+    {
+      "tick": 139,
+      "source": 1,
+      "seq": 9,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "jump",
+          "right"
+        ]
+      }
+    },
+    {
+      "tick": 140,
+      "source": 1,
+      "seq": 10,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "jump",
+          "left"
+        ]
+      }
+    },
+    {
+      "tick": 153,
+      "source": 1,
+      "seq": 11,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "left"
+        ]
+      }
+    },
+    {
+      "tick": 154,
+      "source": 1,
+      "seq": 12,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "jump",
+          "left"
+        ]
+      }
+    },
+    {
+      "tick": 155,
+      "source": 1,
+      "seq": 13,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "jump",
+          "right"
+        ]
+      }
+    },
+    {
+      "tick": 177,
+      "source": 1,
+      "seq": 14,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "right"
+        ]
+      }
+    },
+    {
+      "tick": 250,
+      "source": 1,
+      "seq": 15,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "jump",
+          "right"
+        ]
+      }
+    },
+    {
+      "tick": 273,
+      "source": 1,
+      "seq": 16,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "dash",
+          "right"
+        ]
+      }
+    },
+    {
+      "tick": 274,
+      "source": 1,
+      "seq": 17,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "jump",
+          "right"
+        ]
+      }
+    },
+    {
+      "tick": 284,
+      "source": 1,
+      "seq": 18,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "right"
+        ]
+      }
+    },
+    {
+      "tick": 421,
+      "source": 1,
+      "seq": 19,
+      "type": "controls",
+      "payload": {
+        "held": []
+      }
+    }
+  ],
+  "checks": [
+    {
+      "tick": 60,
+      "hash": "aa5431193f1c34b9"
+    },
+    {
+      "tick": 120,
+      "hash": "4d76f39f4736ea31"
+    },
+    {
+      "tick": 180,
+      "hash": "28242af28465183c"
+    },
+    {
+      "tick": 240,
+      "hash": "bd7f2dc182609fd6"
+    },
+    {
+      "tick": 300,
+      "hash": "91b2c0b0027a291a"
+    },
+    {
+      "tick": 360,
+      "hash": "59e3790fe5e04b51"
+    },
+    {
+      "tick": 420,
+      "hash": "0fe160a6ac3644f1"
+    }
+  ],
+  "finalHash": "e6bb91370368b0d0",
+  "meta": {
+    "level": "level-3",
+    "players": "1"
+  }
+}
