@@ -84,11 +84,11 @@ const answeredOk = (found: Opened, pattern: RegExp): boolean =>
 test('the font and the icons are files beside the page', async () => {
   opened = await openGame({ size: 'phone-390x844' })
   const { page } = opened
-  // The buttons (and so their pictures) are only drawn once a finger is on the screen.
-  await page.touchscreen.tap(195, 422)
+  // The button (and so its picture) is only drawn once a finger is on the screen.
+  await page.touchscreen.tap(97, 422)
   const found = opened
   await expect.poll(() => answeredOk(found, /fredoka-latin-600-normal.*\.woff2$/)).toBe(true)
-  await expect.poll(() => answeredOk(found, /arrow-left.*\.svg$/)).toBe(true)
+  await expect.poll(() => answeredOk(found, /lightning.*\.svg$/)).toBe(true)
   expectOnlyOwnFiles(found)
 })
 

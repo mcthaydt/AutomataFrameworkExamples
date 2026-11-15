@@ -1,11 +1,11 @@
-// The Blueprint look on the built page, in each browser, at every size: dark paper, the one font, the buttons as paper
-// chips that turn peach red under a thumb, a broken file said on the same paper, and a page that still plays when its font
+// The Blueprint look on the built page, in each browser, at every size: dark paper, the one font, the thumbs and the
+// dash button as paper chips that turn peach red under a thumb, a broken file said on the same paper, and a page that still plays when its font
 // files never arrive. Layout and focus are checked here because a screenshot proves neither.
 import type { Page } from 'playwright'
 import { afterAll, afterEach, expect, test } from 'vitest'
 import { WORDS } from '#src/features/play/words.ts'
 import { pinnedFiles } from '../fixtures/pinned-level.ts'
-import { say } from '../fixtures/words.ts'
+import { say, THUMB_WORDS } from '../fixtures/words.ts'
 import {
   closeBrowser,
   ENGINE,
@@ -16,6 +16,7 @@ import {
   SIZES,
   untilTick,
 } from './open.ts'
+import { backgroundOf, SLIDE_PX, thumb } from './thumbs.ts'
 
 let opened: Opened | undefined
 afterEach(async () => {
@@ -28,7 +29,7 @@ const PAPER = 'rgb(17, 19, 20)'
 const CHALK = 'rgb(182, 191, 193)'
 const MARKER = 'rgb(241, 90, 48)'
 const LEVEL = 'content/levels/level-1.json'
-const LABELS = ['Left', 'Right', 'Jump'] as const
+const LABELS = [THUMB_WORDS.dash] as const
 
 interface Box {
   readonly x: number
@@ -71,8 +72,8 @@ for (const [name, size] of sizes) {
   test(`at ${name}, the game wears the look`, async () => {
     opened = await openGame({ size: name })
     const { page } = opened
-    // A finger on the screen brings up the buttons, as it does for a player on a phone or a tablet.
-    if (size.touch) await page.touchscreen.tap(size.width / 2, size.height / 2)
+    // A finger on the screen brings up the thumbs, as it does for a player on a phone or a tablet.
+    if (size.touch) await page.touchscreen.tap(size.width / 4, size.height / 2)
     await untilTick(page, 30)
     await fontsReady(page)
 
@@ -103,17 +104,30 @@ for (const [name, size] of sizes) {
 }
 
 for (const [name, size] of sizes.filter(([, s]) => s.touch)) {
-  test(`at ${name}, holding Jump turns it peach red and the hero jumps`, async () => {
+  test(`at ${name}, the thumbs are chalk at rest and peach red held, and the hero jumps`, async () => {
     opened = await openGame({ size: name })
     const { page } = opened
-    await page.touchscreen.tap(size.width / 2, size.height / 2)
-    const jump = page.getByRole('button', { name: 'Jump' })
-    await jump.dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 1, bubbles: true })
-    const background = (): Promise<string> => jump.evaluate((b) => getComputedStyle(b).backgroundColor)
-    expect(await background()).toBe(MARKER)
+    await page.touchscreen.tap(size.width / 4, size.height / 2)
+    await page.locator('.automata-thumbs').waitFor({ state: 'visible' })
+    // The jumping thumb: the arrow shows and is peach red; lifted, it is gone.
+    await thumb(page, 'jump', 'down')
+    expect(await backgroundOf(page, '.automata-thumb-arrow')).toBe(MARKER)
     await untilTick(page, (await page.evaluate(() => window.automataGame?.sim.tick ?? 0)) + 10)
-    await jump.dispatchEvent('pointerup', { pointerType: 'touch', pointerId: 1, bubbles: true })
-    expect(await background()).toBe(PAPER)
+    await thumb(page, 'jump', 'up')
+    expect(await page.locator('.automata-thumb-arrow').isHidden()).toBe(true)
+    // The walking thumb: the ring is paper at rest and peach red once it slides.
+    await thumb(page, 'walk', 'down')
+    expect(await backgroundOf(page, '.automata-thumb-ring')).toBe(PAPER)
+    await thumb(page, 'walk', 'move', SLIDE_PX)
+    expect(await backgroundOf(page, '.automata-thumb-ring')).toBe(MARKER)
+    await thumb(page, 'walk', 'up', SLIDE_PX)
+    expect(await page.locator('.automata-thumb-ring').isHidden()).toBe(true)
+    // The dash button, held, is peach red too.
+    const dash = page.getByRole('button', { name: THUMB_WORDS.dash })
+    await dash.dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 1, bubbles: true })
+    expect(await dash.evaluate((b) => getComputedStyle(b).backgroundColor)).toBe(MARKER)
+    await dash.dispatchEvent('pointerup', { pointerType: 'touch', pointerId: 1, bubbles: true })
+    expect(await dash.evaluate((b) => getComputedStyle(b).backgroundColor)).toBe(PAPER)
 
     const replay = JSON.parse(await page.evaluate(() => JSON.stringify(window.automataGame?.replay()))) as {
       commands: { type: string; payload: unknown }[]
@@ -177,8 +191,8 @@ test('at desktop-1280x720, pushing the crate says well done, with a tick', async
 test('at tablet-1180x820, Tab shows where the keyboard is', async () => {
   opened = await openGame({ size: 'tablet-1180x820' })
   const { page } = opened
-  await page.touchscreen.tap(590, 410)
-  await page.getByRole('button', { name: 'Jump' }).waitFor()
+  await page.touchscreen.tap(295, 410)
+  await page.getByRole('button', { name: THUMB_WORDS.dash }).waitFor()
   const onButton = (): Promise<boolean> =>
     page.evaluate(() => document.activeElement?.matches('.automata-touch-button:focus-visible') ?? false)
   // WebKit only visits buttons with Alt held, as Safari does; the others need plain Tab. Try the engine's own first.
@@ -199,7 +213,7 @@ test('with the fonts blocked, the game still starts and the words are still abov
   const block = /\.woff2?$/
   opened = await openGame({ size: 'phone-844x390', block })
   const { page, errorUrls } = opened
-  await page.touchscreen.tap(422, 195)
+  await page.touchscreen.tap(211, 195)
   await untilTick(page, 30)
   await fontsReady(page)
   expect(await page.locator('#game').getAttribute('data-state')).toBe('playing')
@@ -225,19 +239,18 @@ test('with the fonts blocked, the game still starts and the words are still abov
   }
 })
 
-test('at 320 wide, the three buttons fit side by side', async () => {
+test('at 320 wide, the dash button fits and nothing scrolls sideways', async () => {
   opened = await openGame({ size: 'phone-390x844' })
   const { page } = opened
   await page.setViewportSize({ width: 320, height: 568 })
-  await page.touchscreen.tap(160, 284)
-  await page.getByRole('button', { name: 'Jump' }).waitFor()
+  await page.touchscreen.tap(80, 284)
+  await page.getByRole('button', { name: THUMB_WORDS.dash }).waitFor()
   await fontsReady(page)
   const buttons = await buttonsLook(page)
-  expect(buttons).toHaveLength(3)
-  for (const [i, b] of buttons.entries()) {
+  expect(buttons).toHaveLength(1)
+  for (const b of buttons) {
     expect(b.box.x, b.label).toBeGreaterThanOrEqual(0)
     expect(b.box.x + b.box.width, b.label).toBeLessThanOrEqual(320)
-    for (const other of buttons.slice(i + 1)) expect(overlaps(b.box, other.box), b.label).toBe(false)
   }
   expect((await pageLook(page)).sideways, 'nothing scrolls sideways').toBe(false)
 })

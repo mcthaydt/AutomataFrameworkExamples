@@ -5,7 +5,7 @@ import { parseContent, writeContent } from '@automataframework/framework/headles
 import { afterAll, afterEach, expect, test } from 'vitest'
 import { PLAY_MESSAGE } from '#src/features/play/handover.ts'
 import { gameFiles } from '../fixtures/game-files.ts'
-import { say } from '../fixtures/words.ts'
+import { say, THUMB_WORDS } from '../fixtures/words.ts'
 import {
   closeBrowser,
   fontsReady,
@@ -120,7 +120,7 @@ test('without ?watch nothing changed: it plays at once and never asks for the re
   expect(requested.filter((url) => url.includes('replays/'))).toEqual([])
 })
 
-test('a tap on the game takes over, from the start, and then a touch brings up the buttons', async () => {
+test('a tap on the game takes over, from the start, and then a touch brings up the thumbs', async () => {
   opened = await openGame({ size: 'phone-390x844', search: '?watch' })
   const { page } = opened
   await untilWatchTick(page, 30)
@@ -129,12 +129,15 @@ test('a tap on the game takes over, from the start, and then a touch brings up t
   expect(await watchTickOf(page)).toBe(-1)
   expect(await page.getByText(say('goal.push'), { exact: true }).isVisible()).toBe(true)
   expect(await page.locator('canvas').count()).toBe(1)
-  await page.touchscreen.tap(195, 300)
-  for (const name of ['Left', 'Right', 'Jump']) {
-    const box = await page.getByRole('button', { name }).boundingBox()
-    expect(box?.width ?? 0, name).toBeGreaterThanOrEqual(48)
-    expect(box?.height ?? 0, name).toBeGreaterThanOrEqual(48)
+  await page.touchscreen.tap(97, 300)
+  for (const name of [THUMB_WORDS.walk, THUMB_WORDS.jump]) {
+    const box = await page.getByRole('group', { name }).boundingBox()
+    expect(box?.width ?? 0, name).toBeGreaterThanOrEqual(44)
+    expect(box?.height ?? 0, name).toBeGreaterThanOrEqual(44)
   }
+  const dash = await page.getByRole('button', { name: THUMB_WORDS.dash }).boundingBox()
+  expect(dash?.width ?? 0).toBeGreaterThanOrEqual(48)
+  expect(dash?.height ?? 0).toBeGreaterThanOrEqual(48)
 })
 
 test('a key takes over too, so no one needs a mouse', async () => {

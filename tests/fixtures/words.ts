@@ -1,6 +1,7 @@
 // The game's own words, read from its messages files as a test needs them, so no test types a sentence the game says
 // twice: a sentence changed in `content/messages/en.json` changes the tests' word for it, and a key that does not
 // exist is a mistake the test names.
+import { frameworkWords, playHint } from '@automataframework/framework/headless'
 import { gameFiles } from './game-files.ts'
 
 /** The messages of one of the game's languages, by key. Throws, naming the file, when it is not there. */
@@ -18,8 +19,28 @@ export function say(key: string, language = 'en'): string {
   return text
 }
 
-const move = say('hint.move').replace('{keys}', say('hint.arrows'))
-const jump = say('hint.jump').replace('{key}', say('key.space'))
+/** The first key of each action in the real game's tuning file, which is what a keyboard player sees named. */
+const FIRST_KEYS: Readonly<Record<string, string>> = {
+  left: 'ArrowLeft',
+  right: 'ArrowRight',
+  jump: 'Space',
+  dash: 'ShiftLeft',
+}
 
-/** The words a player at a keyboard reads about moving and jumping, as the page builds them from `hint.*` and `key.*`. */
-export const KEYBOARD_WORDS: string = `${move} ${jump}`
+/**
+ * The words a player at a keyboard reads about moving, jumping and dashing, as the page builds them with the
+ * framework's `playHint` from the framework's own sentences.
+ */
+export const KEYBOARD_WORDS: string = playHint({
+  device: 'keyboard',
+  first: (action) => FIRST_KEYS[action],
+  dash: true,
+  words: frameworkWords('en'),
+})
+
+/** What a screen reader (and a test) calls the two halves of the screen and the one button, in English. */
+export const THUMB_WORDS: { readonly walk: string; readonly jump: string; readonly dash: string } = {
+  walk: frameworkWords('en')('automata.thumbs.walk'),
+  jump: frameworkWords('en')('automata.thumbs.jump'),
+  dash: say('controls.dash'),
+}

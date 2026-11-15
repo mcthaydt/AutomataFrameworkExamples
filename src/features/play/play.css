@@ -173,8 +173,9 @@ body:has(#game[data-state="watching"]) {
   -webkit-mask-image: url("@phosphor-icons/core/assets/regular/check-circle.svg");
 }
 
-/* The touch buttons, drawn by the framework: its colours, edge, corners and font come from the properties above. Here
-   are the parts a property cannot say: the picture above the word, the capitals, and no motion at all. */
+/* The one round button the thumbs do not do (the dash mark), drawn by the framework: its colours, edge, corners and font
+   come from the properties above, and so do the ring, the arrow and the knob of the two thumbs, chalk at rest and peach
+   red while held. Here are the parts a property cannot say: the picture above the word, the capitals, and no motion. */
 .play-root .automata-touch-button {
   display: flex;
   flex-direction: column;
@@ -191,19 +192,9 @@ body:has(#game[data-state="watching"]) {
   height: 28px;
 }
 
-.play-root .automata-touch-button[data-action="left"]::before {
-  mask-image: url("@phosphor-icons/core/assets/regular/arrow-left.svg");
-  -webkit-mask-image: url("@phosphor-icons/core/assets/regular/arrow-left.svg");
-}
-
-.play-root .automata-touch-button[data-action="right"]::before {
-  mask-image: url("@phosphor-icons/core/assets/regular/arrow-right.svg");
-  -webkit-mask-image: url("@phosphor-icons/core/assets/regular/arrow-right.svg");
-}
-
-.play-root .automata-touch-button[data-action="jump"]::before {
-  mask-image: url("@phosphor-icons/core/assets/regular/arrow-fat-up.svg");
-  -webkit-mask-image: url("@phosphor-icons/core/assets/regular/arrow-fat-up.svg");
+.play-root .automata-touch-button[data-action="dash"]::before {
+  mask-image: url("@phosphor-icons/core/assets/regular/lightning.svg");
+  -webkit-mask-image: url("@phosphor-icons/core/assets/regular/lightning.svg");
 }
 
 /* Where the keyboard is: a 3 px chalk ring, 2 px away, the same ring as the site's. */

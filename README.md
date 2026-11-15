@@ -47,17 +47,17 @@ what is wrong if something is.
 | `automata.toml` | The project file: the game's name, its first level, its hero, and the content files it lists. |
 | `content/` | The game's content, JSON: the level, the characters and the words (`content/messages/`, in six languages). Only `pnpm content:write` writes these. |
 | `replays/level-1.json` | A recorded play. CI plays it back in four engines and checks they all end the same. |
-| `src/features/hero/` | The hero's rules: run, and jump once for each press. |
-| `src/features/plugins/` | The list of everything the game's rules are made of. |
-| `src/features/play/` | The page: loads the files, asks a first-time player which language to play in, starts the game, and says what to do. |
+| `content/tunings/hero-moves.json` | The hero's moves: walk, jump, double jump, wall jump and dash. The framework moves the hero from these numbers and the four controls, so the game has no hero code. |
+| `src/features/plugins/` | The list of everything the game's rules are made of (empty for now: the hero is the framework's). |
+| `src/features/play/` | The page: loads the files, asks a first-time player which language to play in, starts the game, and says what to do in the strip at the top. |
 | `src/features/play/blueprint.css` | The look's colours, font and icons, in one place. `play.css` takes every colour from here. |
 | `server.ts` | This game's room server, for online play: `node server.ts`. The pages of this game stay offline; `tests/server/` proves two players in a room end on one hash. |
 | `tests/` | The checks. They mirror `src/`. |
 
 ## The look
 
-The game's own screens (the words at the top, the touch buttons and the screen that says a file is broken) use the
-project's Blueprint look: grey words on black paper (palette No. 340 of *A Dictionary of Color Combinations*), with peach red only on a touch button while a thumb holds it. The
+The game's own screens (the words at the top, the two thumbs and the dash button, and the screen that says a file is broken) use the
+project's Blueprint look: grey words on black paper (palette No. 340 of *A Dictionary of Color Combinations*), with peach red only on a thumb or the dash button while a thumb holds it. The
 game's art (the level, the hero and the crate) does not: it always shows as it is. The five colours and the one font (Fredoka, at 18 pixels or larger, with a rounded partner for Japanese, Korean and Chinese)
 are in one file, `src/features/play/blueprint.css`; change a colour there and every screen follows.
 

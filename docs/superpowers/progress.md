@@ -19,7 +19,7 @@ stage 6 is 12 and the Owner's review is the last 6)
 | 1. Spec | Done (in AutomataFramework) | the M2 spec and its addenda |
 | 2. Plan | Written, in review, 100% | `plans/2026-11-15-demo-game.md` |
 | 3. Plan audit | Done, 100%: sound, no critical; 7 important (6 written into the plan, 1 the Owner answered: the palette stays a rule) and 6 minor | `audits/2026-11-15-plan-d-plan-audit.md` |
-| 4. Execution | In progress, 20% (ten parts, each its own pull request; Part 1 is merged, Part 2 is pushed and in CI) | Examples 37 (merged) and 38 |
+| 4. Execution | In progress, 20% (ten parts, each its own pull request; Parts 1 and 2 are merged, Part 3 is pushed and in CI) | Examples 37 and 39 (merged), 40 |
 | 5. Implementation audit | Not started | |
 | 6. Fixes | Not started | |
 | 7. Owner review | Not started | |
@@ -29,8 +29,8 @@ Stage 4, by part (each part is 10% of the stage):
 | Part | Waits for | State |
 |---|---|---|
 | 1. The game's words, in six languages | nothing | Merged (pull request 37): 117 Node, 67 per browser and 90 journeys per browser tests passed |
-| 2. A room server for this game | nothing | Pushed, in CI (pull request 38): `server.ts`, a two-player room test and the rule that only `server.ts` imports the server entry |
-| 3. The built-in hero | framework plan H (AutomataFramework pull request 101) | Not started |
+| 2. A room server for this game | nothing | Merged (pull request 39, which replaced 38): `server.ts`, a two-player room test and the rule that only `server.ts` imports the server entry |
+| 3. The built-in hero | framework plan H (AutomataFramework pull request 101, merged) | Pushed, in CI (pull request 40): the pin moves to `b634dce`, the hero is the framework's, two thumbs and the strip; both goldens are recorded again |
 | 4. Three levels, the door and playing together | Part 3 | Not started |
 | 5. Sound | Part 4 | Not started |
 | 6. Feel | framework plan F (its spec is being written), Part 5 | Not started |
@@ -40,6 +40,8 @@ Stage 4, by part (each part is 10% of the stage):
 | 10. The close | every part above | Not started |
 
 ### Log
+
+- 2026-11-15: Stage 4, Part 3. The framework pin moves to `b634dce` (plan H, alone in its own commit, green). The hero is the framework's now: its character file says `moves` (double jump, wall jump and dash on) and `content/tunings/hero-moves.json` holds the eighteen numbers at the framework's own values and the four controls. `src/features/hero/` and `controls.ts` are gone, and `gamePlugins` is empty until Part 4. A phone gets the framework's two thumbs (the left half walks, the right half jumps, a flick dashes) in place of Left, Right and Jump buttons; the dash button is the one round button, in the player's language (`controls.dash`). `src/features/play/strip.ts` is the strip above the level (`say`, `done`, `how`, `clear`); the keyboard words come from the framework's `playHint`, so they name the dash key too and follow what the player last used. `replays/level-1.json` and `replays/test-game.json` are recorded again, once, because the sim has a new hero.
 
 - 2026-11-15: Stage 4, Part 2. `server.ts` at the root is this game's room server: it reads the game from disk as a page does and hands it, with `gamePlugins`, to the framework's `runRoomServer` (`node server.ts`); `serverGame()` is exported for the test. `tests/server/room.test.ts` starts the server on a port the system picks, joins two headless players over real sockets, plays 240 ticks and expects both to report the server's own hash, then plays the room's recording again from the start. A new architecture rule, `only-server-ts-imports-the-server`, fails any file under `src/` that imports the server entry. The pages stay offline. No golden moved.
 

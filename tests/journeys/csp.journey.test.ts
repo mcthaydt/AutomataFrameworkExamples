@@ -2,6 +2,7 @@
 // The game must start under it and the browser must report nothing blocked. (Firefox once reported the framework's
 // eval probe, a caught `new Function`, as a violation; the framework now never makes it.)
 import { afterAll, afterEach, expect, test } from 'vitest'
+import { THUMB_WORDS } from '../fixtures/words.ts'
 import {
   closeBrowser,
   fontLoaded,
@@ -41,18 +42,18 @@ test("under the Site's strict policy the game starts and nothing is blocked", as
 test("under the Site's whole policy the look loads and nothing is blocked", async () => {
   opened = await openGame({ size: 'phone-390x844', csp: SITE_WHOLE_POLICY })
   const { page, errors, violations } = opened
-  await page.touchscreen.tap(195, 422)
-  await page.getByRole('button', { name: 'Jump' }).waitFor()
+  await page.touchscreen.tap(97, 422)
+  await page.getByRole('button', { name: THUMB_WORDS.dash }).waitFor()
   await fontsReady(page)
   await untilTick(page, 30)
   expect(violations, 'the policy blocked nothing').toEqual([])
   expect(errors, 'the page logged no errors').toEqual([])
   expect(await fontLoaded(page, 'Fredoka', '600')).toBe(true)
-  const mask = await page.getByRole('button', { name: 'Jump' }).evaluate((b) => {
+  const mask = await page.getByRole('button', { name: THUMB_WORDS.dash }).evaluate((b) => {
     const picture = getComputedStyle(b, '::before')
     return picture.maskImage || picture.getPropertyValue('-webkit-mask-image')
   })
-  expect(mask, "Jump's picture").not.toBe('none')
+  expect(mask, "the dash button's picture").not.toBe('none')
 })
 
 test("under the Site's whole policy the problem screen loads its font", async () => {
