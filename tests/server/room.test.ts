@@ -38,6 +38,10 @@ afterEach(async () => {
   server = undefined
 })
 
+/** The places in the room: the game's `players` in `automata.toml`. Seats 3 and 4 are taken and stand where they start. */
+const SEATS = 4
+const EVERYONE = [1, 2, 3, 4]
+
 /** What each seat holds from which tick: the push-crate idea, once for each of two players. */
 const HOLDS: Readonly<Record<number, Readonly<Record<number, readonly string[]>>>> = {
   1: { 10: ['right'], 120: ['jump', 'right'], 180: [] },
@@ -50,7 +54,7 @@ const script = (seat: number, tick: number): Command[] => {
 
 async function makeSim(): Promise<Sim> {
   const { content, plugins } = await serverGame()
-  const sim = await createGameSim({ content, plugins, players: [1, 2] })
+  const sim = await createGameSim({ content, plugins, players: EVERYONE })
   sims.push(sim)
   return sim
 }
@@ -61,7 +65,7 @@ async function join(url: string, room?: string): Promise<Player> {
     server: url,
     ...(room === undefined ? {} : { room }),
     level: 'level-1',
-    seats: 2,
+    seats: SEATS,
     confirmed: await makeSim(),
     predicted: await makeSim(),
     onCheck: (tick, hash) => void checks.set(tick, hash),

@@ -8,8 +8,14 @@ import { gamePlugins } from '#src/features/plugins/plugins.ts'
 import { type Course, type Driven, drive, walker } from './bot.ts'
 import { loadTheGame } from './game-files.ts'
 
-/** Level 1: a ledge one tile high at 12 to 18 (jump), a crate to push toward a pit at 26 to 28, the door at 35.5. */
-export const LEVEL_1: Course = { hops: [{ from: 10.2, to: 11.2, kind: 'jump' }], door: 35.5 }
+/** Level 1: a ledge one tile high at 12 to 18 (jump), a crate pushed toward a pit at 26 to 28 and then a jump over it, the door at 35.5. */
+export const LEVEL_1: Course = {
+  hops: [
+    { from: 10.2, to: 11.2, kind: 'jump' },
+    { from: 24.2, to: 25.4, kind: 'jump' },
+  ],
+  door: 35.5,
+}
 
 /** Level 2: a block three tiles high at 12 to 15 (a double jump), a pit six wide at 20 (a double jump), the door at 40. */
 export const LEVEL_2: Course = {

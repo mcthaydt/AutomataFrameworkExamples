@@ -1,6 +1,6 @@
-// `levelProblems`: what a level must have for everyone to finish it, and the sentence that says what to add when it does
-// not. The broken levels are made from the real ones, a thing or a start taken out, so the sentences are the ones a
-// person editing a level would read.
+// `levelProblems`: what a level must have for anyone to finish it, and the sentence that says what to add when it does
+// not. The broken levels are made from the real ones, the door taken out, so the sentence is the one a person editing a
+// level would read.
 import { parseContent, writeContent } from '@automataframework/framework/headless'
 import { expect, test } from 'vitest'
 import { levelProblems } from '#src/features/play/levels.ts'
@@ -39,35 +39,18 @@ test('a level with no door says so, and where to add one', async () => {
   ])
 })
 
-test('a level with no start for a player the game lets play says which player', async () => {
-  const file = 'content/levels/level-3.json'
-  const game = await without(file, (level) => ({
-    ...level,
-    starts: level.starts.filter((start) => start.player !== 3),
-  }))
-  expect(levelProblems(game)).toEqual([
-    {
-      file,
-      message: 'This level has no start for player 3. Add one to "starts" with "player": 3.',
-    },
-  ])
-})
-
-test('problems come in the order the levels are played, door first', async () => {
+test('problems come in the order the levels are played', async () => {
   const first = 'content/levels/level-1.json'
   const last = 'content/levels/level-3.json'
   const game = await loadTheGame({
     [last]: writeContent('level', {
       ...read(last),
-      starts: read(last).starts.filter((start) => start.player !== 2),
+      things: read(last).things.filter((thing) => thing.character !== 'door'),
     }),
     [first]: writeContent('level', {
       ...read(first),
       things: read(first).things.filter((thing) => thing.character !== 'door'),
     }),
   })
-  expect(levelProblems(game).map((problem) => `${problem.file}: ${problem.message.slice(0, 24)}`)).toEqual([
-    'content/levels/level-1.json: This level has no door, ',
-    'content/levels/level-3.json: This level has no start',
-  ])
+  expect(levelProblems(game).map((problem) => problem.file)).toEqual([first, last])
 })
