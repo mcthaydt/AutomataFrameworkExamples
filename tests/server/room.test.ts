@@ -107,10 +107,16 @@ test('two players in this game’s room end on the hash the server computed', as
   const hash = one.checks.get(CHECK_TICK)
   expect(hash).toBeDefined()
   expect(two.checks.get(CHECK_TICK)).toBe(hash)
-  const replay = server.replays()[one.joined.code]
+  // A replay leaves out the check that falls on its last tick (that hash is `finalHash`), and the clients hear the
+  // check the moment the room takes it. So wait until the room has played one tick further and the check is kept.
+  const code = one.joined.code
+  const checkOf = (): string | undefined =>
+    server?.replays()[code]?.checks.find((c) => c.tick === CHECK_TICK + 1)?.hash
+  await until('the room to keep its first check', () => checkOf() !== undefined)
+  expect(checkOf()).toBe(hash)
+  const replay = server.replays()[code]
   expect(replay).toBeDefined()
   if (replay === undefined) return
-  expect(replay.checks.find((c) => c.tick === CHECK_TICK + 1)?.hash).toBe(hash)
   // The room's own play, played again from the start, ends where the room said it did.
   for (const player of players.splice(0)) player.stop()
   expect(verifyReplay(await makeSim(), replay)).toEqual({ ok: true })
