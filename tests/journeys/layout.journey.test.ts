@@ -1,10 +1,13 @@
 // What the thumbs draw must never sit on the hero. The two thumbs take the bottom of the screen once a finger touches
 // it, and the framework fits the level above them. The proof looks at what a player sees: a picture of the page, in
 // which the hero is the one thing in the hero's own colour, and the thumbs' parts are boxes on the page. Held sideways
-// on a phone, the level fills the height, which is where the thumbs once covered the hero's starting place.
+// on a phone, the level fills the height, which is where the thumbs once covered the hero's starting place. It plays the
+// journeys' own still level (`pinned-level.ts`), which fits above the thumbs: the real levels have a camera, which keeps the
+// heroes clear of the thumbs by moving, and the editors may change them.
 import { readFileSync } from 'node:fs'
 import type { Page } from 'playwright'
 import { afterAll, afterEach, expect, test } from 'vitest'
+import { pinnedFiles } from '../fixtures/pinned-level.ts'
 import { closeBrowser, fontsReady, type Opened, openGame, SIZES, untilTick } from './open.ts'
 
 let opened: Opened | undefined
@@ -111,7 +114,7 @@ async function boxOf(page: Page, selector: string): Promise<Box | null> {
 
 for (const name of touchSizes) {
   test(`at ${name}, nothing the thumbs draw sits on the hero`, async () => {
-    opened = await openGame({ size: name })
+    opened = await openGame({ size: name, files: pinnedFiles })
     const { page } = opened
     const size = SIZES[name]
     // A finger on the screen brings up the thumbs, as it does for a player on a phone or a tablet. It lands on the
@@ -133,7 +136,7 @@ for (const name of touchSizes) {
 }
 
 test('the check bites: the dash button put over the hero is reported', async () => {
-  opened = await openGame({ size: 'phone-390x844' })
+  opened = await openGame({ size: 'phone-390x844', files: pinnedFiles })
   const { page } = opened
   await page.touchscreen.tap(97, 422)
   await page.locator('.automata-thumbs').waitFor({ state: 'visible' })
