@@ -1,6 +1,6 @@
 // The page's pieces in each real browser: real DOM, real key and pointer events, hand-driven frames. The test game
 // (`tests/fixtures/test-game.ts`) is the one played, so no editor's change to the real level can break these.
-import { Player, testHost, Transform } from '@automataframework/framework'
+import { Player, Transform, testHost } from '@automataframework/framework'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { userEvent } from 'vitest/browser'
 import { type Play, type PlayOptions, play, readFrom, WORDS } from '#src/features/play/play.ts'

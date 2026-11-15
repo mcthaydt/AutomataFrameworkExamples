@@ -1,6 +1,6 @@
 // The page watching itself in each real browser: the test game plays a recording made in the test, with hand-driven
 // frames. Nothing here presses a key unless the test says so, and what is checked is the sim's state, never a picture.
-import { Player, parseReplay, Thing, testHost, Transform, writeReplay } from '@automataframework/framework'
+import { Player, parseReplay, Thing, Transform, testHost, writeReplay } from '@automataframework/framework'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { type Play, type PlayOptions, play } from '#src/features/play/play.ts'
 import { manualFrames } from '../../fixtures/frames.ts'
