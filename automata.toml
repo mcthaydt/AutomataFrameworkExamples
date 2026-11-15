@@ -2,6 +2,7 @@ format = 1
 name = "Crate Game"
 start = "level-1"   # the level a new game opens
 hero = "hero"       # the character each player controls
+source = "en"       # the language the game is written in: its words are in content/messages/, and English says what each is for
 
 [[content]]
 type = "level"
@@ -14,3 +15,30 @@ path = "content/characters/hero.json"
 [[content]]
 type = "character"
 path = "content/characters/crate.json"
+
+# The game's words, one file for each language. English (source, above) says what every word is for; the others carry
+# the same keys. `automata check` names a word a language is missing.
+
+[[content]]
+type = "messages"
+path = "content/messages/en.json"
+
+[[content]]
+type = "messages"
+path = "content/messages/es.json"
+
+[[content]]
+type = "messages"
+path = "content/messages/ko.json"
+
+[[content]]
+type = "messages"
+path = "content/messages/ja.json"
+
+[[content]]
+type = "messages"
+path = "content/messages/zh.json"
+
+[[content]]
+type = "messages"
+path = "content/messages/pt.json"

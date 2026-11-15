@@ -1,24 +1,24 @@
 // The page's pieces in each real browser: real DOM, real key and pointer events, hand-driven frames. The test game
 // (`tests/fixtures/test-game.ts`) is the one played, so no editor's change to the real level can break these.
-import { Player, Transform } from '@automataframework/framework'
+import { Player, Transform, testHost } from '@automataframework/framework'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
 import { userEvent } from 'vitest/browser'
 import { type Play, type PlayOptions, play, readFrom, WORDS } from '#src/features/play/play.ts'
 import { manualFrames } from '../../fixtures/frames.ts'
 import { readTestGame } from '../../fixtures/test-game.ts'
 import { LEVEL, levelWithCrate } from '../../fixtures/test-game-recording.ts'
+import { KEYBOARD_WORDS, say } from '../../fixtures/words.ts'
 
 const FRAME = 1000 / 60
 
 let root: HTMLDivElement
 let running: Play | undefined
 
-/** A host that is always on screen, so no test depends on the machine's own window. */
-const host: NonNullable<PlayOptions['host']> = {
-  target: 'web',
-  visible: () => true,
-  onVisibility: () => () => {},
-}
+/**
+ * A host that is always on screen, so no test depends on the machine's own window, and whose player speaks English, so
+ * the game starts at once. Each test makes its own: a host keeps what the player chose.
+ */
+const english = () => testHost({ language: 'en' })
 
 beforeEach(() => {
   root = document.createElement('div')
@@ -39,7 +39,7 @@ async function begin(
 ): Promise<{ play: Play; frames: ReturnType<typeof manualFrames> }> {
   const { files, coarse = false, ...rest } = extra
   const frames = manualFrames()
-  running = await play({ root, read: readTestGame(files), host, frames, coarse, ...rest })
+  running = await play({ root, read: readTestGame(files), host: english(), frames, coarse, ...rest })
   return { play: running, frames }
 }
 
@@ -136,28 +136,28 @@ test('play fills the root (the words, then the game under them), starts the game
 
 test('the words say who you are and how to move with keys', async () => {
   await begin({ coarse: false })
-  expect(text('.play-goal')).toBe(WORDS.goal)
-  expect(text('.play-how')).toBe(WORDS.keys)
+  expect(text('.play-goal')).toBe(say('goal.push'))
+  expect(text('.play-how')).toBe(KEYBOARD_WORDS)
 })
 
 test('on a touch screen the words name the buttons', async () => {
   await begin({ coarse: true })
-  expect(text('.play-goal')).toBe(WORDS.goal)
-  expect(text('.play-how')).toBe(WORDS.touch)
+  expect(text('.play-goal')).toBe(say('goal.push'))
+  expect(text('.play-how')).toBe(say('how.touch'))
 })
 
 test('the first touch switches the words to the buttons, for good', async () => {
   await begin({ coarse: false })
   pointer('pointerdown', 'touch')
-  expect(text('.play-how')).toBe(WORDS.touch)
+  expect(text('.play-how')).toBe(say('how.touch'))
   pointer('pointerdown', 'mouse')
-  expect(text('.play-how')).toBe(WORDS.touch)
+  expect(text('.play-how')).toBe(say('how.touch'))
 })
 
 test('a mouse click does not switch the words', async () => {
   await begin({ coarse: false })
   pointer('pointerdown', 'mouse')
-  expect(text('.play-how')).toBe(WORDS.keys)
+  expect(text('.play-how')).toBe(KEYBOARD_WORDS)
 })
 
 test('holding the right arrow key moves the hero', async () => {
@@ -242,19 +242,19 @@ test('pushing the crate changes the words to say so', async () => {
   const { play: made, frames } = await begin({ files: { [LEVEL]: levelWithCrate() } })
   const game = made.game
   if (game === undefined) throw new Error('the game did not start')
-  expect(text('.play-goal')).toBe(WORDS.goal)
+  expect(text('.play-goal')).toBe(say('goal.push'))
   key('keydown', 'ArrowRight')
   frames.at(0)
   run(frames, 20)
   // Still walking towards the crate: nothing has been pushed yet.
-  expect(text('.play-goal')).toBe(WORDS.goal)
+  expect(text('.play-goal')).toBe(say('goal.push'))
   run(frames, 100)
   key('keyup', 'ArrowRight')
   expect(heroX(game)).toBeGreaterThan(14.5)
-  expect(text('.play-goal')).toBe(WORDS.done)
+  expect(text('.play-goal')).toBe(say('goal.pushed'))
   // And it stays said.
   run(frames, 30)
-  expect(text('.play-goal')).toBe(WORDS.done)
+  expect(text('.play-goal')).toBe(say('goal.pushed'))
 })
 
 test('the words are chalk on black paper, in the one font', async () => {
@@ -358,7 +358,7 @@ test('pushing the crate marks the words as done', async () => {
   frames.at(0)
   run(frames, 120)
   key('keyup', 'ArrowRight')
-  expect(text('.play-goal')).toBe(WORDS.done)
+  expect(text('.play-goal')).toBe(say('goal.pushed'))
   expect(root.querySelector('.play-goal')?.classList.contains('play-done')).toBe(true)
 })
 

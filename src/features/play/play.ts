@@ -1,14 +1,21 @@
-// The page: loads the game's files, starts the game in an element, and puts words on top of it. The sim decides
-// everything; this file only shows it and says what to do. Whatever goes wrong becomes a screen of plain words, never
-// a blank canvas and never an error nobody reads. In `watch` mode the game first plays its own recording by itself, and
-// `takeOver` hands the same page over to a player, from the start of the level, with nothing reloaded.
+// The page: loads the game's files, asks a first-time player which language to play in, starts the game in an element,
+// and puts words on top of it. The sim decides everything; this file only shows it and says what to do. Every word a
+// player reads is in `content/messages/` and is said in the player's language (`locale.words`); the three sentences in
+// `words.ts` are for the developer, before any file has loaded. Whatever goes wrong becomes a screen of plain words,
+// never a blank canvas and never an error nobody reads. In `watch` mode the game first plays its own recording by
+// itself, and `takeOver` hands the same page over to a player, from the start of the level, with nothing reloaded.
 import {
+  createLocale,
   type Diagnostic,
   type Frames,
+  followLanguage,
   type Game,
   type GameContent,
   type Host,
+  type Locale,
+  languagePicker,
   loadGame,
+  openSettings,
   type Replay,
   startGame,
   Thing,
@@ -21,18 +28,20 @@ import { gamePlugins } from '../plugins/plugins.ts'
 import { CONTROLS } from './controls.ts'
 import './blueprint.css'
 import './play.css'
+import { hintFor } from './hints.ts'
 import type { Mode } from './mode.ts'
 import { whileSeen } from './seen.ts'
 import { listenToTakeOver, loadRecording } from './watching.ts'
-import { WORDS } from './words.ts'
+import { GAME_ID, WORDS } from './words.ts'
 
 export { CONTROLS } from './controls.ts'
 export { listenForPlay, PLAY_MESSAGE, tellParent } from './handover.ts'
 export { modeOf } from './mode.ts'
 export { readFrom } from './read.ts'
-export { WORDS } from './words.ts'
+export { GAME_ID, WORDS } from './words.ts'
 
-export type PlayState = 'loading' | 'watching' | 'playing' | 'problem'
+/** `picking`: a first-time player is choosing a language, so nothing is said in any language yet. */
+export type PlayState = 'loading' | 'picking' | 'watching' | 'playing' | 'problem'
 
 export interface PlayOptions {
   readonly root: HTMLElement
@@ -54,9 +63,9 @@ export interface PlayOptions {
 }
 
 export interface Play {
-  /** A getter: it changes on hand-over. */
-  readonly state: 'watching' | 'playing' | 'problem'
-  /** `undefined` while watching and on a problem. */
+  /** A getter: it changes on hand-over, and again once a first-time player has picked a language. */
+  readonly state: Exclude<PlayState, 'loading'>
+  /** `undefined` while watching, while picking a language, and on a problem. */
   readonly game: Game | undefined
   /** The recording that is playing; `undefined` unless watching. Its sim and rounds say how far it has got. */
   readonly watch: Watch | undefined
@@ -128,13 +137,24 @@ export async function play(options: PlayOptions): Promise<Play> {
   let onTouch: ((event: PointerEvent) => void) | undefined
   // What `begin` needs, once the game's files have loaded.
   let content: GameContent
+  let locale: Locale | undefined
   let stage: HTMLElement
   let words: HTMLElement
+  /** Puts the strip's words in the player's language again: the picker's choice, or any later change of language. */
+  let drawWords: () => void = () => {}
+  let unfollowLanguage: (() => void) | undefined
+  let unfollowWords: (() => void) | undefined
+  let picker: { destroy(): void } | undefined
 
   const setState = (next: PlayState): void => {
     state = next
     root.dataset.state = next
     if (next !== 'loading') options.onState?.(next)
+  }
+  /** A sentence in the player's language, or the developer's own once there is none: the page may be stopped before. */
+  const say = (key: string, developers: string): string => {
+    const current = locale
+    return current !== undefined && current.language() !== undefined ? current.words(key) : developers
   }
   /** Stops watching: the listeners, the recording and what looks at the window. The root is left as it is. */
   const stopWatching = (): void => {
@@ -150,6 +170,10 @@ export async function play(options: PlayOptions): Promise<Play> {
     stopped = true
     if (onTouch !== undefined) root.removeEventListener('pointerdown', onTouch)
     stopWatching()
+    picker?.destroy()
+    picker = undefined
+    unfollowWords?.()
+    unfollowLanguage?.()
     game?.stop()
     root.replaceChildren()
     root.classList.remove('play-root')
@@ -171,7 +195,7 @@ export async function play(options: PlayOptions): Promise<Play> {
       takingOver ??= (async () => {
         stopWatching()
         stage.replaceChildren()
-        await begin()
+        await beginSafely()
       })()
       return takingOver
     },
@@ -183,7 +207,7 @@ export async function play(options: PlayOptions): Promise<Play> {
    * and the place in it, set quieter than the rest) and `what` (a sentence for a person). Together they read exactly
    * as `formatDiagnostic` gives them.
    */
-  const problem = (title: string, lines: readonly ProblemLine[], fix: boolean): Play => {
+  const problem = (title: string, lines: readonly ProblemLine[], fix?: string): Play => {
     stopWatching()
     root.replaceChildren()
     const screen = element('div', 'play-problem')
@@ -197,37 +221,71 @@ export async function play(options: PlayOptions): Promise<Play> {
       list.append(item)
     }
     screen.append(element('h1', '', title), list)
-    if (fix) screen.append(element('p', '', WORDS.problemFix))
+    if (fix !== undefined) screen.append(element('p', '', fix))
     root.append(screen)
     game = undefined
     setState('problem')
     return made
   }
 
+  /**
+   * Asks a first-time player which language to play in, with flags, before anything is said in any language. `false`
+   * when the page was stopped while the flags were up.
+   */
+  const pickLanguage = async (current: Locale): Promise<boolean> => {
+    words.replaceChildren()
+    stage.replaceChildren()
+    setState('picking')
+    const shown = languagePicker({ mount: stage, locale: current, frames })
+    picker = shown
+    await shown.done
+    // `done` never settles after `stop`, so a page that is still here has a language now.
+    picker = undefined
+    shown.destroy()
+    stage.replaceChildren()
+    return !stopped
+  }
+
   /** The game for a player: the goal and how to move in the strip, the level on the stage, the controls live. */
   const begin = async (): Promise<void> => {
-    const goal = element('p', 'play-goal', WORDS.goal)
-    const how = element('p', 'play-how', coarse ? WORDS.touch : WORDS.keys)
+    if (locale === undefined) return
+    const spoken = locale
+    if (!spoken.asked() && !(await pickLanguage(spoken))) return
+
+    const goal = element('p', 'play-goal')
+    const how = element('p', 'play-how')
     words.replaceChildren(goal, how)
 
-    // The first finger on the screen is the moment the framework shows its buttons, and the words follow it for good.
+    // A finger on the screen is the moment the framework shows its buttons, and the words follow it for good.
+    let touched = coarse
+    let pushed = false
+    // The first key of an action: the game's, once it runs, and the controls' own before that.
+    const firstKey = (action: string): string | undefined =>
+      game?.input.inputsFor(1, action)[0] ?? CONTROLS[action]?.keys[0]
+    drawWords = (): void => {
+      goal.textContent = spoken.words(pushed ? 'goal.pushed' : 'goal.push')
+      how.textContent = touched ? spoken.words('how.touch') : hintFor(firstKey, spoken.words)
+    }
+    drawWords()
+    unfollowWords?.()
+    unfollowWords = spoken.onChange(() => drawWords())
     onTouch = (event) => {
       if (event.pointerType !== 'touch') return
-      how.textContent = WORDS.touch
+      touched = true
+      drawWords()
       if (onTouch !== undefined) root.removeEventListener('pointerdown', onTouch)
     }
     root.addEventListener('pointerdown', onTouch)
 
     // Where the level file puts the crate, so "pushed" means moved from there, whatever an editor made it.
     const startX = content.levels[content.project.start]?.things.find((thing) => thing.id === CRATE)?.x
-    let pushed = false
     // Presentation only observes: after each frame, read the crate's place from the sim and change the words.
     const observe = (): void => {
       if (pushed || game === undefined || startX === undefined) return
       const crate = game.sim.query(Thing, Transform).find((entity) => entity.get(Thing).id === CRATE)
       if (crate === undefined || Math.abs(crate.get(Transform).x - startX) <= PUSHED_TILES) return
       pushed = true
-      goal.textContent = WORDS.done
+      drawWords()
       // The look puts a tick before the words, so a player sees at a glance that they did it.
       goal.classList.add('play-done')
     }
@@ -240,10 +298,11 @@ export async function play(options: PlayOptions): Promise<Play> {
         mount: stage,
         controls: CONTROLS,
         host,
+        locale: spoken,
         frames: observing(frames, observe),
       })
     } catch (error) {
-      problem(WORDS.cannotStart, [{ what: reasonOf(error) }], false)
+      problem(say('page.cannot-start', WORDS.cannotStart), [{ what: reasonOf(error) }])
       return
     }
     if (stopped) {
@@ -252,6 +311,15 @@ export async function play(options: PlayOptions): Promise<Play> {
     }
     game = started
     setState('playing')
+  }
+
+  /** `begin`, with anything that goes wrong on the way shown as words. */
+  const beginSafely = async (): Promise<void> => {
+    try {
+      await begin()
+    } catch (error) {
+      problem(say('page.cannot-start', WORDS.cannotStart), [{ what: reasonOf(error) }])
+    }
   }
 
   /**
@@ -275,7 +343,14 @@ export async function play(options: PlayOptions): Promise<Play> {
       return false
     }
     seen = looking
-    words.replaceChildren(element('p', 'play-watching', coarse ? WORDS.watching : WORDS.watchingClick))
+    const watchingWords = element('p', 'play-watching')
+    words.replaceChildren(watchingWords)
+    // Nobody has been asked yet, so these words are in the device's language, else the game's own (a watching locale).
+    drawWords = (): void => {
+      watchingWords.textContent = locale?.words(coarse ? 'watch.tap' : 'watch.click') ?? ''
+    }
+    drawWords()
+    unfollowWords = locale?.onChange(() => drawWords())
     unlistenTakeOver = listenToTakeOver(root, () => void made.takeOver())
     setState('watching')
     return true
@@ -284,23 +359,35 @@ export async function play(options: PlayOptions): Promise<Play> {
   root.replaceChildren()
   root.classList.add('play-root')
   setState('loading')
-  words = element('div', 'play-words')
-  words.append(element('p', 'play-loading', WORDS.loading))
-  root.append(words)
+  // No letters: nobody has a language yet, so the mark only turns.
+  const loading = element('div', 'play-loading')
+  loading.setAttribute('role', 'status')
+  loading.setAttribute('aria-busy', 'true')
+  root.append(loading)
 
   try {
     const loaded = await loadGame(read)
-    if (!loaded.ok) return problem(WORDS.problemTitle, loaded.diagnostics.map(lineOf), true)
+    if (!loaded.ok) return problem(WORDS.problemTitle, loaded.diagnostics.map(lineOf), WORDS.problemFix)
     content = loaded.value
 
+    // The player's language: the one they picked before, else the host's. A player who has neither is asked first. A
+    // game that watches itself says its words in the device's language, or the game's own, until someone is asked.
+    const settings = await openSettings({ game: GAME_ID, store: host.store })
+    locale = createLocale({ content, host, settings, watching: mode === 'watch' })
+    unfollowLanguage = followLanguage(locale)
+
+    words = element('div', 'play-words')
     stage = element('div', 'play-stage')
-    root.append(stage)
+    root.replaceChildren(words, stage)
     const recording = mode === 'watch' ? await loadRecording(content.project.start, read) : undefined
     if (recording !== undefined && (await watchIt(recording))) return made
-    await begin()
+    const going = beginSafely()
+    // A first-time player is choosing a language: the page is theirs to stop, and the game starts when Go is pressed.
+    if (made.state === 'picking') return made
+    await going
     return made
   } catch (error) {
     // `loadGame` reports a bad file as words; this is a read that failed in some other way.
-    return problem(WORDS.cannotStart, [{ what: reasonOf(error) }], false)
+    return problem(say('page.cannot-start', WORDS.cannotStart), [{ what: reasonOf(error) }])
   }
 }

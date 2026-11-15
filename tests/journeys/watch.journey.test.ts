@@ -4,8 +4,8 @@
 import { parseContent, writeContent } from '@automataframework/framework/headless'
 import { afterAll, afterEach, expect, test } from 'vitest'
 import { PLAY_MESSAGE } from '#src/features/play/handover.ts'
-import { WORDS } from '#src/features/play/words.ts'
 import { gameFiles } from '../fixtures/game-files.ts'
+import { say } from '../fixtures/words.ts'
 import {
   closeBrowser,
   fontsReady,
@@ -65,7 +65,7 @@ for (const [name, size] of Object.entries(SIZES) as [
     // A screen no finger touches says "Click"; one that is touched says "Tap" (the engines differ in whether a test's
     // touch emulation counts as a coarse pointer, so a touch size may say either).
     expect(await words.innerText()).toMatch(WATCHING_WORDS)
-    if (!SIZES[name].touch) expect(await words.innerText()).toBe(WORDS.watchingClick)
+    if (!SIZES[name].touch) expect(await words.innerText()).toBe(say('watch.click'))
     expect(
       Number.parseFloat(await words.evaluate((e) => getComputedStyle(e).fontSize)),
     ).toBeGreaterThanOrEqual(18)
@@ -109,7 +109,7 @@ test('with no recording the game opens ready to play', async () => {
   const { page } = opened
   expect(await stateOf(page)).toBe('playing')
   expect(await page.evaluate(() => window.automataWatch)).toBeUndefined()
-  expect(await page.getByText(WORDS.goal, { exact: true }).isVisible()).toBe(true)
+  expect(await page.getByText(say('goal.push'), { exact: true }).isVisible()).toBe(true)
   await untilTick(page, 5)
 })
 
@@ -127,7 +127,7 @@ test('a tap on the game takes over, from the start, and then a touch brings up t
   await page.touchscreen.tap(195, 500)
   await untilState(page, 'playing')
   expect(await watchTickOf(page)).toBe(-1)
-  expect(await page.getByText(WORDS.goal, { exact: true }).isVisible()).toBe(true)
+  expect(await page.getByText(say('goal.push'), { exact: true }).isVisible()).toBe(true)
   expect(await page.locator('canvas').count()).toBe(1)
   await page.touchscreen.tap(195, 300)
   for (const name of ['Left', 'Right', 'Jump']) {

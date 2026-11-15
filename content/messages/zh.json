@@ -1,0 +1,25 @@
+{
+  "format": 1,
+  "id": "zh",
+  "messages": {
+    "controls.jump": "跳跃",
+    "controls.left": "左",
+    "controls.right": "右",
+    "goal.push": "你是左边的箱子。去推另一个箱子。",
+    "goal.pushed": "你推动了箱子。做得好！",
+    "hint.arrows": "方向键",
+    "hint.jump": "按{key}跳跃。",
+    "hint.move": "用{keys}移动。",
+    "how.touch": "按住“左”或“右”来移动。点按“跳跃”来跳。",
+    "key.arrow-down": "下箭头",
+    "key.arrow-left": "左箭头",
+    "key.arrow-right": "右箭头",
+    "key.arrow-up": "上箭头",
+    "key.space": "空格键",
+    "page.cannot-start": "这个浏览器无法启动游戏。请换一个浏览器试试。",
+    "page.problem-fix": "请修好上面列出的文件，然后重新加载此页面。",
+    "page.problem-title": "这个游戏有问题，无法启动。",
+    "watch.click": "游戏正在自己玩。点击一下就可以自己玩了。",
+    "watch.tap": "游戏正在自己玩。点一下就可以自己玩了。"
+  }
+}

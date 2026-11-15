@@ -60,7 +60,8 @@ test('the recorded play of level 1 still plays, and this engine reports where it
   const replay = await recording()
   const verdict = verifyReplay(await fresh(), replay)
   if (!verdict.ok && verdict.reason !== 'content-changed') {
-    const where = verdict.reason === 'diverged' ? `at tick ${verdict.tick}` : verdict.detail
+    const where =
+      verdict.reason === 'diverged' ? `at tick ${verdict.tick}` : 'detail' in verdict ? verdict.detail : ''
     throw new Error(
       `The game no longer plays the way it was recorded: ${verdict.reason}, ${where}. If the game's code was meant to change the play, take a new recording: delete replays/level-1.json, push, and commit what the Node job prints.`,
     )

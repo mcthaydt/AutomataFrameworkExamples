@@ -11,7 +11,7 @@ Spec: [`2026-11-14-m2-design.md`](https://github.com/mcthaydt/AutomataFramework/
 in AutomataFramework ("The demo game as showcase"), with the built-in hero, no-default-language and watch-mode addenda.
 Plan: [`plans/2026-11-15-demo-game.md`](plans/2026-11-15-demo-game.md)
 
-Overall: **18%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
+Overall: **23%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
 stage 6 is 12 and the Owner's review is the last 6)
 
 | Stage | State | Output |
@@ -19,7 +19,7 @@ stage 6 is 12 and the Owner's review is the last 6)
 | 1. Spec | Done (in AutomataFramework) | the M2 spec and its addenda |
 | 2. Plan | Written, in review, 100% | `plans/2026-11-15-demo-game.md` |
 | 3. Plan audit | Done, 100%: sound, no critical; 7 important (6 written into the plan, 1 the Owner answered: the palette stays a rule) and 6 minor | `audits/2026-11-15-plan-d-plan-audit.md` |
-| 4. Execution | Not started, 0% (ten parts, each its own pull request; Parts 1 and 2 can start once the audit is in) | |
+| 4. Execution | In progress, 10% (ten parts, each its own pull request; Part 1 is green in CI, Part 2 is in CI) | pull requests 37 and 38 |
 | 5. Implementation audit | Not started | |
 | 6. Fixes | Not started | |
 | 7. Owner review | Not started | |
@@ -28,8 +28,8 @@ Stage 4, by part (each part is 10% of the stage):
 
 | Part | Waits for | State |
 |---|---|---|
-| 1. The game's words, in six languages | nothing | Not started |
-| 2. A room server for this game | nothing | Not started |
+| 1. The game's words, in six languages | nothing | Green in CI, in review (pull request 37): 117 Node, 67 per browser and 90 journeys per browser tests pass |
+| 2. A room server for this game | nothing | In CI (pull request 38, stacked on 37 because the framework pin moves there) |
 | 3. The built-in hero | framework plan H (AutomataFramework pull request 101) | Not started |
 | 4. Three levels, the door and playing together | Part 3 | Not started |
 | 5. Sound | Part 4 | Not started |
@@ -40,6 +40,17 @@ Stage 4, by part (each part is 10% of the stage):
 | 10. The close | every part above | Not started |
 
 ### Log
+
+- 2026-11-15: Stage 4, Part 1. The framework pin moves to `504c278`. Every word a player reads moves into
+  `content/messages/{en,es,ko,ja,zh,pt}.json` (the only sentences left in code are the three the page says before a
+  file has loaded). A first-time player is shown the framework's language picker, with the device's language already
+  chosen; the game starts only once there is one, and the page's `lang` is set from it. The three CJK partner fonts
+  (Jua, M PLUS Rounded 1c, ZCOOL KuaiLe) are build-time packages, and a page loads only its own. New journeys:
+  the picker at five sizes, the choice kept across a reload, and each partner font loaded alone under the Site's
+  whole policy. No golden moved: words are not in the hash. Size from the build log: JavaScript about 1.08 MB, Rapier
+  2.44 MB (0.93 MB gzipped), Fredoka 16 kB; a Korean page adds 368 kB of font, Japanese 911 kB, Chinese 726 kB. The
+  fonts' old-browser copies (`.woff`) also sit in `dist/` and are never loaded. Four lint errors and one warning came
+  up in the first run and were fixed (import order, a CSS rule order). Pictures: the review artifact.
 
 - 2026-11-15: Stage 3. The plan audit, at the plan's `cda2c63`. Sound and true to the spec; every name it takes from
   a merged framework plan exists, and those from plans H and T match their branches. Written into the plan: gameplay

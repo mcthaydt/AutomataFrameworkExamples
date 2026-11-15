@@ -5,18 +5,24 @@
 import {
   formatDiagnostic,
   type GameContent,
+  LANGUAGES,
   loadGame,
   PROJECT_FILE,
   writeContent,
 } from '@automataframework/framework/headless'
+import { gameFiles } from './game-files.ts'
 
 const WIDE = 32
 const TALL = 9
+
+/** The real game's words, in the real game's six languages: the page says the same things whichever game it plays. */
+const messagePaths: readonly string[] = LANGUAGES.map((language) => `content/messages/${language}.json`)
 
 const project = `format = 1
 name = "Test Game"
 start = "level-1"
 hero = "hero"
+source = "en"
 
 [[content]]
 type = "level"
@@ -29,11 +35,12 @@ path = "content/characters/hero.json"
 [[content]]
 type = "character"
 path = "content/characters/crate.json"
-`
+${messagePaths.map((path) => `\n[[content]]\ntype = "messages"\npath = "${path}"\n`).join('')}`
 
 /** Every file of the test game, by its path from the game's root. */
 export const testGameFiles: Readonly<Record<string, string>> = {
   [PROJECT_FILE]: project,
+  ...Object.fromEntries(messagePaths.map((path) => [path, gameFiles[path] ?? ''])),
   'content/levels/level-1.json': writeContent('level', {
     format: 1,
     id: 'level-1',

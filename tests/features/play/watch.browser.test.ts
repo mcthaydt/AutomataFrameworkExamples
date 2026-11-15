@@ -1,8 +1,8 @@
 // The page watching itself in each real browser: the test game plays a recording made in the test, with hand-driven
 // frames. Nothing here presses a key unless the test says so, and what is checked is the sim's state, never a picture.
-import { Player, parseReplay, Thing, Transform, writeReplay } from '@automataframework/framework'
+import { Player, parseReplay, Thing, Transform, testHost, writeReplay } from '@automataframework/framework'
 import { afterEach, beforeEach, expect, test, vi } from 'vitest'
-import { type Play, type PlayOptions, play, WORDS } from '#src/features/play/play.ts'
+import { type Play, type PlayOptions, play } from '#src/features/play/play.ts'
 import { manualFrames } from '../../fixtures/frames.ts'
 import { readTestGame } from '../../fixtures/test-game.ts'
 import {
@@ -12,17 +12,15 @@ import {
   RECORDING_TICKS,
   recordTestGame,
 } from '../../fixtures/test-game-recording.ts'
+import { KEYBOARD_WORDS, say } from '../../fixtures/words.ts'
 
 const FRAME = 1000 / 60
 
 let root: HTMLDivElement
 let running: Play | undefined
 
-const host: NonNullable<PlayOptions['host']> = {
-  target: 'web',
-  visible: () => true,
-  onVisibility: () => () => {},
-}
+/** A host that is always on screen and whose player speaks English, so no test waits on the language picker. */
+const english = () => testHost({ language: 'en' })
 
 beforeEach(() => {
   root = document.createElement('div')
@@ -47,7 +45,7 @@ async function watchIt(
   running = await play({
     root,
     read: readTestGame({ [LEVEL]: levelWithCrate(), [RECORDING]: recording, ...files }),
-    host,
+    host: english(),
     frames,
     coarse: false,
     mode: 'watch',
@@ -102,16 +100,16 @@ test('in watch mode the game plays the recording by itself', async () => {
 
 test('while it plays itself the words say so, and only that: "Click" on a screen no finger touches', async () => {
   await watchIt()
-  expect(text('.play-watching')).toBe(WORDS.watchingClick)
+  expect(text('.play-watching')).toBe(say('watch.click'))
   expect(root.querySelector('.play-how')).toBeNull()
-  expect(WORDS.watchingClick).toBe('The game is playing by itself. Click it to play.')
+  expect(say('watch.click')).toBe('The game is playing by itself. Click it to play.')
 })
 
 test('on a screen touched with a finger the words say "Tap"', async () => {
   await watchIt({ coarse: true })
-  expect(text('.play-watching')).toBe(WORDS.watching)
+  expect(text('.play-watching')).toBe(say('watch.tap'))
   expect(root.querySelector('.play-how')).toBeNull()
-  expect(WORDS.watching).toBe('The game is playing by itself. Tap it to play.')
+  expect(say('watch.tap')).toBe('The game is playing by itself. Tap it to play.')
 })
 
 test('held keys and fingers do nothing to a watching game', async () => {
@@ -158,8 +156,8 @@ test('takeOver starts the level from the beginning with the controls live', asyn
   const game = made.game
   if (game === undefined) throw new Error('the game did not start')
   expect(game.sim.tick).toBe(0)
-  expect(text('.play-goal')).toBe(WORDS.goal)
-  expect(text('.play-how')).toBe(WORDS.keys)
+  expect(text('.play-goal')).toBe(say('goal.push'))
+  expect(text('.play-how')).toBe(KEYBOARD_WORDS)
   expect(root.querySelector('.play-watching')).toBeNull()
   expect(root.querySelectorAll('canvas')).toHaveLength(1)
   const before = heroX(game.sim)
@@ -186,7 +184,7 @@ test('takeOver twice starts one game', async () => {
 
 test('takeOver when not watching does nothing', async () => {
   const frames = manualFrames()
-  running = await play({ root, read: readTestGame(), host, frames, coarse: false })
+  running = await play({ root, read: readTestGame(), host: english(), frames, coarse: false })
   const game = running.game
   await running.takeOver()
   expect(running.game).toBe(game)
@@ -198,7 +196,7 @@ test('a missing recording opens the ordinary game, and says why in the console',
   const { play: made } = await watchIt({ files: { [RECORDING]: undefined } })
   expect(made.state).toBe('playing')
   expect(made.game).toBeDefined()
-  expect(text('.play-goal')).toBe(WORDS.goal)
+  expect(text('.play-goal')).toBe(say('goal.push'))
   expect(info).toHaveBeenCalledTimes(1)
   expect(String(info.mock.calls[0]?.[0])).toContain(RECORDING)
 })

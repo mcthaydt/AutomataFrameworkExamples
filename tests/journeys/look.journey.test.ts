@@ -5,6 +5,7 @@ import type { Page } from 'playwright'
 import { afterAll, afterEach, expect, test } from 'vitest'
 import { WORDS } from '#src/features/play/words.ts'
 import { pinnedFiles } from '../fixtures/pinned-level.ts'
+import { say } from '../fixtures/words.ts'
 import {
   closeBrowser,
   ENGINE,
@@ -157,7 +158,7 @@ test('at desktop-1280x720, pushing the crate says well done, with a tick', async
   await untilTick(page, 180)
   await page.keyboard.up('ArrowRight')
   await fontsReady(page)
-  expect(await page.getByText(WORDS.done, { exact: true }).isVisible()).toBe(true)
+  expect(await page.getByText(say('goal.pushed'), { exact: true }).isVisible()).toBe(true)
   const goal = await page.locator('.play-goal').evaluate((p) => {
     const tick = getComputedStyle(p, '::before')
     return {

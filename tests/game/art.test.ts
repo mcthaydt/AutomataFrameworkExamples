@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { expect, test } from 'vitest'
 import { WORDS } from '#src/features/play/words.ts'
+import { messagesOf } from '../fixtures/words.ts'
 
 const colourOf = (character: string): string => {
   const file = readFileSync(
@@ -16,13 +17,14 @@ const colourOf = (character: string): string => {
   return (JSON.parse(file) as { color: string }).color
 }
 
-test("the words are the Owner's, and none of them names a colour", () => {
-  expect(WORDS.goal).toBe('You are the box on the left. Push the other box.')
-  expect(WORDS.done).toBe('You pushed the box. Well done!')
-  for (const words of Object.values(WORDS))
-    expect(words, words).not.toMatch(
-      /\b(?:pink|green|yellow|red|blue|black|white|grey|gray|orange|purple|brown|colou?r)\b/i,
-    )
+/** A colour's name in English; the words of the other five languages are checked for what a translator may leave in. */
+const COLOUR_WORD = /\b(?:pink|green|yellow|red|blue|black|white|grey|gray|orange|purple|brown|colou?r)\b/i
+
+test('the words, in every language, never name a colour', () => {
+  for (const language of ['en', 'es', 'ko', 'ja', 'zh', 'pt'])
+    for (const [key, words] of Object.entries(messagesOf(language)))
+      expect(words, `${language} ${key}`).not.toMatch(COLOUR_WORD)
+  for (const words of Object.values(WORDS)) expect(words, words).not.toMatch(COLOUR_WORD)
 })
 
 /** What the framework paints a level that sets no sky or ground (its own defaults), so an unset colour is still read. */
