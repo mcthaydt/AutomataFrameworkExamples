@@ -51,6 +51,7 @@ what is wrong if something is.
 | `src/features/plugins/` | The list of everything the game's rules are made of. |
 | `src/features/play/` | The page: loads the files, asks a first-time player which language to play in, starts the game, and says what to do. |
 | `src/features/play/blueprint.css` | The look's colours, font and icons, in one place. `play.css` takes every colour from here. |
+| `server.ts` | This game's room server, for online play: `node server.ts`. The pages of this game stay offline; `tests/server/` proves two players in a room end on one hash. |
 | `tests/` | The checks. They mirror `src/`. |
 
 ## The look
