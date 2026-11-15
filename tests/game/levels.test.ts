@@ -43,8 +43,9 @@ test('every level has a start for each of the four players, and a camera that ma
 
 test('the camera never shows more than the level has', async () => {
   for (const { id, level } of await levels()) {
-    const rows = level.tiles.length
-    const columns = level.tiles[0]?.length ?? 0
+    const tiles = level.tiles ?? []
+    const rows = tiles.length
+    const columns = tiles[0]?.length ?? 0
     expect(level.view?.most?.w ?? 0, `${id} width`).toBeLessThanOrEqual(columns)
     expect(level.view?.most?.h ?? 0, `${id} height`).toBeLessThanOrEqual(rows)
   }
@@ -56,7 +57,7 @@ test('nothing and nobody starts inside a wall', async () => {
   const inside = (level: Level, x: number, y: number, w: number, h: number): string | undefined => {
     for (let row = Math.floor(y - h / 2 + 0.001); row <= Math.floor(y + h / 2 - 0.001); row++) {
       for (let col = Math.floor(x - w / 2 + 0.001); col <= Math.floor(x + w / 2 - 0.001); col++) {
-        if (level.tiles[row]?.[col] === '#') return `${row},${col}`
+        if (level.tiles?.[row]?.[col] === '#') return `${row},${col}`
       }
     }
     return undefined
