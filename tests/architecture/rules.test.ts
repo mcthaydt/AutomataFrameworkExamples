@@ -51,3 +51,12 @@ test('headless reaches nothing that needs a page', () =>
   expect(one({ 'src/headless.ts': "export * from './features/play/play.ts'" })).toEqual([
     'headless-is-headless',
   ]))
+
+test('only server.ts imports the server entry', () => {
+  expect(one({ 'src/features/play/play.ts': "import '@automataframework/framework/server'" })).toEqual([
+    'only-server-ts-imports-the-server',
+  ])
+  expect(one({ 'src/features/hero/hero.ts': "import '@automataframework/framework/server'" })).toEqual([
+    'only-server-ts-imports-the-server',
+  ])
+})
