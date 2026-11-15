@@ -238,6 +238,11 @@ changed files and decides.
   `tsconfig*.json`, `tests/fixtures/`, `.github/`) runs everything in all three browsers, in six shards (`browsers
   (<engine> <n>/2)`), each engine's `engines (<engine>)` check green only when both its shards passed. Only that run's
   checks have the required names.
+- **A docs-only change runs no tests** (the Owner, 2026-11-15). When a pull request, draft or ready, changes only
+  Markdown that people read (`CLAUDE.md` and the notes under `docs/`, never the README),
+  `plan` says `docs`: every job that tests is left out, and the `docs` job passes each check `main` requires under
+  its exact name, so it can merge in about a minute. One other file, or the `full-tests` label, brings the usual run
+  back.
 - **Always:** installs and Playwright browsers cached, the Node tests' checkout with `fetch-depth: 0` (so `origin/main`
   is there to compare with), and a new push cancels the run it replaces.
 - **How to use it:** open the pull request as a draft, push as often as you like, and mark it ready for review when the
