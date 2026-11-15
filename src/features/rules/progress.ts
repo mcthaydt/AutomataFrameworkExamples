@@ -13,7 +13,12 @@ import {
   z,
 } from '@automataframework/framework/headless'
 
-const progressShape = z.object({
+const progressShape: z.ZodObject<{
+  sparks: z.ZodNumber
+  inDoor: z.ZodArray<z.ZodNumber>
+  done: z.ZodBoolean
+  doneTick: z.ZodNumber
+}> = z.object({
   sparks: z.number().int(),
   inDoor: z.array(z.number().int()),
   done: z.boolean(),
@@ -30,7 +35,7 @@ export const Progress: ResourceDef<typeof progressShape> = defineResource(
   () => ({ sparks: 0, inDoor: [], done: false, doneTick: 0 }),
 )
 
-const doneShape = z.object({ sparks: z.number().int() })
+const doneShape: z.ZodObject<{ sparks: z.ZodNumber }> = z.object({ sparks: z.number().int() })
 
 /** Raised once, on the tick the level is done, with how many sparks were taken. The project's `done` names it. */
 export const LevelDone: EventDef<typeof doneShape> = defineEvent('game.level-done', doneShape)
