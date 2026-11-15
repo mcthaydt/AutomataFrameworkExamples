@@ -6,12 +6,20 @@
 // It is the one file that may import the server entry (`tests/architecture.test.ts` fails on any other).
 import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
-import { formatDiagnostic, loadGame } from '@automataframework/framework/headless'
-import { type RoomServerOptions, runRoomServer } from '@automataframework/framework/server'
+import {
+  formatDiagnostic,
+  type GameContent,
+  loadGame,
+  type PluginDef,
+} from '@automataframework/framework/headless'
+import { runRoomServer } from '@automataframework/framework/server'
 import { gamePlugins } from './src/features/plugins/plugins.ts'
 
 /** The game a room plays: its content read from disk, and its code. Throws, naming each problem, if it does not load. */
-export async function serverGame(): Promise<RoomServerOptions['game']> {
+export async function serverGame(): Promise<{
+  readonly content: GameContent
+  readonly plugins: readonly PluginDef[]
+}> {
   const loaded = await loadGame((path) => readFile(path, 'utf8'))
   if (!loaded.ok)
     throw new Error(`The game did not load:\n${loaded.diagnostics.map(formatDiagnostic).join('\n')}`)
