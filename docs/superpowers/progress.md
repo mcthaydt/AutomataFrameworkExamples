@@ -49,9 +49,9 @@ Stage 4, by part (each part is 10% of the stage):
   Parts 6, 8 (its first three tasks) and 9 are written as outcomes and proofs, and each needs a short look by the
   audit when its gate opens. The Owner said (2026-11-15) that the demo's real art comes from the builders, so the
   game stays boxes until Part 9. Goldens: the two there are move in Parts 3, 4, 7 and 9, each recorded in CI and
-  shown to the Owner before and after, and three join (`level-2.json`, `level-3.json`, `co-op.json`). One question
-  for the Owner is with the coordinator and not decided: who makes the art in Part 9 (a person in the builders, an
-  agent writing the builders' files, or an agent's draft a person finishes). New dependencies: none beyond the three
+  shown to the Owner before and after, and three join (`level-2.json`, `level-3.json`, `co-op.json`). The Owner
+  answered who makes the art in Part 9 (C): an agent drafts every figure and scene as the builders' files, then the
+  Owner finishes them in the builders; Part 9 has a task for each. New dependencies: none beyond the three
   font packages the first spec names. No test was run.
 
 ## Cycle 3: the game plays itself before Play ("watch" mode)
