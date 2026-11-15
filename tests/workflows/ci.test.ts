@@ -32,11 +32,11 @@ test('each engine plays the recording in Node too and is compared with it, in th
 })
 
 test('each engine builds the page and runs the journeys in its own browser, after the hashes are compared', () => {
-  const steps = ['pnpm same-hash node ', 'pnpm build\n', 'pnpm test:journeys\n']
+  const steps = ['pnpm same-hash node ', 'pnpm build\n', 'pnpm test:journeys ']
   const at = steps.map((step) => ci.indexOf(`- run: ${step}`))
   expect(at.every((position) => position > 0)).toBe(true)
   expect(at).toEqual([...at].sort((a, b) => a - b))
-  expect(ci).toMatch(/pnpm test:journeys\n\s+env:\n\s+ENGINE: \$\{\{ matrix\.engine \}\}/)
+  expect(ci).toMatch(/pnpm test:journeys .*\n.*\n\s+env:\n\s+ENGINE: \$\{\{ matrix\.engine \}\}/)
 })
 
 // CI's pictures are kept only as artifacts of each run (the Owner, 2026-11-15: no ci-screens branch here).
