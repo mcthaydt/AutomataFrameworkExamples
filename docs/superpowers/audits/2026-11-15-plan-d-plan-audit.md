@@ -23,11 +23,11 @@ waits for a merged framework plan or builder, and each is to get a short audit a
 
 There is nothing critical. There are **seven important findings** (I1 to I7) and **six minor ones** (M1 to M6). I1
 to I5 and I7 are written into the plan by this pull request, marked `audit I<n>`, so execution reads one document. I6
-is an Owner question (Q1) and is not decided here: the plan's text that decided it is marked as waiting.
+was an Owner question (Q1); the Owner answered A (the palette stays a rule), and the plan says so.
 
 **Ready to execute:** Parts 1 and 2 now. Part 3 when pull request 101 merges, Part 4 after it, Part 5 after Part 4,
 Part 7 when pull request 64 merges. Parts 6, 8 (8.1 to 8.3) and 9 when their gates open and their addenda are written.
-Task 9.3 also waits on Q1.
+
 
 ## Owner decisions checked
 
@@ -113,6 +113,9 @@ Task 9.3 Step 1 (and Task 9.1 Step 1 as the plan thread rewrote it) turns the pa
 the log once the Owner starts finishing the art, so any colour the Owner picks in a builder passes. That changes an
 Owner decision (the example games' art is palette B No. 276) and was not asked. This audit does not decide it either.
 The plan's sentence is marked as waiting on the answer.
+
+**Answered (the Owner, 2026-11-15): A.** The palette stays a rule: CI fails any colour outside No. 276, and a new
+colour means changing the palette in one place. Tasks 9.1 and 9.3 now say so.
 
 **Q1 for the Owner.** When you finish the demo's art in the builders, may it use colours outside palette No. 276?
 
