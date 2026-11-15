@@ -4,7 +4,9 @@ import { createGameSim, parseReplay, type Replay, type Sim } from '@automatafram
 import { type Browser, type BrowserType, chromium, type Frame, firefox, type Page, webkit } from 'playwright'
 import { inject } from 'vitest'
 import { gamePlugins } from '#src/features/plugins/plugins.ts'
+import { GAME_ID } from '#src/features/play/words.ts'
 import { loadTheGame } from '../fixtures/game-files.ts'
+import { say } from '../fixtures/words.ts'
 
 const BROWSERS = { chromium, webkit, firefox } satisfies Record<string, BrowserType>
 
@@ -26,8 +28,12 @@ export const SIZES = {
   'desktop-1280x720': { width: 1280, height: 720, touch: false },
 } as const
 
-/** What the strip says while the game plays itself: "Tap" for a finger, "Click" for a mouse (see `words.ts`). */
-export const WATCHING_WORDS: RegExp = /^The game is playing by itself\. (Tap|Click) it to play\.$/
+const literally = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+/** What the strip says while the game plays itself, in English: "Tap" for a finger, "Click" for a mouse. */
+export const WATCHING_WORDS: RegExp = new RegExp(
+  `^(?:${literally(say('watch.tap'))}|${literally(say('watch.click'))})$`,
+)
 
 /** Where a journey looks at the game: the page itself, or the frame it sits in when a page frames it. */
 export type Surface = Page | Frame
@@ -102,13 +108,38 @@ export async function openGame(
     framed?: Framed
     /** Addresses to hold back until `release()`, as when a file is slow. Nothing waits for the game to be ready. */
     hold?: RegExp
+    /**
+     * The language this device's player has already chosen, default `'en'`, so a journey about something else is not
+     * stopped by the language picker. `'ask'` is a first visit: nobody has chosen, and the flags come first.
+     */
+    language?: string
+    /** The language the device itself speaks, as a browser's setting: `'ko-KR'`. Default the browser's own, `en-US`. */
+    device?: string
   } = {},
 ): Promise<Opened> {
   const size = SIZES[options.size ?? 'desktop-1280x720']
   const context = await (await launch()).newContext({
     viewport: { width: size.width, height: size.height },
     hasTouch: size.touch,
+    ...(options.device === undefined ? {} : { locale: options.device }),
   })
+  // The chosen language is kept where the page keeps it, set before the page's own script runs, and only when nothing
+  // is kept yet, so a reload in the middle of a journey keeps what the player chose and does not overwrite it.
+  const language = options.language ?? 'en'
+  if (language !== 'ask')
+    await context.addInitScript(
+      ({ key, value }) => {
+        try {
+          if (localStorage.getItem(key) === null) localStorage.setItem(key, value)
+        } catch {
+          // A browser that will not keep it is a first visit, and the journey that needed more says so.
+        }
+      },
+      {
+        key: `automata.${GAME_ID}.settings`,
+        value: JSON.stringify({ format: 1, sections: { language: { format: 1, language } } }),
+      },
+    )
   const page = await context.newPage()
   const errors: string[] = []
   const errorUrls: string[] = []
@@ -175,7 +206,8 @@ export async function openGame(
     return route.fulfill({ status: 200, contentType: 'text/plain', body })
   })
 
-  const ready = '#game[data-state="watching"], #game[data-state="playing"], #game[data-state="problem"]'
+  const ready =
+    '#game[data-state="picking"], #game[data-state="watching"], #game[data-state="playing"], #game[data-state="problem"]'
   let game: Surface = page
   if (framed === undefined) {
     await page.goto(`${base.href}${search}`)

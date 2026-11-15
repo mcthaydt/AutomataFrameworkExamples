@@ -39,17 +39,27 @@ particular to this repo added under "This repo".
   changed"); the second is a play of a game built inside the tests, which no edit can reach, so a change to the
   game's code that alters the play fails in every engine. The merge session stops on a golden moved without a commit
   naming it, and these are the two files it watches.
-- **Two build-time packages, named only in CSS.** `@fontsource/fredoka` and `@phosphor-icons/core` (exact versions, in
-  `devDependencies`) give the game's own screens the Blueprint look; the Owner approved them (2026-11-14: the icons, and
-  Fredoka as the one font, never smaller than 18 pixels; its Korean and Chinese partners join with the first translation). Only `src/features/play/*.css` names them, never a `.ts` file, so knip, which does
-  not read CSS, would call them unused: they are under `ignoreDependencies` in `knip.json` for that reason alone.
+- **Five build-time packages, named only in CSS.** `@fontsource/fredoka`, the rounded partners for the three languages Fredoka
+  has no letters for (`@fontsource/m-plus-rounded-1c` for Japanese, `@fontsource/jua` for Korean, `@fontsource/zcool-kuaile`
+  for Chinese; one weight each) and `@phosphor-icons/core` (exact versions, in `devDependencies`) give the game's own screens
+  the Blueprint look; the Owner approved the icons and Fredoka as the one font, never smaller than 18 pixels (2026-11-14), and
+  the first spec's visual direction names the partners (plan D, Part 1). Only `src/features/play/*.css` names them, never a
+  `.ts` file, so knip, which does not read CSS, would call them unused: they are under `ignoreDependencies` in `knip.json`
+  for that reason alone. A language's page names its own partner first after Fredoka and no other, so a Korean page never
+  fetches the Japanese font.
+- **The game's words.** Every sentence a player reads is in `content/messages/{en,es,ko,ja,zh,pt}.json`, in the player's own
+  language; English is `source`, so it says what each word is for, and `automata.translations.toml` marks the words a native
+  speaker has read (none yet). The only sentences in code are the three the page says before any file has loaded
+  (`words.ts`), for the developer. `index.html` has no `lang`: no language is the default, and the page sets it once the
+  player has chosen one. A first-time player is shown the framework's language picker, with the device's language already
+  chosen, before anything is said.
 - **The look.** The game's own screens (the words strip, the touch buttons, the problem screen, the loading and "well
   done" messages) use the project's Blueprint look, dark only, in palette No. 340 (Black, Neutral Gray, Peach Red; the Owner, 2026-11-14); the game's art never does. The five colours and the one
   font family are in `src/features/play/blueprint.css` and nowhere else (a test fails on any other colour), and the
   framework's touch buttons are dressed through its `--automata-touch-*` CSS properties, never by reaching into the
   framework.
 - **Licence notices.** `public/licences.txt` (Vite copies it into `dist/`, beside the page) carries the notices of
-  Fredoka, the icons and Rapier (the physics, Apache-2.0, built into the framework's files), copied from each
+  Fredoka and its three partners, the icons and Rapier (the physics, Apache-2.0, built into the framework's files), copied from each
   package's own `LICENSE`; Rapier's is the framework's `dist/rapier.LICENSE`. Move a package's version (or the
   framework pin, which moves Rapier's), and copy its `LICENSE` there again; `tests/game/licences.test.ts` fails until
   you do.

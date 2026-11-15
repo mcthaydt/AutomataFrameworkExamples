@@ -2,8 +2,8 @@
 // to the same hash in Node. Journeys wait on the game's own tick, never on a sleep.
 import { playReplay, Thing, Transform, verifyReplay } from '@automataframework/framework/headless'
 import { afterAll, afterEach, expect, test } from 'vitest'
-import { WORDS } from '#src/features/play/words.ts'
 import { PINNED_CRATE_X, pinnedFiles } from '../fixtures/pinned-level.ts'
+import { KEYBOARD_WORDS, say } from '../fixtures/words.ts'
 import { closeBrowser, nodeSim, type Opened, openGame, replayOf, tickOf, untilTick } from './open.ts'
 
 let opened: Opened | undefined
@@ -20,8 +20,8 @@ test('the game opens, says what to do, and nothing goes wrong', async () => {
   opened = await openGame()
   const { page, errors } = opened
   expect(await page.locator('#game').getAttribute('data-state')).toBe('playing')
-  expect(await visible(page, WORDS.goal)).toBe(true)
-  expect(await visible(page, WORDS.keys)).toBe(true)
+  expect(await visible(page, say('goal.push'))).toBe(true)
+  expect(await visible(page, KEYBOARD_WORDS)).toBe(true)
   const canvases = page.locator('canvas')
   expect(await canvases.count()).toBe(1)
   expect(await canvases.isVisible()).toBe(true)
@@ -54,7 +54,7 @@ test('holding the right arrow key pushes the crate, and what was played replays 
   played.dispose()
 
   // And the page told the player so: the words changed from "push" to "you did it".
-  expect(await visible(page, WORDS.done)).toBe(true)
+  expect(await visible(page, say('goal.pushed'))).toBe(true)
 })
 
 test('on a phone, a touch brings up Left, Right and Jump, and holding Right runs the hero', async () => {
@@ -68,7 +68,7 @@ test('on a phone, a touch brings up Left, Right and Jump, and holding Right runs
     expect(box?.width ?? 0, name).toBeGreaterThanOrEqual(48)
     expect(box?.height ?? 0, name).toBeGreaterThanOrEqual(48)
   }
-  expect(await visible(page, WORDS.touch)).toBe(true)
+  expect(await visible(page, say('how.touch'))).toBe(true)
 
   const right = page.getByRole('button', { name: 'Right' })
   await right.dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 1, bubbles: true })

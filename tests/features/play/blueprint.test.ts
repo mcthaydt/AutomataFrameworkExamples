@@ -39,14 +39,29 @@ test('nothing is fetched from another site or carried as data', () => {
   expect(page.replace('href="data:,"', '')).not.toMatch(/https?:|data:/)
 })
 
-// One font, Fredoka (the Owner, 2026-11-14), set at a size a person can read on a phone. Its Korean and Chinese partners
-// join with the first translation, so the stack names only Fredoka and the system fonts for now.
-test('the one font is Fredoka and nothing is set smaller than 18 pixels', () => {
+// One font, Fredoka (the Owner, 2026-11-14), set at a size a person can read on a phone. It has no Japanese, Korean or
+// Chinese, so each of those has a rounded partner that only that language's page names first after Fredoka and loads.
+test('one font, Fredoka, with a partner for three languages, and nothing under 18 pixels', () => {
   expect(blueprint).toContain('@fontsource/fredoka/latin-600.css')
-  expect(blueprint).toMatch(/--label:\s*"Fredoka",/)
+  expect(blueprint).toMatch(/--label-latin:\s*"Fredoka",/)
+  expect(blueprint).toContain('--label: var(--label-latin)')
+  // The partners are named after Fredoka and each only in its own language's list: a Korean page never fetches the
+  // Japanese font, which is nearly a megabyte.
+  const partners = [
+    ['ja', 'M PLUS Rounded 1c', '@fontsource/m-plus-rounded-1c/japanese-500.css'],
+    ['ko', 'Jua', '@fontsource/jua/korean-400.css'],
+    ['zh', 'ZCOOL KuaiLe', '@fontsource/zcool-kuaile/chinese-simplified-400.css'],
+  ] as const
+  for (const [language, partner, file] of partners) {
+    expect(blueprint, file).toContain(file)
+    expect(blueprint).toMatch(new RegExp(`--label-${language}:\\s*"Fredoka", "${partner}",`))
+    expect(blueprint).toContain(`.play-root:lang(${language})`)
+    for (const [, other] of partners.filter(([one]) => one !== language))
+      expect(blueprint).not.toMatch(new RegExp(`--label-${language}:[^;]*"${other}"`))
+  }
   expect(blueprint).not.toMatch(/ibm-plex|jetbrains|--measure/i)
   expect(rules).not.toMatch(/--measure/)
-  // The browser must not fake a weight Fredoka was not asked for.
+  // The browser must not fake a weight these fonts were not asked for.
   expect(rules).toMatch(/font-synthesis:\s*none/)
   const sizes = [...rules.matchAll(/font(?:-size)?:[^;]*?(\d+)px/g)].map((m) => Number(m[1]))
   expect(sizes.length).toBeGreaterThan(0)

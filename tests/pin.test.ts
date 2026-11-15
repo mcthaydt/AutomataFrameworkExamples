@@ -24,17 +24,24 @@ test('the commit allowed to build is the commit that is pinned', () =>
 test('the game depends on nothing but the framework', () =>
   expect(Object.keys(manifest.dependencies)).toEqual(['@automataframework/framework']))
 
-// The look's font and icons are build inputs: CSS names them, Vite copies the files into `dist/`, and no code
-// imports them. The Owner approved these two (2026-11-14: the icons, and Fredoka as the one font) at these versions;
-// anything else needs a new yes.
-test("the look's two packages are build inputs at exact versions, and there are no others", () => {
+// The look's fonts and icons are build inputs: CSS names them, Vite copies the files into `dist/`, and no code
+// imports them. The Owner approved the icons and Fredoka as the one font (2026-11-14); Fredoka has no Japanese, Korean
+// or Chinese, so each of those has a rounded partner, which the first spec's visual direction names and plan D's
+// Part 1 adds. Anything else needs a new yes.
+test("the look's packages are build inputs at exact versions, and there are no others", () => {
   expect(manifest.devDependencies).toMatchObject({
     '@fontsource/fredoka': '5.3.0',
+    '@fontsource/jua': '5.3.0',
+    '@fontsource/m-plus-rounded-1c': '5.3.0',
+    '@fontsource/zcool-kuaile': '5.3.0',
     '@phosphor-icons/core': '2.1.1',
   })
   expect(Object.keys(manifest.devDependencies).sort()).toEqual([
     '@biomejs/biome',
     '@fontsource/fredoka',
+    '@fontsource/jua',
+    '@fontsource/m-plus-rounded-1c',
+    '@fontsource/zcool-kuaile',
     '@phosphor-icons/core',
     '@types/node',
     '@vitest/browser-playwright',

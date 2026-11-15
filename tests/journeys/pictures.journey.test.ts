@@ -2,8 +2,8 @@
 // and sideways, the screen that says a file is broken, and the words after the crate is pushed. Nothing compares them
 // with anything; CI copies them to the `ci-screens` branch, and the checks here are about the words, not the pixels.
 import { afterAll, afterEach, expect, test } from 'vitest'
-import { WORDS } from '#src/features/play/words.ts'
 import { pinnedFiles } from '../fixtures/pinned-level.ts'
+import { say } from '../fixtures/words.ts'
 import {
   closeBrowser,
   fontsReady,
@@ -70,7 +70,7 @@ test('how it looks when the crate has been pushed', async () => {
   await page.keyboard.down('ArrowRight')
   await untilTick(page, 180)
   await page.keyboard.up('ArrowRight')
-  expect(await page.getByText(WORDS.done, { exact: true }).isVisible()).toBe(true)
+  expect(await page.getByText(say('goal.pushed'), { exact: true }).isVisible()).toBe(true)
   await fontsReady(page)
   await page.screenshot({ path: `${OUT}/done-390x844.png` })
 })
