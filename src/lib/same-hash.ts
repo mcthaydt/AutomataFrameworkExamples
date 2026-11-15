@@ -1,4 +1,4 @@
-// Says whether every engine ended a play the same way, in a sentence a person can act on. It compares hashes and
+// Says whether every engine ended a play the same way, in a sentence a person can act on (a draft-mode CI try, taken out again). It compares hashes and
 // nothing else, so it runs in Node, where CI collects what each engine saved.
 
 /** What one engine reports for a play: the hash after every check tick, and where it ended. */
