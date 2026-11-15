@@ -3,8 +3,8 @@
 import { createGameSim, parseReplay, type Replay, type Sim } from '@automataframework/framework/headless'
 import { type Browser, type BrowserType, chromium, type Frame, firefox, type Page, webkit } from 'playwright'
 import { inject } from 'vitest'
-import { gamePlugins } from '#src/features/plugins/plugins.ts'
 import { GAME_ID } from '#src/features/play/words.ts'
+import { gamePlugins } from '#src/features/plugins/plugins.ts'
 import { loadTheGame } from '../fixtures/game-files.ts'
 import { say } from '../fixtures/words.ts'
 

@@ -49,12 +49,6 @@
   --automata-picker-font: 600 22px / 1.2 var(--label-zh);
 }
 
-/* While a first-time player chooses a language, nothing is said in any language yet: the strip is out of the way and the
-   flags fill the whole game. */
-.play-root[data-state="picking"] .play-words {
-  display: none;
-}
-
 /* The mark while the game's files load: no letters, since nobody has a language yet. A player who asked their device
    for less movement sees it still. */
 .play-loading {
@@ -118,6 +112,12 @@
   color: var(--chalk);
   text-align: center;
   pointer-events: none;
+}
+
+/* While a first-time player chooses a language, nothing is said in any language yet: the strip is out of the way and the
+   flags fill the whole game. */
+.play-root[data-state="picking"] .play-words {
+  display: none;
 }
 
 /* While the game plays itself the whole of it is one big button: a tap or a click anywhere on it starts the game. A finger
