@@ -58,3 +58,9 @@ test('the pictures go only to the ci-screens branch, one writer at a time', () =
   expect(screens.match(/git push/g)).toHaveLength(1)
   expect(screens).toMatch(/group: ci-screens\n {6}cancel-in-progress: false/)
 })
+
+test('ci-screens keeps only the newest pictures: main and the open pull requests', () => {
+  expect(screens).not.toContain('$COMMIT')
+  expect(screens).toContain('gh pr list --repo "$GITHUB_REPOSITORY" --state open')
+  expect(screens).toMatch(/^ {6}pull-requests: read$/m)
+})
