@@ -1,0 +1,108 @@
+{
+ "format": 2,
+ "framework": "0.1.0",
+ "tickHz": 60,
+ "seed": 1,
+ "contentHash": "0b4143bea85e089c",
+ "schemaHash": "7c11d79b580d61f8",
+ "ticks": 401,
+ "commands": [
+   {
+     "tick": 10,
+     "source": 1,
+     "seq": 0,
+     "type": "controls",
+     "payload": {
+       "held": [
+         "right"
+       ]
+     }
+   },
+   {
+     "tick": 92,
+     "source": 1,
+     "seq": 1,
+     "type": "controls",
+     "payload": {
+       "held": [
+         "jump",
+         "right"
+       ]
+     }
+   },
+   {
+     "tick": 117,
+     "source": 1,
+     "seq": 2,
+     "type": "controls",
+     "payload": {
+       "held": [
+         "right"
+       ]
+     }
+   },
+   {
+     "tick": 238,
+     "source": 1,
+     "seq": 3,
+     "type": "controls",
+     "payload": {
+       "held": [
+         "jump",
+         "right"
+       ]
+     }
+   },
+   {
+     "tick": 262,
+     "source": 1,
+     "seq": 4,
+     "type": "controls",
+     "payload": {
+       "held": [
+         "right"
+       ]
+     }
+   },
+   {
+     "tick": 355,
+     "source": 1,
+     "seq": 5,
+     "type": "controls",
+     "payload": {
+       "held": []
+     }
+   }
+ ],
+ "checks": [
+   {
+     "tick": 60,
+     "hash": "d73a71569b9285d5"
+   },
+   {
+     "tick": 120,
+     "hash": "323efdceed5d30f7"
+   },
+   {
+     "tick": 180,
+     "hash": "731f977a54f2029c"
+   },
+   {
+     "tick": 240,
+     "hash": "255e3a3f6cbeb412"
+   },
+   {
+     "tick": 300,
+     "hash": "eb507bd1ad38f97e"
+   },
+   {
+     "tick": 360,
+     "hash": "03ad1fa1abb3e536"
+   }
+ ],
+ "finalHash": "81aefb56f0e54407",
+ "meta": {
+   "level": "level-1",
+   "players": "1"
+ }
+}

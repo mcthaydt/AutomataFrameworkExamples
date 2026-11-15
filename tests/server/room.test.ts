@@ -38,9 +38,8 @@ afterEach(async () => {
   server = undefined
 })
 
-/** The places in the room: the game's `players` in `automata.toml`. Seats 3 and 4 are taken and stand where they start. */
+/** The places in the room: the game's `players` in `automata.toml`. Only the first two are taken in this test. */
 const SEATS = 4
-const EVERYONE = [1, 2, 3, 4]
 
 /** What each seat holds from which tick: the push-crate idea, once for each of two players. */
 const HOLDS: Readonly<Record<number, Readonly<Record<number, readonly string[]>>>> = {
@@ -52,9 +51,10 @@ const script = (seat: number, tick: number): Command[] => {
   return held === undefined ? [] : [controlsCommand(tick, seat, 0, held)]
 }
 
+/** A co-op game's room starts with nobody in it: each player is put in by the join command the room sends. */
 async function makeSim(): Promise<Sim> {
   const { content, plugins } = await serverGame()
-  const sim = await createGameSim({ content, plugins, players: EVERYONE })
+  const sim = await createGameSim({ content, plugins, players: [] })
   sims.push(sim)
   return sim
 }

@@ -1,0 +1,158 @@
+{
+ "format": 2,
+ "framework": "0.1.0",
+ "tickHz": 60,
+ "seed": 1,
+ "contentHash": "0b4143bea85e089c",
+ "schemaHash": "0de19ef4bc0ef7de",
+ "ticks": 443,
+ "commands": [
+   {
+     "tick": 10,
+     "source": 1,
+     "seq": 0,
+     "type": "controls",
+     "payload": {
+       "held": [
+         "right"
+       ]
+     }
+   },
+   {
+     "tick": 69,
+     "source": 1,
+     "seq": 1,
+     "type": "controls",
+     "payload": {
+       "held": [
+         "jump",
+         "right"
+       ]
+     }
+   },
+   {
+     "tick": 92,
+     "source": 1,
+     "seq": 2,
+     "type": "controls",
+     "payload": {
+       "held": [
+         "right"
+       ]
+     }
+   },
+   {
+     "tick": 93,
+     "source": 1,
+     "seq": 3,
+     "type": "controls",
+     "payload": {
+       "held": [
+         "jump",
+         "right"
+       ]
+     }
+   },
+   {
+     "tick": 114,
+     "source": 1,
+     "seq": 4,
+     "type": "controls",
+     "payload": {
+       "held": [
+         "right"
+       ]
+     }
+   },
+   {
+     "tick": 186,
+     "source": 1,
+     "seq": 5,
+     "type": "controls",
+     "payload": {
+       "held": [
+         "jump",
+         "right"
+       ]
+     }
+   },
+   {
+     "tick": 209,
+     "source": 1,
+     "seq": 6,
+     "type": "controls",
+     "payload": {
+       "held": [
+         "right"
+       ]
+     }
+   },
+   {
+     "tick": 210,
+     "source": 1,
+     "seq": 7,
+     "type": "controls",
+     "payload": {
+       "held": [
+         "jump",
+         "right"
+       ]
+     }
+   },
+   {
+     "tick": 231,
+     "source": 1,
+     "seq": 8,
+     "type": "controls",
+     "payload": {
+       "held": [
+         "right"
+       ]
+     }
+   },
+   {
+     "tick": 396,
+     "source": 1,
+     "seq": 9,
+     "type": "controls",
+     "payload": {
+       "held": []
+     }
+   }
+ ],
+ "checks": [
+   {
+     "tick": 60,
+     "hash": "cc72c3bdbee4bf8e"
+   },
+   {
+     "tick": 120,
+     "hash": "b5766af959a5d8ef"
+   },
+   {
+     "tick": 180,
+     "hash": "d04149171e12ba58"
+   },
+   {
+     "tick": 240,
+     "hash": "c915ac5d7e92a096"
+   },
+   {
+     "tick": 300,
+     "hash": "3efd7e0aa14fc8cb"
+   },
+   {
+     "tick": 360,
+     "hash": "51455d6eee61c666"
+   },
+   {
+     "tick": 420,
+     "hash": "9a9946ef7830ea7f"
+   }
+ ],
+ "finalHash": "a41e7e9cedc7bb87",
+ "meta": {
+   "level": "level-2",
+   "players": "1"
+ }
+}

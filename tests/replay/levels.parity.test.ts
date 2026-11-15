@@ -55,9 +55,10 @@ async function record(recording: Recording): Promise<Replay> {
 async function recordingOf(recording: Recording): Promise<Replay> {
   const text = textOf(recording)
   if (text === undefined) {
-    throw new Error(
-      `REPLAY NOT RECORDED. Commit this as ${recording.file}:\n${writeReplay(await record(recording))}`,
-    )
+    const written = writeReplay(await record(recording))
+    // The failure message is cut short by the test runner when the play is long, so the whole file is printed as well.
+    console.log(`RECORDING ${recording.file}\n${written}\nEND RECORDING`)
+    throw new Error(`REPLAY NOT RECORDED. Commit this as ${recording.file}:\n${written}`)
   }
   return parseReplay(text)
 }
