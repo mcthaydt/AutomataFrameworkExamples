@@ -33,6 +33,14 @@
   background: var(--paper);
   color: var(--chalk);
   font: 600 18px / 1.3 var(--label);
+  /* A finger anywhere on the game is the game's (the Owner, 2026-11-15): a quick second tap on the words does not zoom,
+     a held finger selects nothing and offers no menu, and a tap shows no grey flash. The framework guards the level
+     itself, harder, while it is played. */
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* The picker shows each flag's own language in its title, so its font follows the language it shows, not the page's
@@ -121,10 +129,9 @@
 }
 
 /* While the game plays itself the whole of it is one big button: a tap or a click anywhere on it starts the game. A finger
-   dragged across it must still scroll the page, so touch is left to the browser. */
+   dragged across it must still scroll the page, which `manipulation` above leaves to the browser. */
 .play-root[data-state="watching"] {
   cursor: pointer;
-  touch-action: auto;
 }
 
 /* The page keeps a swipe from pulling or bouncing the page while a game is played (`overscroll-behavior: none` in

@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@automataframework/framework':
-        specifier: github:mcthaydt/AutomataFramework#0e0d8d000b513ab5adb3ff6890e51f17296e1d26
-        version: https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/0e0d8d000b513ab5adb3ff6890e51f17296e1d26(@colyseus/better-call@1.3.3(zod@4.6.6))(express@5.3.0)(typescript@7.0.2)
+        specifier: github:mcthaydt/AutomataFramework#c71c57cf64988febc2a6e1ee9fff86cfffccf5e5
+        version: https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/c71c57cf64988febc2a6e1ee9fff86cfffccf5e5(@colyseus/better-call@1.3.3(zod@4.6.6))(express@5.3.0)(typescript@7.0.2)
     devDependencies:
       '@biomejs/biome':
         specifier: 2.5.15
@@ -54,8 +54,8 @@ importers:
 
 packages:
 
-  '@automataframework/framework@https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/0e0d8d000b513ab5adb3ff6890e51f17296e1d26':
-    resolution: {gitHosted: true, integrity: sha512-kuhl3qe2b0UdIO2PQYwxrrZ5CdXr/39ywPXSoy5wrLgaNdmA3aZfkbQUSyOil6+lztXe7IBFiiVSy1VSelBerw==, tarball: https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/0e0d8d000b513ab5adb3ff6890e51f17296e1d26}
+  '@automataframework/framework@https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/c71c57cf64988febc2a6e1ee9fff86cfffccf5e5':
+    resolution: {gitHosted: true, tarball: https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/c71c57cf64988febc2a6e1ee9fff86cfffccf5e5}
     version: 0.1.0
     engines: {node: '>=24.21.0'}
     hasBin: true
@@ -1564,7 +1564,7 @@ packages:
 
 snapshots:
 
-  '@automataframework/framework@https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/0e0d8d000b513ab5adb3ff6890e51f17296e1d26(@colyseus/better-call@1.3.3(zod@4.6.6))(express@5.3.0)(typescript@7.0.2)':
+  '@automataframework/framework@https://codeload.github.com/mcthaydt/AutomataFramework/tar.gz/c71c57cf64988febc2a6e1ee9fff86cfffccf5e5(@colyseus/better-call@1.3.3(zod@4.6.6))(express@5.3.0)(typescript@7.0.2)':
     dependencies:
       '@colyseus/core': 0.18.18(@colyseus/better-call@1.3.3(zod@4.6.6))(@colyseus/schema@5.0.36(typescript@7.0.2))(@colyseus/ws-transport@0.18.4)(express@5.3.0)(zod@4.6.6)
       '@colyseus/schema': 5.0.36(typescript@7.0.2)
