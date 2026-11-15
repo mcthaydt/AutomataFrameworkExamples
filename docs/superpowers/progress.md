@@ -11,14 +11,14 @@ Spec: [`2026-11-14-m2-design.md`](https://github.com/mcthaydt/AutomataFramework/
 in AutomataFramework ("The demo game as showcase"), with the built-in hero, no-default-language and watch-mode addenda.
 Plan: [`plans/2026-11-15-demo-game.md`](plans/2026-11-15-demo-game.md)
 
-Overall: **12%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
+Overall: **18%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
 stage 6 is 12 and the Owner's review is the last 6)
 
 | Stage | State | Output |
 |---|---|---|
 | 1. Spec | Done (in AutomataFramework) | the M2 spec and its addenda |
 | 2. Plan | Written, in review, 100% | `plans/2026-11-15-demo-game.md` |
-| 3. Plan audit | Not started | |
+| 3. Plan audit | Done, 100%: sound, no critical; 7 important (6 written into the plan, 1 the Owner answered: the palette stays a rule) and 6 minor | `audits/2026-11-15-plan-d-plan-audit.md` |
 | 4. Execution | Not started, 0% (ten parts, each its own pull request; Parts 1 and 2 can start once the audit is in) | |
 | 5. Implementation audit | Not started | |
 | 6. Fixes | Not started | |
@@ -40,6 +40,16 @@ Stage 4, by part (each part is 10% of the stage):
 | 10. The close | every part above | Not started |
 
 ### Log
+
+- 2026-11-15: Stage 3. The plan audit, at the plan's `cda2c63`. Sound and true to the spec; every name it takes from
+  a merged framework plan exists, and those from plans H and T match their branches. Written into the plan: gameplay
+  is tested on pinned copies of the levels, never on the files an editor saves (I1); the test game gains a door, a
+  spark and a view so `test-game.json` still guards the game's rules (I2); the rules read players with
+  `ctx.query(Player)` and keep-up writes `Transform` (I3); the loading words become the template's mark, and every
+  test that reads English is listed (I4); level one's walk and jump steps say the framework's move and jump hints one
+  at a time, and nothing on touch, where the thumbs teach (I5); Task 9.3 waits for the editors' saving to be live here
+  (I7). The Owner answered Q1 (I6) with A: the palette stays a rule, CI fails any colour outside No. 276, and a
+  new colour means changing the palette in one place. Parts 1 and 2 can start.
 
 - 2026-11-15: Stage 2. The plan is written from the M2 spec and from the "Plan D" handoff each framework plan left.
   The demo becomes three levels (walk and jump; the double jump; the wall jump and the dash), with the door, sparks,
