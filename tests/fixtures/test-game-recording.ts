@@ -15,6 +15,7 @@ import { gamePlugins } from '#src/features/plugins/plugins.ts'
 import { readTestGame, testGameFiles } from './test-game.ts'
 
 export const LEVEL = 'content/levels/level-1.json'
+const LEVEL_ID = 'level-1'
 /** Where the page looks for the recording of the first level. */
 export const RECORDING = 'replays/level-1.json'
 /** How long the recording is, in ticks: right from tick 5 and never let go, so the hero walks into the crate and on. */
@@ -36,7 +37,7 @@ export async function recordTestGame(
 ): Promise<{ readonly text: string; readonly replay: Replay }> {
   const loaded = await loadGame(readTestGame(files))
   if (!loaded.ok) throw new Error('the test game did not load')
-  const sim = await createGameSim({ content: loaded.value, plugins: gamePlugins })
+  const sim = await createGameSim({ content: loaded.value, plugins: gamePlugins(LEVEL_ID) })
   try {
     const recorder = createRecorder(sim)
     for (let tick = 0; tick < RECORDING_TICKS; tick++)

@@ -99,14 +99,15 @@ In the browser's console, `window.automataWatch` is the recording that is playin
 
 ## The recording
 
-`replays/level-1.json` is the recorded play of the level. It is the repo's golden file: once it holds hashes it changes
-only when the Owner has seen the hashes before and after. It is recorded in CI and never typed. To take a new one,
-delete the file, push, and commit what the Node job prints.
+`replays/level-1.json` is the recorded play of the first level, and `replays/level-2.json` and `replays/level-3.json`
+are the plays of the other two, each by one player; `replays/co-op.json` is two players on level 1. They are the repo's
+golden files: once one holds hashes it changes only when the Owner has seen the hashes before and after. They are
+recorded in CI and never typed. To take a new one, delete the file, push, and commit what the Node job prints.
 
 Moving the crate (or anything else in the content) is allowed and passes CI: the check says "the content changed" and
-still compares the four engines with each other. `replays/test-game.json` is the strict check: a play of a game built
-inside the tests, which no content edit can change, so a change to the game's code that alters the play fails in
-every engine.
+still compares the four engines with each other. `replays/test-game.json` is the strict check: a play of two players
+on a game built inside the tests, which no content edit can change, so a change to the game's code that alters the
+play fails in every engine.
 
 ## Tests run on GitHub
 

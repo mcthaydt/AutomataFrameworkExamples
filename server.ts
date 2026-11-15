@@ -23,7 +23,7 @@ export async function serverGame(): Promise<{
   const loaded = await loadGame((path) => readFile(path, 'utf8'))
   if (!loaded.ok)
     throw new Error(`The game did not load:\n${loaded.diagnostics.map(formatDiagnostic).join('\n')}`)
-  return { content: loaded.value, plugins: gamePlugins }
+  return { content: loaded.value, plugins: gamePlugins(loaded.value.project.start) }
 }
 
 // Only when this file is the one that was run: a test imports `serverGame` and starts its own server on its own port.

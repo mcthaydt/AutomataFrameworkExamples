@@ -4,7 +4,7 @@
 // Nothing here reads the file system, so a rule can be tested without one.
 
 /** Feature folders, lowest first. A feature may import only itself, `src/lib/` and features before it in this list. */
-export const LAYERS = ['plugins', 'play'] as const
+export const LAYERS = ['rules', 'plugins', 'play'] as const
 
 /** Path from the repo root (with `/`) to the file's text. */
 export type SourceFiles = Readonly<Record<string, string>>
@@ -17,7 +17,7 @@ export interface Violation {
 
 const MAX_LINES = 600
 /** The features that must run the same on every machine: no clock, no randomness, no I/O. */
-const PURE_FEATURES: ReadonlySet<string> = new Set(['plugins'])
+const PURE_FEATURES: ReadonlySet<string> = new Set(['rules', 'plugins'])
 /** Features that need a page (a DOM, a canvas): the headless entry may not reach them. */
 const PAGE_FEATURES: ReadonlySet<string> = new Set(['play'])
 

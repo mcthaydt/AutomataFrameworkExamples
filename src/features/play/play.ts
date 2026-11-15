@@ -292,7 +292,7 @@ export async function play(options: PlayOptions): Promise<Play> {
     try {
       started = await start({
         content,
-        plugins: gamePlugins,
+        plugins: gamePlugins(content.project.start),
         mount: stage,
         host,
         locale: spoken,
@@ -334,7 +334,7 @@ export async function play(options: PlayOptions): Promise<Play> {
     try {
       watching = await watch({
         content,
-        plugins: gamePlugins,
+        plugins: gamePlugins(content.project.start),
         mount: stage,
         host: looking,
         frames,

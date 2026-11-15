@@ -33,12 +33,14 @@ particular to this repo added under "This repo".
   App to commit to `main`, which requires `check` and the three `engines` checks, it must be on `main`'s bypass list
   here; that is a settings step when the editors are deployed. The journeys that check gameplay play a level of
   their own (`tests/fixtures/pinned-level.ts`), so a content save, wherever it puts the crate, cannot turn them red.
-- **`replays/level-1.json` and `replays/test-game.json` are the goldens.** Both are recorded in CI, never typed. Once
-  one holds hashes it changes only with the Owner seeing before and after. An editor never writes either. The first
-  is the real level's play, which a content edit may change without breaking CI (the check says "the content
-  changed"); the second is a play of a game built inside the tests, which no edit can reach, so a change to the
-  game's code that alters the play fails in every engine. The merge session stops on a golden moved without a commit
-  naming it, and these are the two files it watches.
+- **`replays/level-1.json`, `level-2.json`, `level-3.json`, `co-op.json` and `test-game.json` are the goldens.** All
+  are recorded in CI, never typed. Once one holds hashes it changes only with the Owner seeing before and after. An
+  editor never writes any of them. The first four are plays of the real levels (one player on each, and two on the
+  first), made by the bots in `tests/fixtures/bot.ts`, which a content edit may change without breaking CI (the check
+  says "the content changed"); the last is a play of two players on a game built inside the tests, which no edit can
+  reach, so a change to the game's code that alters the play fails in every engine. The merge session stops on a
+  golden moved without a commit naming it, and these are the files it watches. The tests that play a level to its
+  end use copies the tests own (`tests/fixtures/levels/`), never the real files.
 - **Five build-time packages, named only in CSS.** `@fontsource/fredoka`, the rounded partners for the three languages Fredoka
   has no letters for (`@fontsource/m-plus-rounded-1c` for Japanese, `@fontsource/jua` for Korean, `@fontsource/zcool-kuaile`
   for Chinese; one weight each) and `@phosphor-icons/core` (exact versions, in `devDependencies`) give the game's own screens
@@ -195,7 +197,7 @@ implementations or incomplete integrations. Do your best work."
 ```
 automata.toml                 the project file: the game's name, its first level, its hero, its content files
 content/                      the game's content, JSON, written only by writeContent
-replays/                      recorded plays; level-1.json and test-game.json are the goldens
+replays/                      recorded plays; the five goldens (three levels, co-op, test-game)
 index.html                    the page
 src/index.ts                  the public surface: everything, for a page
 src/headless.ts               everything that needs no page: the sim side of the game
@@ -211,12 +213,12 @@ tests/framework.test.ts       the pinned framework is installed and built
 tests/features/<feature>/     mirrors src/features
 tests/lib/                    tests of src/lib
 tests/game/                   checks of the game's own files at the root
-tests/replay/                 the recorded plays (level-1.json, test-game.json), in Node and three browsers
+tests/replay/                 the recorded plays (level-1 to 3, co-op, test-game), in Node and three browsers
 tests/journeys/               the built page driven in a real browser, end to end
 tests/fixtures/               shared test helpers, the test game and the pinned level the journeys play
 tests/workflows/, tests/docs/ checks that read a workflow or the README
 docs/superpowers/             plans/, audits/, progress.md (specs live in AutomataFramework)
 ```
 
-Features import only from features below them (`plugins`, then `play`). No top-level `components/`,
+Features import only from features below them (`rules`, then `plugins`, then `play`). No top-level `components/`,
 `services/` or `utils/`.

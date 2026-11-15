@@ -323,5 +323,6 @@ export function framesPass(page: Surface, n: number): Promise<void> {
  * replay from the page can be checked against it. `files` replaces game files, as for `openGame`.
  */
 export async function nodeSim(files: Readonly<Record<string, string | undefined>> = {}): Promise<Sim> {
-  return createGameSim({ content: await loadTheGame(files), plugins: gamePlugins })
+  const content = await loadTheGame(files)
+  return createGameSim({ content, plugins: gamePlugins(content.project.start) })
 }

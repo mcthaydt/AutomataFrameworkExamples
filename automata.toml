@@ -3,10 +3,21 @@ name = "Crate Game"
 start = "level-1"   # the level a new game opens
 hero = "hero"       # the character each player controls
 source = "en"       # the language the game is written in: its words are in content/messages/, and English says what each is for
+players = 4         # how many can play at once on one screen
+levels = ["level-1", "level-2", "level-3"]   # the order the levels are played in
+done = "game.level-done"                     # the event that ends a level: every player is in the door (src/features/rules/)
 
 [[content]]
 type = "level"
 path = "content/levels/level-1.json"
+
+[[content]]
+type = "level"
+path = "content/levels/level-2.json"
+
+[[content]]
+type = "level"
+path = "content/levels/level-3.json"
 
 [[content]]
 type = "character"
@@ -15,6 +26,25 @@ path = "content/characters/hero.json"
 [[content]]
 type = "character"
 path = "content/characters/crate.json"
+
+# What the levels are made of besides the hero and the crate: the door that ends a level, the sparks to take, and the
+# plank and the platform that the levels' joints (a seesaw's pin, a swing's ropes) hold.
+
+[[content]]
+type = "character"
+path = "content/characters/door.json"
+
+[[content]]
+type = "character"
+path = "content/characters/spark.json"
+
+[[content]]
+type = "character"
+path = "content/characters/plank.json"
+
+[[content]]
+type = "character"
+path = "content/characters/platform.json"
 
 # The numbers and the four controls of the hero's moves (walk, jump, double jump, wall jump, dash): the framework
 # moves the hero from them, so the game has no hero code of its own.
