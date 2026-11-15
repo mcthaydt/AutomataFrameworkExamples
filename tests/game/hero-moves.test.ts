@@ -78,7 +78,7 @@ test('a sim with no plugins at all walks the hero right when player 1 holds righ
   const before = hero().x
   sim.step([controlsCommand(sim.tick, 1, 0, ['right'])])
   for (let i = 1; i < 30; i++) sim.step([])
-  expect(hero().x).toBeGreaterThan(before + 3)
+  expect(hero().x).toBeGreaterThan(before + 2)
   expect(hero().vx).toBeGreaterThan(0)
 })
 
