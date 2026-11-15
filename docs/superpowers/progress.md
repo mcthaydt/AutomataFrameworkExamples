@@ -19,7 +19,7 @@ stage 6 is 12 and the Owner's review is the last 6)
 | 1. Spec | Done (in AutomataFramework) | the M2 spec and its addenda |
 | 2. Plan | Written, in review, 100% | `plans/2026-11-15-demo-game.md` |
 | 3. Plan audit | Done, 100%: sound, no critical; 7 important (6 written into the plan, 1 the Owner answered: the palette stays a rule) and 6 minor | `audits/2026-11-15-plan-d-plan-audit.md` |
-| 4. Execution | In progress, 20% (ten parts, each its own pull request; Parts 1 and 2 are merged, Part 3 is pushed and in CI) | Examples 37 and 39 (merged), 40 |
+| 4. Execution | In progress, 35% (ten parts, each its own pull request or two; Parts 1 to 3 are merged, Part 4's first pull request is green) | Examples 37, 39, 40 (merged), 41 |
 | 5. Implementation audit | Not started | |
 | 6. Fixes | Not started | |
 | 7. Owner review | Not started | |
@@ -31,7 +31,7 @@ Stage 4, by part (each part is 10% of the stage):
 | 1. The game's words, in six languages | nothing | Merged (pull request 37): 117 Node, 67 per browser and 90 journeys per browser tests passed |
 | 2. A room server for this game | nothing | Merged (pull request 39, which replaced 38): `server.ts`, a two-player room test and the rule that only `server.ts` imports the server entry |
 | 3. The built-in hero | framework plan H (AutomataFramework pull request 101, merged) | Merged (pull request 40, `afaeb02`): the pin moves to `b634dce`, the hero is the framework's, two thumbs and the strip; both goldens recorded again |
-| 4. Three levels, the door and playing together | Part 3 | In two pull requests. First (Tasks 4.1 to 4.3: rules, characters, levels, recordings): being written, not yet in CI. Second (page, teaching, journeys): not started |
+| 4. Three levels, the door and playing together | Part 3 | In two pull requests. First (Tasks 4.1 to 4.3: rules, characters, levels, recordings): pull request 41, green in all four engines. Second (page, teaching, journeys): not started |
 | 5. Sound | Part 4 | Not started |
 | 6. Feel | framework plan F (its spec is being written), Part 5 | Not started |
 | 7. The story | framework plan T (AutomataFramework pull request 64), Part 4 | Not started |
