@@ -5,6 +5,55 @@ framework's own tracker are in AutomataFramework
 ([spec](https://github.com/mcthaydt/AutomataFramework/blob/main/docs/superpowers/specs/2026-11-13-2d-first-layer-design.md),
 [tracker](https://github.com/mcthaydt/AutomataFramework/blob/main/docs/superpowers/progress.md)).
 
+## Cycle 4: the showcase demo (plan D of M2)
+
+Spec: [`2026-11-14-m2-design.md`](https://github.com/mcthaydt/AutomataFramework/blob/main/docs/superpowers/specs/2026-11-14-m2-design.md)
+in AutomataFramework ("The demo game as showcase"), with the built-in hero, no-default-language and watch-mode addenda.
+Plan: [`plans/2026-11-15-demo-game.md`](plans/2026-11-15-demo-game.md)
+
+Overall: **12%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
+stage 6 is 12 and the Owner's review is the last 6)
+
+| Stage | State | Output |
+|---|---|---|
+| 1. Spec | Done (in AutomataFramework) | the M2 spec and its addenda |
+| 2. Plan | Written, in review, 100% | `plans/2026-11-15-demo-game.md` |
+| 3. Plan audit | Not started | |
+| 4. Execution | Not started, 0% (ten parts, each its own pull request; Parts 1 and 2 can start once the audit is in) | |
+| 5. Implementation audit | Not started | |
+| 6. Fixes | Not started | |
+| 7. Owner review | Not started | |
+
+Stage 4, by part (each part is 10% of the stage):
+
+| Part | Waits for | State |
+|---|---|---|
+| 1. The game's words, in six languages | nothing | Not started |
+| 2. A room server for this game | nothing | Not started |
+| 3. The built-in hero | framework plan H (AutomataFramework pull request 101) | Not started |
+| 4. Three levels, the door and playing together | Part 3 | Not started |
+| 5. Sound | Part 4 | Not started |
+| 6. Feel | framework plan F (its spec is being written), Part 5 | Not started |
+| 7. The story | framework plan T (AutomataFramework pull request 64), Part 4 | Not started |
+| 8. The screens, the saves and "What's inside" | framework plan U (no plan yet), Parts 4 and 5 | Not started |
+| 9. Real art, from the builders | the 2D figure and environment builders (specs being written), Parts 4 and 7 | Not started |
+| 10. The close | every part above | Not started |
+
+### Log
+
+- 2026-11-15: Stage 2. The plan is written from the M2 spec and from the "Plan D" handoff each framework plan left.
+  The demo becomes three levels (walk and jump; the double jump; the wall jump and the dash), with the door, sparks,
+  the seesaw, the swinging platform, co-op for up to four, sound, feel, the keeper, the critter, the screens, saves
+  and "What's inside". Found while planning: only five of the ten parts can be planned in full today. Plan H is still
+  being built, plan T is built and not merged, plans F and U have no plan, and the two builders have no spec, so
+  Parts 6, 8 (its first three tasks) and 9 are written as outcomes and proofs, and each needs a short look by the
+  audit when its gate opens. The Owner said (2026-11-15) that the demo's real art comes from the builders, so the
+  game stays boxes until Part 9. Goldens: the two there are move in Parts 3, 4, 7 and 9, each recorded in CI and
+  shown to the Owner before and after, and three join (`level-2.json`, `level-3.json`, `co-op.json`). The Owner
+  answered who makes the art in Part 9 (C): an agent drafts every figure and scene as the builders' files, then the
+  Owner finishes them in the builders; Part 9 has a task for each. New dependencies: none beyond the three
+  font packages the first spec names. No test was run.
+
 ## Cycle 3: the game plays itself before Play ("watch" mode)
 
 Spec: [`2026-11-14-watch-mode-design.md`](https://github.com/mcthaydt/AutomataFramework/blob/main/docs/superpowers/specs/2026-11-14-watch-mode-design.md)
