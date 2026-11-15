@@ -11,7 +11,7 @@ Spec: [`2026-11-14-m2-design.md`](https://github.com/mcthaydt/AutomataFramework/
 in AutomataFramework ("The demo game as showcase"), with the built-in hero, no-default-language and watch-mode addenda.
 Plan: [`plans/2026-11-15-demo-game.md`](plans/2026-11-15-demo-game.md)
 
-Overall: **23%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
+Overall: **28%** (the same weights as cycle 1: stage 2 is worth 12 points, stage 3 is 6, stage 4 is 50, stage 5 is 14,
 stage 6 is 12 and the Owner's review is the last 6)
 
 | Stage | State | Output |
@@ -19,7 +19,7 @@ stage 6 is 12 and the Owner's review is the last 6)
 | 1. Spec | Done (in AutomataFramework) | the M2 spec and its addenda |
 | 2. Plan | Written, in review, 100% | `plans/2026-11-15-demo-game.md` |
 | 3. Plan audit | Done, 100%: sound, no critical; 7 important (6 written into the plan, 1 the Owner answered: the palette stays a rule) and 6 minor | `audits/2026-11-15-plan-d-plan-audit.md` |
-| 4. Execution | In progress, 10% (ten parts, each its own pull request; Part 1 is green in CI, Part 2 is in CI) | pull requests 37 and 38 |
+| 4. Execution | In progress, 20% (ten parts, each its own pull request; Part 1 is merged, Part 2 is pushed and in CI) | Examples 37 (merged) and 38 |
 | 5. Implementation audit | Not started | |
 | 6. Fixes | Not started | |
 | 7. Owner review | Not started | |
@@ -28,8 +28,8 @@ Stage 4, by part (each part is 10% of the stage):
 
 | Part | Waits for | State |
 |---|---|---|
-| 1. The game's words, in six languages | nothing | Green in CI, in review (pull request 37): 117 Node, 67 per browser and 90 journeys per browser tests pass |
-| 2. A room server for this game | nothing | In CI (pull request 38, stacked on 37 because the framework pin moves there) |
+| 1. The game's words, in six languages | nothing | Merged (pull request 37): 117 Node, 67 per browser and 90 journeys per browser tests passed |
+| 2. A room server for this game | nothing | Pushed, in CI (pull request 38): `server.ts`, a two-player room test and the rule that only `server.ts` imports the server entry |
 | 3. The built-in hero | framework plan H (AutomataFramework pull request 101) | Not started |
 | 4. Three levels, the door and playing together | Part 3 | Not started |
 | 5. Sound | Part 4 | Not started |
@@ -40,6 +40,8 @@ Stage 4, by part (each part is 10% of the stage):
 | 10. The close | every part above | Not started |
 
 ### Log
+
+- 2026-11-15: Stage 4, Part 2. `server.ts` at the root is this game's room server: it reads the game from disk as a page does and hands it, with `gamePlugins`, to the framework's `runRoomServer` (`node server.ts`); `serverGame()` is exported for the test. `tests/server/room.test.ts` starts the server on a port the system picks, joins two headless players over real sockets, plays 240 ticks and expects both to report the server's own hash, then plays the room's recording again from the start. A new architecture rule, `only-server-ts-imports-the-server`, fails any file under `src/` that imports the server entry. The pages stay offline. No golden moved.
 
 - 2026-11-15: Stage 4, Part 1. The framework pin moves to `504c278`. Every word a player reads moves into
   `content/messages/{en,es,ko,ja,zh,pt}.json` (the only sentences left in code are the three the page says before a
