@@ -1,8 +1,7 @@
 // The two things `play` needs to watch the game play itself: the recording to watch, and what ends the watching.
 // Anything wrong with the recording is never a problem screen: a visitor who came to play gets the game, and one
 // sentence in the console says why for whoever looks.
-import { parseReplay, type Replay } from '@automataframework/framework'
-import { CONTROLS } from './controls.ts'
+import { type Controls, parseReplay, type Replay } from '@automataframework/framework'
 import { recordingPath } from './mode.ts'
 
 /**
@@ -25,24 +24,30 @@ export async function loadRecording(
   return undefined
 }
 
-/** The keys that take over: Enter, Space and every key a control uses. */
-const TAKE_OVER_KEYS: ReadonlySet<string> = new Set([
-  'Enter',
-  'NumpadEnter',
-  'Space',
-  ...Object.values(CONTROLS).flatMap((control) => control.keys),
-])
+/** The keys that take over: Enter, Space and every key the hero's controls use (the hero's tuning file lists them). */
+export function takeOverKeys(controls: Controls | undefined): ReadonlySet<string> {
+  return new Set([
+    'Enter',
+    'NumpadEnter',
+    'Space',
+    ...Object.values(controls ?? {}).flatMap((control) => control.keys),
+  ])
+}
 
 /**
- * Calls `onTakeOver` for a click on `root` or a key from `TAKE_OVER_KEYS` (so a keyboard player is not made to find a
- * mouse). A click, not a pointer press, so a finger dragged across the game scrolls the page and starts nothing.
- * Returns the undo.
+ * Calls `onTakeOver` for a click on `root` or a key from `keys` (so a keyboard player is not made to find a mouse).
+ * A click, not a pointer press, so a finger dragged across the game scrolls the page and starts nothing. Returns the
+ * undo.
  */
-export function listenToTakeOver(root: HTMLElement, onTakeOver: () => void): () => void {
+export function listenToTakeOver(
+  root: HTMLElement,
+  onTakeOver: () => void,
+  keys: ReadonlySet<string>,
+): () => void {
   const clicked = (): void => onTakeOver()
   const pressed = (event: KeyboardEvent): void => {
     if (event.repeat || event.ctrlKey || event.metaKey || event.altKey) return
-    if (TAKE_OVER_KEYS.has(event.code)) onTakeOver()
+    if (keys.has(event.code)) onTakeOver()
   }
   root.addEventListener('click', clicked)
   // On the window, as the framework's keyboard is: a watching game takes no focus, so a key never reaches the root.

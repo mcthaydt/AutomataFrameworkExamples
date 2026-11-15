@@ -12,6 +12,7 @@ import {
   type Game,
   type GameContent,
   type Host,
+  heroControls,
   type Input,
   type Locale,
   languagePicker,
@@ -32,7 +33,7 @@ import './play.css'
 import type { Mode } from './mode.ts'
 import { whileSeen } from './seen.ts'
 import { createStrip, type Strip } from './strip.ts'
-import { listenToTakeOver, loadRecording } from './watching.ts'
+import { listenToTakeOver, loadRecording, takeOverKeys } from './watching.ts'
 import { GAME_ID, WORDS } from './words.ts'
 
 export { listenForPlay, PLAY_MESSAGE, tellParent } from './handover.ts'
@@ -350,7 +351,8 @@ export async function play(options: PlayOptions): Promise<Play> {
     }
     drawWords()
     unfollowWords = locale?.onChange(() => drawWords())
-    unlistenTakeOver = listenToTakeOver(root, () => void made.takeOver())
+    const keys = takeOverKeys(heroControls(content))
+    unlistenTakeOver = listenToTakeOver(root, () => void made.takeOver(), keys)
     setState('watching')
     return true
   }
