@@ -1,7 +1,7 @@
 {
   "$schema": "https://unpkg.com/knip@6.39.0/schema.json",
   "ignoreExportsUsedInFile": true,
-  "entry": ["scripts/*.ts", "tests/**/*.test.ts", "src/index.ts", "src/headless.ts"],
+  "entry": ["scripts/*.ts", "tests/**/*.test.ts", "src/index.ts", "src/headless.ts", "server.ts"],
   "project": ["src/**/*.ts", "tests/**/*.ts"],
   "ignoreDependencies": [
     "@fontsource/fredoka",
