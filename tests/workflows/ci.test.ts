@@ -4,7 +4,6 @@ import { expect, test } from 'vitest'
 // The workflow only runs on GitHub, so these checks read its text.
 const ci = readFileSync(new URL('../../.github/workflows/ci.yml', import.meta.url), 'utf8')
 const jobs = ci.slice(ci.indexOf('\njobs:'))
-const screens = jobs.slice(jobs.indexOf('\n  screens:'))
 
 test('the workflow as a whole can only read the repository', () => {
   expect(ci.slice(0, ci.indexOf('\njobs:'))).toMatch(/^permissions:\n {2}contents: read$/m)
@@ -40,27 +39,9 @@ test('each engine builds the page and runs the journeys in its own browser, afte
   expect(ci).toMatch(/pnpm test:journeys\n\s+env:\n\s+ENGINE: \$\{\{ matrix\.engine \}\}/)
 })
 
-// CI's pictures are copied to the `ci-screens` branch so a cloud session, which cannot reach the artifact store, can
-// read them through the GitHub API.
-test('only the screens job may write, and only after the engines made the pictures', () => {
-  expect(jobs.match(/contents: write/g)).toHaveLength(1)
-  expect(screens).toMatch(/^ {6}contents: write$/m)
-  expect(screens).toContain('needs: engines')
-  expect(screens).toContain('if: always() &&')
-})
-
-test('pull requests from forks never get to write', () => {
-  expect(screens).toContain('github.event.pull_request.head.repo.full_name == github.repository')
-})
-
-test('the pictures go only to the ci-screens branch, one writer at a time', () => {
-  expect(screens).toContain('git push -q origin ci-screens')
-  expect(screens.match(/git push/g)).toHaveLength(1)
-  expect(screens).toMatch(/group: ci-screens\n {6}cancel-in-progress: false/)
-})
-
-test('ci-screens keeps only the newest pictures: main and the open pull requests', () => {
-  expect(screens).not.toContain('$COMMIT')
-  expect(screens).toContain('gh pr list --repo "$GITHUB_REPOSITORY" --state open')
-  expect(screens).toMatch(/^ {6}pull-requests: read$/m)
+// CI's pictures are kept only as artifacts of each run (the Owner, 2026-11-15: no ci-screens branch here).
+test('no job may write to the repository, and nothing pushes a branch', () => {
+  expect(jobs).not.toContain('contents: write')
+  expect(jobs).not.toContain('git push')
+  expect(jobs).not.toContain('\n  screens:')
 })
