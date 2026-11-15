@@ -53,7 +53,7 @@ particular to this repo added under "This repo".
   (`words.ts`), for the developer. `index.html` has no `lang`: no language is the default, and the page sets it once the
   player has chosen one. A first-time player is shown the framework's language picker, with the device's language already
   chosen, before anything is said.
-- **The look.** The game's own screens (the words strip, the touch buttons, the problem screen, the loading and "well
+- **The look.** The game's own screens (the words strip, the two thumbs and the dash button, the problem screen, the loading and "well
   done" messages) use the project's Blueprint look, dark only, in palette No. 340 (Black, Neutral Gray, Peach Red; the Owner, 2026-11-14); the game's art never does. The five colours and the one
   font family are in `src/features/play/blueprint.css` and nowhere else (a test fails on any other colour), and the
   framework's touch buttons are dressed through its `--automata-touch-*` CSS properties, never by reaching into the
@@ -218,5 +218,5 @@ tests/workflows/, tests/docs/ checks that read a workflow or the README
 docs/superpowers/             plans/, audits/, progress.md (specs live in AutomataFramework)
 ```
 
-Features import only from features below them (`hero`, then `plugins`, then `play`). No top-level `components/`,
+Features import only from features below them (`plugins`, then `play`). No top-level `components/`,
 `services/` or `utils/`.

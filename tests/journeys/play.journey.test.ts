@@ -3,8 +3,9 @@
 import { playReplay, Thing, Transform, verifyReplay } from '@automataframework/framework/headless'
 import { afterAll, afterEach, expect, test } from 'vitest'
 import { PINNED_CRATE_X, pinnedFiles } from '../fixtures/pinned-level.ts'
-import { KEYBOARD_WORDS, say } from '../fixtures/words.ts'
+import { KEYBOARD_WORDS, say, THUMB_WORDS } from '../fixtures/words.ts'
 import { closeBrowser, nodeSim, type Opened, openGame, replayOf, tickOf, untilTick } from './open.ts'
+import { SLIDE_PX, thumb } from './thumbs.ts'
 
 let opened: Opened | undefined
 afterEach(async () => {
@@ -57,29 +58,37 @@ test('holding the right arrow key pushes the crate, and what was played replays 
   expect(await visible(page, say('goal.pushed'))).toBe(true)
 })
 
-test('on a phone, a touch brings up Left, Right and Jump, and holding Right runs the hero', async () => {
+test('on a phone, a touch brings up the two thumbs, and sliding the walking thumb runs the hero', async () => {
   opened = await openGame({ size: 'phone-390x844' })
   const { page } = opened
-  await page.touchscreen.tap(195, 300)
-  for (const name of ['Left', 'Right', 'Jump']) {
-    const button = page.getByRole('button', { name })
-    expect(await button.isVisible(), name).toBe(true)
-    const box = await button.boundingBox()
-    expect(box?.width ?? 0, name).toBeGreaterThanOrEqual(48)
-    expect(box?.height ?? 0, name).toBeGreaterThanOrEqual(48)
+  await page.touchscreen.tap(97, 300)
+  for (const name of [THUMB_WORDS.walk, THUMB_WORDS.jump]) {
+    const half = page.getByRole('group', { name })
+    expect(await half.isVisible(), name).toBe(true)
+    const box = await half.boundingBox()
+    expect(box?.width ?? 0, name).toBeGreaterThanOrEqual(44)
+    expect(box?.height ?? 0, name).toBeGreaterThanOrEqual(44)
   }
-  expect(await visible(page, say('how.touch'))).toBe(true)
+  const dash = await page.getByRole('button', { name: THUMB_WORDS.dash }).boundingBox()
+  expect(dash?.width ?? 0).toBeGreaterThanOrEqual(48)
+  expect(dash?.height ?? 0).toBeGreaterThanOrEqual(48)
 
-  const right = page.getByRole('button', { name: 'Right' })
-  await right.dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 1, bubbles: true })
+  await thumb(page, 'walk', 'down')
+  await thumb(page, 'walk', 'move', SLIDE_PX)
   await untilTick(page, (await tickOf(page)) + 60)
-  await right.dispatchEvent('pointerup', { pointerType: 'touch', pointerId: 1, bubbles: true })
+  await thumb(page, 'walk', 'up', SLIDE_PX)
+  await thumb(page, 'jump', 'down')
+  await untilTick(page, (await tickOf(page)) + 5)
+  await thumb(page, 'jump', 'up')
+  // A thumb is the device now, so the strip has no key words: the thumbs carry their own hints.
+  expect(await page.locator('.play-how').isHidden()).toBe(true)
 
   const replay = await replayOf(page)
-  const held = replay.commands
-    .filter((command) => command.type === 'controls')
-    .map((command) => command.payload)
-  expect(JSON.stringify(held)).toContain('"right"')
+  const held = JSON.stringify(
+    replay.commands.filter((command) => command.type === 'controls').map((command) => command.payload),
+  )
+  expect(held).toContain('"right"')
+  expect(held).toContain('"jump"')
   const checking = await nodeSim()
   expect(verifyReplay(checking, replay)).toEqual({ ok: true })
   checking.dispose()

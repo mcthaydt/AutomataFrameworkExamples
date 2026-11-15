@@ -14,6 +14,7 @@ import {
   untilWatchTick,
   WATCHING_WORDS,
 } from './open.ts'
+import { SLIDE_PX, thumb } from './thumbs.ts'
 
 const OUT = 'tests/journeys/__screenshots__'
 
@@ -36,8 +37,8 @@ for (const [name, size] of Object.entries(SIZES) as [
   test(`how it looks at ${name}`, async () => {
     opened = await openGame({ size: name })
     const { page } = opened
-    // A finger on the screen brings up the buttons, as it does for a player on a phone or a tablet.
-    if (size.touch) await page.touchscreen.tap(size.width / 2, size.height / 2)
+    // A finger on the screen brings up the thumbs, as it does for a player on a phone or a tablet.
+    if (size.touch) await page.touchscreen.tap(size.width / 4, size.height / 2)
     await untilTick(page, 30)
     const words = await page.locator('.play-words').boundingBox()
     expect(words, 'the words are on screen').not.toBeNull()
@@ -75,12 +76,14 @@ test('how it looks when the crate has been pushed', async () => {
   await page.screenshot({ path: `${OUT}/done-390x844.png` })
 })
 
-test('how it looks with Jump held', async () => {
+test('how it looks with a thumb held on each half', async () => {
   opened = await openGame({ size: 'phone-390x844' })
   const { page } = opened
-  await page.touchscreen.tap(195, 422)
-  const jump = page.getByRole('button', { name: 'Jump' })
-  await jump.dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 1, bubbles: true })
+  await page.touchscreen.tap(97, 422)
+  await page.locator('.automata-thumbs').waitFor({ state: 'visible' })
+  await thumb(page, 'walk', 'down')
+  await thumb(page, 'walk', 'move', SLIDE_PX)
+  await thumb(page, 'jump', 'down')
   await untilTick(page, 30)
   await fontsReady(page)
   await page.screenshot({ path: `${OUT}/held-390x844.png` })
@@ -94,7 +97,7 @@ for (const name of ['phone-844x390', 'tablet-820x1180', 'tablet-1180x820'] as co
   })
 }
 
-// The game before anyone has pressed Play: playing its own recording, with the words that say so. No touch buttons.
+// The game before anyone has pressed Play: playing its own recording, with the words that say so. No thumbs.
 for (const name of Object.keys(SIZES) as (keyof typeof SIZES)[]) {
   test(`how it looks watching at ${name}`, async () => {
     opened = await openGame({ size: name, search: '?watch' })

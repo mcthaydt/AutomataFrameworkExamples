@@ -120,6 +120,36 @@ const touchButtons = (): HTMLButtonElement[] => {
   return [...root.querySelectorAll('button')]
 }
 
+/** One of the two thumbs' halves of the screen: the one that walks, or the one that jumps. */
+const half = (name: 'walk' | 'jump'): HTMLElement => {
+  const found = root.querySelector<HTMLElement>(`.automata-thumb-half[data-half="${name}"]`)
+  if (found === null) throw new Error(`no ${name} half`)
+  return found
+}
+/** A finger on a half: it lands, moves or lifts at (`x`, `y`) of the page. */
+const finger = (
+  target: Element,
+  type: 'pointerdown' | 'pointermove' | 'pointerup',
+  x = 100,
+  y = 700,
+): void => {
+  target.dispatchEvent(
+    new PointerEvent(type, {
+      pointerId: 7,
+      pointerType: 'touch',
+      clientX: x,
+      clientY: y,
+      bubbles: true,
+      cancelable: true,
+    }),
+  )
+}
+const background = (selector: string): string => {
+  const found = root.querySelector(selector)
+  if (found === null) throw new Error(`no ${selector}`)
+  return getComputedStyle(found).backgroundColor
+}
+
 test('play fills the root (the words, then the game under them), starts the game and says so', async () => {
   const { play: made } = await begin()
   expect(made.state).toBe('playing')
@@ -140,21 +170,29 @@ test('the words say who you are and how to move with keys', async () => {
   expect(text('.play-how')).toBe(KEYBOARD_WORDS)
 })
 
-test('on a touch screen the words name the buttons', async () => {
+test('on a touch screen the strip says the goal and no more: the thumbs carry their own hints', async () => {
   await begin({ coarse: true })
   expect(text('.play-goal')).toBe(say('goal.push'))
-  expect(text('.play-how')).toBe(say('how.touch'))
+  expect(text('.play-how')).toBe('')
+  expect(root.querySelector<HTMLElement>('.play-how')?.hidden).toBe(true)
 })
 
-test('the first touch switches the words to the buttons, for good', async () => {
-  await begin({ coarse: false })
+test('using a thumb takes the key words away, and a key brings them back', async () => {
+  const { frames } = await begin({ coarse: false })
+  expect(text('.play-how')).toBe(KEYBOARD_WORDS)
   pointer('pointerdown', 'touch')
-  expect(text('.play-how')).toBe(say('how.touch'))
-  pointer('pointerdown', 'mouse')
-  expect(text('.play-how')).toBe(say('how.touch'))
+  frames.at(0) // the first frame only sets the clock
+  finger(half('jump'), 'pointerdown')
+  run(frames, 2)
+  expect(text('.play-how')).toBe('')
+  finger(half('jump'), 'pointerup')
+  key('keydown', 'ArrowRight')
+  run(frames, 2)
+  key('keyup', 'ArrowRight')
+  expect(text('.play-how')).toBe(KEYBOARD_WORDS)
 })
 
-test('a mouse click does not switch the words', async () => {
+test('a mouse click does not change the words', async () => {
   await begin({ coarse: false })
   pointer('pointerdown', 'mouse')
   expect(text('.play-how')).toBe(KEYBOARD_WORDS)
@@ -226,7 +264,7 @@ test('the words never sit under a touch button', async () => {
     pointer('pointerdown', 'touch')
     const words = root.querySelector('.play-words')?.getBoundingClientRect()
     const buttons = [...root.querySelectorAll('button')]
-    expect(buttons.map((button) => button.textContent)).toEqual(['Left', 'Right', 'Jump'])
+    expect(buttons.map((button) => button.textContent)).toEqual([say('controls.dash')])
     for (const button of buttons) {
       const box = button.getBoundingClientRect()
       expect(box.width, `${width}x${height}`).toBeGreaterThanOrEqual(48)
@@ -290,7 +328,7 @@ test('every word can be read: each text and its ground reach 4.5 to 1', () => {
 test('a touch button is a paper chip with a chalk edge', async () => {
   await begin()
   const buttons = touchButtons()
-  expect(buttons.map((b) => b.textContent)).toEqual(['Left', 'Right', 'Jump'])
+  expect(buttons.map((b) => b.textContent)).toEqual([say('controls.dash')])
   for (const b of buttons) {
     const style = getComputedStyle(b)
     expect(style.backgroundColor, b.textContent ?? '').toBe(PAPER)
@@ -310,14 +348,37 @@ test('a touch button is a paper chip with a chalk edge', async () => {
 
 test('a held button turns peach red with paper words', async () => {
   await begin()
-  const jump = touchButtons().find((b) => b.textContent === 'Jump')
-  if (jump === undefined) throw new Error('no Jump button')
-  touchOn(jump, 'pointerdown')
-  expect(getComputedStyle(jump).backgroundColor).toBe(MARKER)
-  expect(getComputedStyle(jump).color).toBe(PAPER)
-  touchOn(jump, 'pointerup')
-  expect(getComputedStyle(jump).backgroundColor).toBe(PAPER)
-  expect(getComputedStyle(jump).color).toBe(CHALK)
+  const [dash] = touchButtons()
+  if (dash === undefined) throw new Error('no Dash button')
+  touchOn(dash, 'pointerdown')
+  expect(getComputedStyle(dash).backgroundColor).toBe(MARKER)
+  expect(getComputedStyle(dash).color).toBe(PAPER)
+  touchOn(dash, 'pointerup')
+  expect(getComputedStyle(dash).backgroundColor).toBe(PAPER)
+  expect(getComputedStyle(dash).color).toBe(CHALK)
+})
+
+test('the ring, the knob and the arrow of the thumbs are chalk at rest and peach red while held', async () => {
+  await begin()
+  pointer('pointerdown', 'touch')
+  // Nothing is drawn under a thumb that has not landed.
+  expect(getComputedStyle(root.querySelector('.automata-thumb-ring') ?? root).display).toBe('none')
+  expect(getComputedStyle(root.querySelector('.automata-thumb-arrow') ?? root).display).toBe('none')
+  // A thumb lands on the walking half: the ring is paper with a chalk edge and a chalk knob, until the thumb slides.
+  finger(half('walk'), 'pointerdown', 100, 700)
+  expect(getComputedStyle(root.querySelector('.automata-thumb-ring') ?? root).display).toBe('block')
+  expect(background('.automata-thumb-ring')).toBe(PAPER)
+  expect(background('.automata-thumb-knob')).toBe(CHALK)
+  finger(half('walk'), 'pointermove', 140, 700)
+  expect(background('.automata-thumb-ring')).toBe(MARKER)
+  expect(background('.automata-thumb-knob')).toBe(PAPER)
+  finger(half('walk'), 'pointerup', 140, 700)
+  // A thumb on the jumping half: the arrow shows, peach red.
+  finger(half('jump'), 'pointerdown', 300, 700)
+  expect(getComputedStyle(root.querySelector('.automata-thumb-arrow') ?? root).display).toBe('block')
+  expect(background('.automata-thumb-arrow')).toBe(MARKER)
+  finger(half('jump'), 'pointerup', 300, 700)
+  expect(getComputedStyle(root.querySelector('.automata-thumb-arrow') ?? root).display).toBe('none')
 })
 
 test('every button has its picture above its word', async () => {

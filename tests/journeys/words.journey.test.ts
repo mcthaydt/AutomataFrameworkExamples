@@ -18,8 +18,8 @@ for (const [name, size] of Object.entries(SIZES) as [
   test(`at ${name}, the words sit above the game and not on it`, async () => {
     opened = await openGame({ size: name })
     const { page } = opened
-    // A finger on the screen switches the words to the buttons' words, which can wrap to another line.
-    if (size.touch) await page.touchscreen.tap(size.width / 2, size.height / 2)
+    // A finger on the screen brings up the thumbs; the strip must still end where the game begins.
+    if (size.touch) await page.touchscreen.tap(size.width / 4, size.height / 2)
     await untilTick(page, 30)
     await fontsReady(page)
     const words = await page.locator('.play-words').boundingBox()

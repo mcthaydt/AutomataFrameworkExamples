@@ -16,6 +16,13 @@ path = "content/characters/hero.json"
 type = "character"
 path = "content/characters/crate.json"
 
+# The numbers and the four controls of the hero's moves (walk, jump, double jump, wall jump, dash): the framework
+# moves the hero from them, so the game has no hero code of its own.
+
+[[content]]
+type = "tuning"
+path = "content/tunings/hero-moves.json"
+
 # The game's words, one file for each language. English (source, above) says what every word is for; the others carry
 # the same keys. `automata check` names a word a language is missing.
 

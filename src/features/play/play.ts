@@ -12,10 +12,12 @@ import {
   type Game,
   type GameContent,
   type Host,
+  type Input,
   type Locale,
   languagePicker,
   loadGame,
   openSettings,
+  playHint,
   type Replay,
   startGame,
   Thing,
@@ -25,19 +27,18 @@ import {
   webHost,
 } from '@automataframework/framework'
 import { gamePlugins } from '../plugins/plugins.ts'
-import { CONTROLS } from './controls.ts'
 import './blueprint.css'
 import './play.css'
-import { hintFor } from './hints.ts'
 import type { Mode } from './mode.ts'
 import { whileSeen } from './seen.ts'
+import { createStrip, type Strip } from './strip.ts'
 import { listenToTakeOver, loadRecording } from './watching.ts'
 import { GAME_ID, WORDS } from './words.ts'
 
-export { CONTROLS } from './controls.ts'
 export { listenForPlay, PLAY_MESSAGE, tellParent } from './handover.ts'
 export { modeOf } from './mode.ts'
 export { readFrom } from './read.ts'
+export { createStrip, type Strip } from './strip.ts'
 export { GAME_ID, WORDS } from './words.ts'
 
 /** `picking`: a first-time player is choosing a language, so nothing is said in any language yet. */
@@ -134,7 +135,6 @@ export async function play(options: PlayOptions): Promise<Play> {
   let unlistenTakeOver: (() => void) | undefined
   let takingOver: Promise<void> | undefined
   let stopped = false
-  let onTouch: ((event: PointerEvent) => void) | undefined
   // What `begin` needs, once the game's files have loaded.
   let content: GameContent
   let locale: Locale | undefined
@@ -145,6 +145,7 @@ export async function play(options: PlayOptions): Promise<Play> {
   let unfollowLanguage: (() => void) | undefined
   let unfollowWords: (() => void) | undefined
   let picker: { destroy(): void } | undefined
+  let unfollowDevice: (() => void) | undefined
 
   const setState = (next: PlayState): void => {
     state = next
@@ -168,12 +169,12 @@ export async function play(options: PlayOptions): Promise<Play> {
   const stop = (): void => {
     if (stopped) return
     stopped = true
-    if (onTouch !== undefined) root.removeEventListener('pointerdown', onTouch)
     stopWatching()
     picker?.destroy()
     picker = undefined
     unfollowWords?.()
     unfollowLanguage?.()
+    unfollowDevice?.()
     game?.stop()
     root.replaceChildren()
     root.classList.remove('play-root')
@@ -252,30 +253,27 @@ export async function play(options: PlayOptions): Promise<Play> {
     const spoken = locale
     if (!spoken.asked() && !(await pickLanguage(spoken))) return
 
-    const goal = element('p', 'play-goal')
-    const how = element('p', 'play-how')
-    words.replaceChildren(goal, how)
-
-    // A finger on the screen is the moment the framework shows its buttons, and the words follow it for good.
-    let touched = coarse
+    // The strip: the goal, and how to do it at a keyboard or a gamepad. A touch screen has the thumbs' own hints.
     let pushed = false
-    // The first key of an action: the game's, once it runs, and the controls' own before that.
-    const firstKey = (action: string): string | undefined =>
-      game?.input.inputsFor(1, action)[0] ?? CONTROLS[action]?.keys[0]
+    const strip: Strip = createStrip(words)
+    // Before the game runs nobody has used anything: a coarse pointer means a finger. After, the framework knows.
+    const device = (): ReturnType<Input['device']> => game?.input.device(1) ?? (coarse ? 'touch' : 'keyboard')
+    const dash = content.characters[content.project.hero]?.moves?.dash === true
     drawWords = (): void => {
-      goal.textContent = spoken.words(pushed ? 'goal.pushed' : 'goal.push')
-      how.textContent = touched ? spoken.words('how.touch') : hintFor(firstKey, spoken.words)
+      if (pushed) strip.done(spoken.words('goal.pushed'))
+      else strip.say(spoken.words('goal.push'))
+      strip.how(
+        playHint({
+          device: device(),
+          first: (action) => game?.input.inputsFor(1, action)[0],
+          dash,
+          words: spoken.words,
+        }),
+      )
     }
     drawWords()
     unfollowWords?.()
     unfollowWords = spoken.onChange(() => drawWords())
-    onTouch = (event) => {
-      if (event.pointerType !== 'touch') return
-      touched = true
-      drawWords()
-      if (onTouch !== undefined) root.removeEventListener('pointerdown', onTouch)
-    }
-    root.addEventListener('pointerdown', onTouch)
 
     // Where the level file puts the crate, so "pushed" means moved from there, whatever an editor made it.
     const startX = content.levels[content.project.start]?.things.find((thing) => thing.id === CRATE)?.x
@@ -286,8 +284,6 @@ export async function play(options: PlayOptions): Promise<Play> {
       if (crate === undefined || Math.abs(crate.get(Transform).x - startX) <= PUSHED_TILES) return
       pushed = true
       drawWords()
-      // The look puts a tick before the words, so a player sees at a glance that they did it.
-      goal.classList.add('play-done')
     }
 
     let started: Game
@@ -296,7 +292,6 @@ export async function play(options: PlayOptions): Promise<Play> {
         content,
         plugins: gamePlugins,
         mount: stage,
-        controls: CONTROLS,
         host,
         locale: spoken,
         frames: observing(frames, observe),
@@ -310,6 +305,10 @@ export async function play(options: PlayOptions): Promise<Play> {
       return
     }
     game = started
+    unfollowDevice = started.input.onDevice((player) => {
+      if (player === 1) drawWords()
+    })
+    drawWords()
     setState('playing')
   }
 

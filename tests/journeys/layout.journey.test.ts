@@ -1,7 +1,7 @@
-// The touch buttons must never sit on the hero. They take the bottom of the screen once a finger touches it, and the
-// framework fits the level above them. The proof looks at what a player sees: a picture of the page, in which the hero
-// is the one thing in the hero's own colour, and the buttons are boxes on the page. Held sideways on a phone, the level fills the height,
-// which is where the buttons once covered the hero's starting place.
+// What the thumbs draw must never sit on the hero. The two thumbs take the bottom of the screen once a finger touches
+// it, and the framework fits the level above them. The proof looks at what a player sees: a picture of the page, in
+// which the hero is the one thing in the hero's own colour, and the thumbs' parts are boxes on the page. Held sideways
+// on a phone, the level fills the height, which is where the thumbs once covered the hero's starting place.
 import { readFileSync } from 'node:fs'
 import type { Page } from 'playwright'
 import { afterAll, afterEach, expect, test } from 'vitest'
@@ -82,12 +82,12 @@ async function heroBox(page: Page, png: Buffer): Promise<Box | undefined> {
 }
 
 /**
- * The hero, with the buttons hidden from the picture but still measured. A solid button would hide the part of the hero
+ * The hero, with the thumbs hidden from the picture but still measured. A solid button would hide the part of the hero
  * under it, the hero would shrink to what still shows, and the check would pass on the very overlap it is there to
  * catch.
  */
 async function heroSeen(page: Page): Promise<Box | undefined> {
-  const hide = await page.addStyleTag({ content: '.automata-touch { visibility: hidden !important }' })
+  const hide = await page.addStyleTag({ content: '.automata-thumbs { visibility: hidden !important }' })
   try {
     return await heroBox(page, await page.screenshot())
   } finally {
@@ -97,44 +97,57 @@ async function heroSeen(page: Page): Promise<Box | undefined> {
 
 const touchSizes = (Object.keys(SIZES) as (keyof typeof SIZES)[]).filter((name) => SIZES[name].touch)
 
+/** What a finger can see of the thumbs: the dash button and the circle of each hint, never the halves themselves. */
+const HINT = '.automata-thumb-hint'
+const THUMB_PARTS = [
+  { name: 'the walking hint', selector: `${HINT}[data-hint="walk"] .automata-thumb-hint-picture` },
+  { name: 'the jumping hint', selector: `${HINT}[data-hint="jump"] .automata-thumb-hint-picture` },
+  { name: 'the dash button', selector: '.automata-touch-button[data-action="dash"]' },
+] as const
+
+async function boxOf(page: Page, selector: string): Promise<Box | null> {
+  return page.locator(selector).first().boundingBox()
+}
+
 for (const name of touchSizes) {
-  test(`at ${name}, no button sits on the hero`, async () => {
+  test(`at ${name}, nothing the thumbs draw sits on the hero`, async () => {
     opened = await openGame({ size: name })
     const { page } = opened
     const size = SIZES[name]
-    // A finger on the screen brings up the buttons, as it does for a player on a phone or a tablet.
-    await page.touchscreen.tap(size.width / 2, size.height / 2)
-    for (const label of ['Left', 'Right', 'Jump']) await page.getByRole('button', { name: label }).waitFor()
+    // A finger on the screen brings up the thumbs, as it does for a player on a phone or a tablet. It lands on the
+    // walking half and slides nowhere, so nothing is held and the hero stays where it starts.
+    await page.touchscreen.tap(size.width / 4, size.height / 2)
+    await page.locator('.automata-thumbs').waitFor({ state: 'visible' })
     await untilTick(page, 30)
     await fontsReady(page)
 
     const hero = await heroSeen(page)
     expect(hero, 'the hero is on screen').toBeDefined()
     if (hero === undefined) return
-    for (const label of ['Left', 'Right', 'Jump']) {
-      const box = await page.getByRole('button', { name: label }).boundingBox()
-      expect(box, label).not.toBeNull()
-      if (box !== null) expect(overlaps(hero, box), `${label} sits on the hero`).toBe(false)
+    for (const part of THUMB_PARTS) {
+      const box = await boxOf(page, part.selector)
+      expect(box, part.name).not.toBeNull()
+      if (box !== null) expect(overlaps(hero, box), `${part.name} sits on the hero`).toBe(false)
     }
   })
 }
 
-test('the check bites: a button put over the hero is reported', async () => {
+test('the check bites: the dash button put over the hero is reported', async () => {
   opened = await openGame({ size: 'phone-390x844' })
   const { page } = opened
-  await page.touchscreen.tap(195, 422)
-  await page.getByRole('button', { name: 'Jump' }).waitFor()
+  await page.touchscreen.tap(97, 422)
+  await page.locator('.automata-thumbs').waitFor({ state: 'visible' })
   await untilTick(page, 30)
   await fontsReady(page)
   const hero = await heroSeen(page)
   expect(hero, 'the hero is on screen').toBeDefined()
   if (hero === undefined) return
-  // Jump, moved to where the hero starts. The solid button would hide the hero in a picture, so only the buttons'
-  // boxes (measured with the buttons hidden from the picture) can say it is there.
+  // The button, moved to where the hero starts. The solid button would hide the hero in a picture, so only the
+  // buttons' boxes (measured with the buttons hidden from the picture) can say it is there.
   await page.addStyleTag({
-    content: `.automata-touch-button[data-action='jump'] { position: fixed; left: ${hero.x}px; top: ${hero.y}px }`,
+    content: `.automata-touch-button[data-action='dash'] { position: fixed; left: ${hero.x}px; top: ${hero.y}px }`,
   })
-  const box = await page.getByRole('button', { name: 'Jump' }).boundingBox()
+  const box = await boxOf(page, '.automata-touch-button[data-action="dash"]')
   expect(box).not.toBeNull()
   if (box !== null) expect(overlaps(hero, box)).toBe(true)
 })

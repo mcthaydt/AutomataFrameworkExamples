@@ -1,7 +1,7 @@
 // A test game the real game's files cannot change. An editor may move the crate in `content/levels/level-1.json`; a
 // unit test built on that file would break. This one is built here, with `writeContent`, and has the real game's
 // paths so a test reads like it was playing the real game: a floor 32 tiles wide, a start for players 1 and 2, and
-// no things.
+// no things. Its hero is moved by the framework, as the real one is.
 import {
   formatDiagnostic,
   type GameContent,
@@ -35,12 +35,18 @@ path = "content/characters/hero.json"
 [[content]]
 type = "character"
 path = "content/characters/crate.json"
+
+[[content]]
+type = "tuning"
+path = "content/tunings/hero-moves.json"
 ${messagePaths.map((path) => `\n[[content]]\ntype = "messages"\npath = "${path}"\n`).join('')}`
 
 /** Every file of the test game, by its path from the game's root. */
 export const testGameFiles: Readonly<Record<string, string>> = {
   [PROJECT_FILE]: project,
   ...Object.fromEntries(messagePaths.map((path) => [path, gameFiles[path] ?? ''])),
+  // The hero's numbers and controls are the real game's: the hero the framework moves is the same hero here.
+  'content/tunings/hero-moves.json': gameFiles['content/tunings/hero-moves.json'] ?? '',
   'content/levels/level-1.json': writeContent('level', {
     format: 1,
     id: 'level-1',
@@ -58,6 +64,7 @@ export const testGameFiles: Readonly<Record<string, string>> = {
     size: { w: 0.8, h: 1 },
     color: '#d7263d',
     upright: true,
+    moves: { tuning: 'hero-moves', 'double-jump': true, 'wall-jump': true, dash: true },
   }),
   'content/characters/crate.json': writeContent('character', {
     format: 1,
