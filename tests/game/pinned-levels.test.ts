@@ -5,7 +5,7 @@ import { parseContent, type Sim, writeContent } from '@automataframework/framewo
 import { afterEach, expect, test } from 'vitest'
 import { Progress } from '#src/features/rules/rules.ts'
 import { pinnedLevels } from '../fixtures/pinned-levels.ts'
-import { type Recording, RECORDINGS, simFor } from '../fixtures/plays.ts'
+import { RECORDINGS, type Recording, simFor } from '../fixtures/plays.ts'
 
 const made: Sim[] = []
 afterEach(() => {

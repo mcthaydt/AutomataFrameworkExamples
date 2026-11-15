@@ -65,7 +65,7 @@ test("the test game's recorded play ends where it was recorded, in every engine"
   }
 })
 
-test("the bots still finish the test game, so the recording was made by a play that won", async () => {
+test('the bots still finish the test game, so the recording was made by a play that won', async () => {
   const sim = await fresh()
   const played = playTestGame(sim)
   const progress = sim.resource(Progress)

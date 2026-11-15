@@ -1,7 +1,7 @@
 // The game's three levels, as files: how many there are and in what order, that each has one door, a place for each of
 // the four players and a camera limit, and that nothing starts inside a wall. The levels are the editors' to change, so
 // these say what the game needs of any level, not where anything is.
-import { levelOrder, type Level } from '@automataframework/framework/headless'
+import { type Level, levelOrder } from '@automataframework/framework/headless'
 import { expect, test } from 'vitest'
 import { loadTheGame } from '../fixtures/game-files.ts'
 
@@ -35,7 +35,8 @@ test('every level has exactly one door, whose character is the sensed door', asy
 
 test('every level has a start for each of the four players, and a camera that may pull back', async () => {
   for (const { id, level } of await levels()) {
-    expect(level.starts.map((start) => start.player), id).toEqual([1, 2, 3, 4])
+    const players = level.starts.map((start) => start.player)
+    expect(players, id).toEqual([1, 2, 3, 4])
     expect(level.view?.most, `${id} has a limit to how far the camera pulls back`).toBeDefined()
   }
 })

@@ -5,7 +5,7 @@
 // the players within the camera, and the hero's moves).
 import { createGameSim, type Sim } from '@automataframework/framework/headless'
 import { gamePlugins } from '#src/features/plugins/plugins.ts'
-import { type Course, drive, type Driven, holder, walker } from './bot.ts'
+import { type Course, type Driven, drive, holder, walker } from './bot.ts'
 import { loadGameFrom, readTestGame, rulesLevel } from './test-game.ts'
 
 /** How long the play may take before it is given up as lost, in ticks (ten seconds). */

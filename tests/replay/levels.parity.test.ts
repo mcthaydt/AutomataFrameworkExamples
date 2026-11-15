@@ -5,8 +5,8 @@
 // test saves where this engine ended all of them, and CI then compares each browser's hashes with Node's. (The strict
 // check that survives an edit is `test-game.parity.test.ts`.)
 import {
-  parseReplay,
   type Played,
+  parseReplay,
   playReplay,
   type Replay,
   type Sim,
@@ -18,7 +18,7 @@ import {
 import { afterEach, expect, test } from 'vitest'
 import { Progress } from '#src/features/rules/rules.ts'
 import { loadTheGame } from '../fixtures/game-files.ts'
-import { type Recording, RECORDINGS, simFor } from '../fixtures/plays.ts'
+import { RECORDINGS, type Recording, simFor } from '../fixtures/plays.ts'
 import { saveHashes } from '../fixtures/save-hashes.ts'
 
 // The recordings are read through a glob so a missing file is an empty object, not a failed import.
