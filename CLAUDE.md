@@ -73,7 +73,8 @@ this repo; a shared rule is changed there, never here.
   so a cloud session can look at them. It shares no history with `main`.
 - **Onboarding here:** a first-time developer must get from clone to a changed game by following the README.
 - **Branches:** the editors' save branches (`automata/<login>`) do not count toward the five (the Owner, 2026-11-13):
-  this repo is our test game, and the editors are a product for other teams' repos.
+  this repo is our test game, and the editors are a product for other teams' repos. The editors' notes branch,
+  `automata/notes` (holding `automata.notes.toml`), is allowed too, and does not count either.
 - **Fast CI here.** A draft runs the Node tests the change reaches; the recorded plays in every engine, whole, since
   they are short and are the proof that every engine plays the same; the journeys in Chromium only, and only when what
   the page is made of changed (`src/`, `content/`, `replays/`, the page, `public/`, the journeys), stopping at the
