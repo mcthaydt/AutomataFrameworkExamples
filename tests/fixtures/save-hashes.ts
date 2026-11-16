@@ -14,19 +14,24 @@ export async function engineName(): Promise<string> {
   return server.browser
 }
 
-/** Writes `.hashes/<engine>.json` at the repo's root as an `EngineHashes`, for `scripts/same-hash.ts` to compare. */
-export async function saveHashes(played: Played): Promise<void> {
+/**
+ * Writes `.hashes/<engine>.json` at the repo's root as an `EngineHashes`, for `scripts/same-hash.ts` to compare. A second
+ * recording passes its name, and its hashes go to `.hashes/<engine>.<name>.json`, so two recorded plays never overwrite
+ * each other.
+ */
+export async function saveHashes(played: Played, recording = ''): Promise<void> {
   const engine = await engineName()
+  const file = `${engine}${recording === '' ? '' : `.${recording}`}.json`
   const hashes: EngineHashes = { engine, finalHash: played.finalHash, checks: played.checks }
   const text = `${JSON.stringify(hashes, null, 2)}\n`
   if (inBrowser()) {
     // In Vitest 5 a path is resolved from the project root.
     const { commands } = await import('vitest/browser')
-    await commands.writeFile(`.hashes/${engine}.json`, text)
+    await commands.writeFile(`.hashes/${file}`, text)
   } else {
     const { mkdir, writeFile } = await import('node:fs/promises')
     const folder = new URL('../../.hashes/', import.meta.url)
     await mkdir(folder, { recursive: true })
-    await writeFile(new URL(`${engine}.json`, folder), text)
+    await writeFile(new URL(file, folder), text)
   }
 }

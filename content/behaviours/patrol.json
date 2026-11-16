@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "patrol",
+  "rules": [
+    {
+      "id": "patrol",
+      "when": [],
+      "do": {
+        "act": "walk-path",
+        "path": "walk",
+        "speed": 1.5
+      }
+    }
+  ]
+}

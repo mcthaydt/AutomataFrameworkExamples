@@ -21,7 +21,7 @@ test('the game opens, says what to do, and nothing goes wrong', async () => {
   opened = await openGame()
   const { page, errors } = opened
   expect(await page.locator('#game').getAttribute('data-state')).toBe('playing')
-  expect(await visible(page, say('goal.push'))).toBe(true)
+  expect(await visible(page, say('level.level-1.goal'))).toBe(true)
   expect(await visible(page, KEYBOARD_WORDS)).toBe(true)
   const canvases = page.locator('canvas')
   expect(await canvases.count()).toBe(1)
@@ -54,8 +54,8 @@ test('holding the right arrow key pushes the crate, and what was played replays 
   expect(crate?.get(Transform).x).toBeGreaterThan(PINNED_CRATE_X + 1)
   played.dispose()
 
-  // And the page told the player so: the words changed from "push" to "you did it".
-  expect(await visible(page, say('goal.pushed'))).toBe(true)
+  // And the page told the player so: the words changed from the goal of the level to "well done".
+  expect(await visible(page, say('goal.done'))).toBe(true)
 })
 
 test('on a phone, a touch brings up the two thumbs, and sliding the walking thumb runs the hero', async () => {

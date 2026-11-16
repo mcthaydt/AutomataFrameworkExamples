@@ -5,6 +5,7 @@
 // never a blank canvas and never an error nobody reads. In `watch` mode the game first plays its own recording by
 // itself, and `takeOver` hands the same page over to a player, from the start of the level, with nothing reloaded.
 import {
+  type Arrive,
   createLocale,
   type Diagnostic,
   type Frames,
@@ -21,9 +22,8 @@ import {
   playHint,
   type Replay,
   startGame,
-  Thing,
-  Transform,
   type Watch,
+  type Way,
   watchReplay,
   webHost,
 } from '@automataframework/framework'
@@ -34,6 +34,7 @@ import type { Mode } from './mode.ts'
 import { whileSeen } from './seen.ts'
 import { createStrip, type Strip } from './strip.ts'
 import { listenToTakeOver, loadRecording, takeOverKeys } from './watching.ts'
+import { followVisit } from './ways.ts'
 import { GAME_ID, WORDS } from './words.ts'
 
 export { listenForPlay, PLAY_MESSAGE, tellParent } from './handover.ts'
@@ -77,25 +78,9 @@ export interface Play {
   stop(): void
 }
 
-/** The thing in the level file the page's words talk about, and how far it must move to count as pushed. */
-const CRATE = 'crate-1'
-const PUSHED_TILES = 1
-
 const pageFrames: Frames = {
   request: (callback) => requestAnimationFrame(callback),
   cancel: (id) => cancelAnimationFrame(id),
-}
-
-/** The same frames, with `after` called once each time a frame has been delivered to the game. */
-function observing(frames: Frames, after: () => void): Frames {
-  return {
-    request: (callback) =>
-      frames.request((ms) => {
-        callback(ms)
-        after()
-      }),
-    cancel: (id) => frames.cancel(id),
-  }
 }
 
 function element<K extends keyof HTMLElementTagNameMap>(
@@ -147,6 +132,7 @@ export async function play(options: PlayOptions): Promise<Play> {
   let unfollowWords: (() => void) | undefined
   let picker: { destroy(): void } | undefined
   let unfollowDevice: (() => void) | undefined
+  let stopVisit: (() => void) | undefined
 
   const setState = (next: PlayState): void => {
     state = next
@@ -176,6 +162,7 @@ export async function play(options: PlayOptions): Promise<Play> {
     unfollowWords?.()
     unfollowLanguage?.()
     unfollowDevice?.()
+    stopVisit?.()
     game?.stop()
     root.replaceChildren()
     root.classList.remove('play-root')
@@ -254,16 +241,18 @@ export async function play(options: PlayOptions): Promise<Play> {
     const spoken = locale
     if (!spoken.asked() && !(await pickLanguage(spoken))) return
 
-    // The strip: the goal, and how to do it at a keyboard or a gamepad. A touch screen has the thumbs' own hints.
-    let pushed = false
+    // The strip: the goal of the level player 1 is in, and how to do it at a keyboard or a gamepad. A touch screen has
+    // the thumbs' own hints.
+    let here = content.project.start
+    let reached = false
     const strip: Strip = createStrip(words)
     // What the player used last, once they have used something; until then a coarse pointer means a finger.
     let used: ReturnType<Input['device']> | undefined
     const device = (): ReturnType<Input['device']> => used ?? (coarse ? 'touch' : 'keyboard')
     const dash = content.characters[content.project.hero]?.moves?.dash === true
     drawWords = (): void => {
-      if (pushed) strip.done(spoken.words('goal.pushed'))
-      else strip.say(spoken.words('goal.push'))
+      if (reached) strip.done(spoken.words('goal.done'))
+      else strip.say(spoken.words(`level.${here}.goal`))
       strip.how(
         playHint({
           device: device(),
@@ -277,43 +266,77 @@ export async function play(options: PlayOptions): Promise<Play> {
     unfollowWords?.()
     unfollowWords = spoken.onChange(() => drawWords())
 
-    // Where the level file puts the crate, so "pushed" means moved from there, whatever an editor made it.
-    const startX = content.levels[content.project.start]?.things.find((thing) => thing.id === CRATE)?.x
-    // Presentation only observes: after each frame, read the crate's place from the sim and change the words.
-    const observe = (): void => {
-      if (pushed || game === undefined || startX === undefined) return
-      const crate = game.sim.query(Thing, Transform).find((entity) => entity.get(Thing).id === CRATE)
-      if (crate === undefined || Math.abs(crate.get(Transform).x - startX) <= PUSHED_TILES) return
-      pushed = true
+    // What was done for good in this visit: the next level opens with it, so a gate a button held open stays open.
+    const kept: string[] = []
+
+    /** Opens `level`, the heroes coming in as `arrive` says. A game that cannot start is a screen of words. */
+    const open = async (level: string, arrive?: Arrive): Promise<void> => {
+      let started: Game
+      try {
+        started = await start({
+          content,
+          plugins: gamePlugins,
+          mount: stage,
+          host,
+          locale: spoken,
+          frames,
+          level,
+          ...(arrive === undefined ? {} : { arrive }),
+          ...(kept.length === 0 ? {} : { facts: [...kept] }),
+        })
+      } catch (error) {
+        problem(say('page.cannot-start', WORDS.cannotStart), [{ what: reasonOf(error) }])
+        return
+      }
+      if (stopped) {
+        started.stop()
+        return
+      }
+      game = started
+      unfollowDevice?.()
+      unfollowDevice = started.input.onDevice((player, kind) => {
+        if (player !== 1) return
+        used = kind
+        drawWords()
+      })
+      stopVisit = followVisit({
+        game: started,
+        content,
+        level,
+        onDoor: (way) => void through(started, way),
+        onEntered: (entered) => {
+          here = entered
+          reached = false
+          drawWords()
+        },
+        onFact: (fact) => {
+          if (!kept.includes(fact)) kept.push(fact)
+        },
+        onGoal: () => {
+          reached = true
+          drawWords()
+        },
+      })
+      here = level
+      reached = false
       drawWords()
+      setState('playing')
     }
 
-    let started: Game
-    try {
-      started = await start({
-        content,
-        plugins: gamePlugins,
-        mount: stage,
-        host,
-        locale: spoken,
-        frames: observing(frames, observe),
-      })
-    } catch (error) {
-      problem(say('page.cannot-start', WORDS.cannotStart), [{ what: reasonOf(error) }])
-      return
+    /** A hero went through a door: the game is held still, and the level it leads to opens, with no screen between. */
+    const through = async (door: Game, way: Way): Promise<void> => {
+      door.pause()
+      door.stop()
+      stage.replaceChildren()
+      if (stopped) return
+      try {
+        await open(way.level, way.thing === undefined ? undefined : { thing: way.thing })
+      } catch (error) {
+        problem(say('page.cannot-start', WORDS.cannotStart), [{ what: reasonOf(error) }])
+      }
     }
-    if (stopped) {
-      started.stop()
-      return
-    }
-    game = started
-    unfollowDevice = started.input.onDevice((player, kind) => {
-      if (player !== 1) return
-      used = kind
-      drawWords()
-    })
-    drawWords()
-    setState('playing')
+
+    await open(here)
   }
 
   /** `begin`, with anything that goes wrong on the way shown as words. */

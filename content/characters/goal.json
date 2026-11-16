@@ -1,0 +1,13 @@
+{
+  "format": 1,
+  "id": "goal",
+  "body": "fixed",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "color": "#fdd4bd",
+  "upright": false,
+  "kind": "goal",
+  "touch": "sense"
+}

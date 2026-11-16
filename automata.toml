@@ -2,11 +2,20 @@ format = 1
 name = "Crate Game"
 start = "level-1"   # the level a new game opens
 hero = "hero"       # the character each player controls
+levels = ["level-1", "level-2", "level-3"]   # the order the levels are played in
 source = "en"       # the language the game is written in: its words are in content/messages/, and English says what each is for
 
 [[content]]
 type = "level"
 path = "content/levels/level-1.json"
+
+[[content]]
+type = "level"
+path = "content/levels/level-2.json"
+
+[[content]]
+type = "level"
+path = "content/levels/level-3.json"
 
 [[content]]
 type = "character"
@@ -15,6 +24,41 @@ path = "content/characters/hero.json"
 [[content]]
 type = "character"
 path = "content/characters/crate.json"
+
+# Plates, buttons, gates, doors and the goal: things that open, lead on or end a level. They are the framework's own parts, set in
+# the levels' files, so the game needs no code for them.
+
+[[content]]
+type = "character"
+path = "content/characters/plate.json"
+
+[[content]]
+type = "character"
+path = "content/characters/button.json"
+
+[[content]]
+type = "character"
+path = "content/characters/gate.json"
+
+[[content]]
+type = "character"
+path = "content/characters/door.json"
+
+[[content]]
+type = "character"
+path = "content/characters/goal.json"
+
+[[content]]
+type = "character"
+path = "content/characters/critter.json"
+
+[[content]]
+type = "behaviour"
+path = "content/behaviours/patrol.json"
+
+[[content]]
+type = "world"
+path = "content/world.json"
 
 # The numbers and the four controls of the hero's moves (walk, jump, double jump, wall jump, dash): the framework
 # moves the hero from them, so the game has no hero code of its own.

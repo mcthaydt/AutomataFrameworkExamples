@@ -1,0 +1,27 @@
+{
+  "format": 1,
+  "id": "plate",
+  "body": "fixed",
+  "size": {
+    "w": 1,
+    "h": 0.25
+  },
+  "color": "#8d9496",
+  "upright": false,
+  "kind": "plate",
+  "touch": "sense",
+  "values": [
+    {
+      "id": "opens",
+      "name": "Opens",
+      "type": "thing",
+      "kinds": [
+        "gate"
+      ],
+      "most": 4
+    }
+  ],
+  "switch": {
+    "opens": "opens"
+  }
+}

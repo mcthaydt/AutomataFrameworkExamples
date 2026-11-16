@@ -156,7 +156,7 @@ test('takeOver starts the level from the beginning with the controls live', asyn
   const game = made.game
   if (game === undefined) throw new Error('the game did not start')
   expect(game.sim.tick).toBe(0)
-  expect(text('.play-goal')).toBe(say('goal.push'))
+  expect(text('.play-goal')).toBe(say('level.level-1.goal'))
   expect(text('.play-how')).toBe(KEYBOARD_WORDS)
   expect(root.querySelector('.play-watching')).toBeNull()
   expect(root.querySelectorAll('canvas')).toHaveLength(1)
@@ -197,7 +197,7 @@ test('a missing recording opens the ordinary game, and says why in the console',
   const { play: made } = await watchIt({ files: { [RECORDING]: undefined } })
   expect(made.state).toBe('playing')
   expect(made.game).toBeDefined()
-  expect(text('.play-goal')).toBe(say('goal.push'))
+  expect(text('.play-goal')).toBe(say('level.level-1.goal'))
   expect(info).toHaveBeenCalledTimes(1)
   expect(String(info.mock.calls[0]?.[0])).toContain(RECORDING)
 })

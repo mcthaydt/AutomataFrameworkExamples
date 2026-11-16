@@ -73,7 +73,7 @@ test('choosing a flag and pressing Go starts the game in that language, and the 
   expect(running.game).toBeDefined()
   expect(root.querySelector('.automata-picker')).toBeNull()
   expect(document.documentElement.lang).toBe('ja')
-  expect(text('.play-goal')).toBe(say('goal.push', 'ja'))
+  expect(text('.play-goal')).toBe(say('level.level-1.goal', 'ja'))
 })
 
 test('Go does nothing until a flag is chosen', async () => {
@@ -101,7 +101,7 @@ test('a second visit with the same store never shows the picker', async () => {
   running = await play({ root, read: readTestGame(), host, frames: manualFrames(), coarse: false })
   expect(running.state).toBe('playing')
   expect(root.querySelector('.automata-picker')).toBeNull()
-  expect(text('.play-goal')).toBe(say('goal.push', 'es'))
+  expect(text('.play-goal')).toBe(say('level.level-1.goal', 'es'))
 })
 
 test("a host that already knows the player's language starts the game at once", async () => {
@@ -113,7 +113,7 @@ test("a host that already knows the player's language starts the game at once", 
     coarse: false,
   })
   expect(running.state).toBe('playing')
-  expect(text('.play-goal')).toBe(say('goal.push', 'pt'))
+  expect(text('.play-goal')).toBe(say('level.level-1.goal', 'pt'))
 })
 
 test('in watch mode the recording plays with no picker, and takeOver shows it before the game', async () => {
@@ -137,7 +137,7 @@ test('in watch mode the recording plays with no picker, and takeOver shows it be
   expect(running.watch).toBeUndefined()
   go().click()
   await vi.waitFor(() => expect(running?.state).toBe('playing'))
-  expect(text('.play-goal')).toBe(say('goal.push', 'ko'))
+  expect(text('.play-goal')).toBe(say('level.level-1.goal', 'ko'))
 })
 
 test('stop while the flags are up leaves the root empty, and the game never starts', async () => {

@@ -1,0 +1,13 @@
+{
+  "format": 1,
+  "id": "gate",
+  "body": "fixed",
+  "size": {
+    "w": 0.5,
+    "h": 8
+  },
+  "color": "#8d9496",
+  "upright": false,
+  "kind": "gate",
+  "opens": "walk-through"
+}

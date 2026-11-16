@@ -20,6 +20,35 @@
       "character": "crate",
       "x": 9.5,
       "y": 7.5
+    },
+    {
+      "id": "plate-1",
+      "character": "plate",
+      "x": 11.5,
+      "y": 7.875,
+      "values": {
+        "opens": [
+          "gate-1"
+        ]
+      }
+    },
+    {
+      "id": "gate-1",
+      "character": "gate",
+      "x": 12.75,
+      "y": 4
+    },
+    {
+      "id": "exit",
+      "character": "door",
+      "x": 14,
+      "y": 7,
+      "values": {
+        "to": {
+          "level": "level-2",
+          "thing": "door-in"
+        }
+      }
     }
   ],
   "starts": [

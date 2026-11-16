@@ -1,5 +1,5 @@
 // Pictures for a person to look at, for the drunk-grandma test: the game on a phone, a tablet and a desktop, upright
-// and sideways, the screen that says a file is broken, and the words after the crate is pushed. Nothing compares them
+// and sideways, the screen that says a file is broken, and the words after the goal is reached. Nothing compares them
 // with anything; CI copies them to the `ci-screens` branch, and the checks here are about the words, not the pixels.
 import { afterAll, afterEach, expect, test } from 'vitest'
 import { pinnedFiles } from '../fixtures/pinned-level.ts'
@@ -64,14 +64,14 @@ test('how it looks when a file is broken', async () => {
   await opened.page.screenshot({ path: `${OUT}/problem-390x844.png` })
 })
 
-test('how it looks when the crate has been pushed', async () => {
-  // The pinned level, so the crate is where the push needs it whatever an editor has done to the real level.
+test('how it looks when the goal has been reached', async () => {
+  // The pinned level, so the goal is where the run needs it whatever an editor has done to the real level.
   opened = await openGame({ size: 'phone-390x844', files: pinnedFiles })
   const { page } = opened
   await page.keyboard.down('ArrowRight')
   await untilTick(page, 180)
   await page.keyboard.up('ArrowRight')
-  expect(await page.getByText(say('goal.pushed'), { exact: true }).isVisible()).toBe(true)
+  expect(await page.getByText(say('goal.done'), { exact: true }).isVisible()).toBe(true)
   await fontsReady(page)
   await page.screenshot({ path: `${OUT}/done-390x844.png` })
 })

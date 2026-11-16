@@ -1,0 +1,20 @@
+{
+  "format": 1,
+  "id": "critter",
+  "body": "dynamic",
+  "size": {
+    "w": 1,
+    "h": 1
+  },
+  "color": "#b6bfc1",
+  "upright": true,
+  "kind": "critter",
+  "behaviour": "patrol",
+  "values": [
+    {
+      "id": "walk",
+      "name": "Walk",
+      "type": "path"
+    }
+  ]
+}
