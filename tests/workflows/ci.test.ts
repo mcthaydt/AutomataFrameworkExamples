@@ -18,15 +18,15 @@ test('every action is pinned to a commit', () => {
 test('a full run is three browsers, a draft is Chromium only, and one failing does not stop the others', () => {
   expect(ci).toContain(`engines='["chromium","webkit","firefox"]'`)
   expect(ci).toContain(`full=false engines='["chromium"]'`)
-  expect(ci).toContain('engine: ${{ fromJSON(needs.plan.outputs.engines) }}')
+  expect(ci).toContain(`engine: \${{ fromJSON(needs.plan.outputs.engines) }}`)
   expect(ci).toContain('fail-fast: false')
 })
 
 test('every browser is six shards, and the `engines` gate counts the same six', () => {
   const browsers = jobs.slice(jobs.indexOf('\n  browsers:'), jobs.indexOf('\n  engines:'))
-  expect(browsers).toContain('name: browsers (${{ matrix.engine }} ${{ matrix.shard }}/6)')
+  expect(browsers).toContain(`name: browsers (\${{ matrix.engine }} \${{ matrix.shard }}/6)`)
   expect(browsers).toContain('shard: [1, 2, 3, 4, 5, 6]')
-  expect(browsers).toContain('--shard=${{ matrix.shard }}/6')
+  expect(browsers).toContain(`--shard=\${{ matrix.shard }}/6`)
   const engines = jobs.slice(jobs.indexOf('\n  engines:'))
   expect(engines).toContain('SHARDS: 6')
   expect(engines).toContain('-eq "$SHARDS"')
