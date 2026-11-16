@@ -6,3 +6,4 @@ coverage/
 __screenshots__/
 .hashes/
 .automata/
+.vitest/
