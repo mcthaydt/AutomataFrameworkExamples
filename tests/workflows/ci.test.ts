@@ -28,8 +28,9 @@ test('every browser is six shards, and the `engines` gate counts the same six', 
   expect(browsers).toContain('shard: [1, 2, 3, 4, 5, 6]')
   expect(browsers).toContain(`--shard=\${{ matrix.shard }}/6`)
   const engines = jobs.slice(jobs.indexOf('\n  engines:'))
-  expect(engines).toContain('SHARDS: 6')
-  expect(engines).toContain('-eq "$SHARDS"')
+  expect(engines).toContain('run: node scripts/engines-gate.ts')
+  const gate = readFileSync(new URL('../../scripts/engines-gate.ts', import.meta.url), 'utf8')
+  expect(gate).toContain('export const SHARDS = 6')
 })
 
 test('each engine plays the recording in Node too and is compared with it, in that order', () => {
