@@ -37,11 +37,12 @@ this repo; a shared rule is changed there, never here.
   here; that is a settings step when the editors are deployed. The journeys that check gameplay play a level of
   their own (`tests/fixtures/pinned-level.ts`), so a content save, wherever it puts the crate, cannot turn them red.
 - **`replays/level-1.json`, `replays/level-2.json` and `replays/test-game.json` are the goldens.** All three are recorded
-  in CI, never typed. Once one holds hashes it changes only with the Owner seeing before and after. An editor never
-  writes any. The first two are the real levels' plays (level 1; levels 2 and 3, which are one place), which a content
+  in CI, never typed. This is the test game, so a golden that holds hashes moves on green under the Owner's
+  standing yes (2026-11-16), only for a change someone asked for, with the commit naming it and its before and after;
+  never re-recorded to turn a red check green. An editor never writes any. The first two are the real levels' plays (level 1; levels 2 and 3, which are one place), which a content
   edit may change without breaking CI (the check says "the content changed"); the third is a play of a game built inside
   the tests, which no edit can reach, so a change to the game's code that alters the play fails in every engine. The
-  merge session stops on a golden moved without a commit naming it, and these are the three files it watches.
+  merge session holds a golden moved without a commit naming it, and these are the three files it watches.
 - **Five build-time packages, named only in CSS.** `@fontsource/fredoka`, the rounded partners for the three languages Fredoka
   has no letters for (`@fontsource/m-plus-rounded-1c` for Japanese, `@fontsource/jua` for Korean, `@fontsource/zcool-kuaile`
   for Chinese; one weight each) and `@phosphor-icons/core` (exact versions, in `devDependencies`) give the game's own screens
