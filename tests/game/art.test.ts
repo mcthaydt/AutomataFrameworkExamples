@@ -1,4 +1,4 @@
-// The colours of the game's own art are the editors' to change (the Owner, 2026-11-14): `CLAUDE.md` says a change that
+// The colours of the game's own art are the editors' to change (the Owner, 2026-11-14): a change that
 // only touches content must pass CI, and an editor's recolour is one. So nothing here pins a colour on the real files.
 // What it holds is the rule that matters, that the hero, the crate and the ground each stand clear of the sky behind
 // them, and that the words never name a colour, so no recolour can make a word untrue. The journeys' own level, which an
