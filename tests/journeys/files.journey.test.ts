@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 import { parseContent, verifyReplay, writeContent } from '@automataframework/framework/headless'
 import { afterAll, afterEach, expect, test } from 'vitest'
 import { WORDS } from '#src/features/play/words.ts'
-import { LEVEL_FILE as LEVEL, pinnedLevel } from '../fixtures/pinned-level.ts'
+import { LEVEL_FILE as LEVEL, pinnedFiles, pinnedLevel } from '../fixtures/pinned-level.ts'
 import { closeBrowser, nodeSim, type Opened, openGame, replayOf, untilTick } from './open.ts'
 
 let opened: Opened | undefined
@@ -25,7 +25,7 @@ function levelWithCrateAt(x: number): string {
 }
 
 test('the game plays the level file it is given: a moved crate is where the file says', async () => {
-  const moved = { [LEVEL]: levelWithCrateAt(12.5) }
+  const moved = { ...pinnedFiles, [LEVEL]: levelWithCrateAt(12.5) }
   opened = await openGame({ files: moved })
   await untilTick(opened.page, 30)
   const replay = await replayOf(opened.page)
@@ -37,7 +37,7 @@ test('the game plays the level file it is given: a moved crate is where the file
 
   // And it is not the level the crate started in: the pinned level, with the crate at 9.5, does not verify it. The
   // check is against the pinned level, not the file on disk, which an editor may have put the crate at 12.5 in too.
-  const before = await nodeSim({ [LEVEL]: pinnedLevel })
+  const before = await nodeSim(pinnedFiles)
   const verdict = verifyReplay(before, replay)
   before.dispose()
   expect(verdict.ok).toBe(false)

@@ -6,7 +6,7 @@ import { userEvent } from 'vitest/browser'
 import { type Play, type PlayOptions, play, readFrom, WORDS } from '#src/features/play/play.ts'
 import { manualFrames } from '../../fixtures/frames.ts'
 import { readTestGame } from '../../fixtures/test-game.ts'
-import { LEVEL, levelWithCrate } from '../../fixtures/test-game-recording.ts'
+import { filesWithGoal, LEVEL } from '../../fixtures/test-game-recording.ts'
 import { KEYBOARD_WORDS, say } from '../../fixtures/words.ts'
 
 const FRAME = 1000 / 60
@@ -166,13 +166,13 @@ test('play fills the root (the words, then the game under them), starts the game
 
 test('the words say who you are and how to move with keys', async () => {
   await begin({ coarse: false })
-  expect(text('.play-goal')).toBe(say('goal.push'))
+  expect(text('.play-goal')).toBe(say('level.level-1.goal'))
   expect(text('.play-how')).toBe(KEYBOARD_WORDS)
 })
 
 test('on a touch screen the strip says the goal and no more: the thumbs carry their own hints', async () => {
   await begin({ coarse: true })
-  expect(text('.play-goal')).toBe(say('goal.push'))
+  expect(text('.play-goal')).toBe(say('level.level-1.goal'))
   expect(text('.play-how')).toBe('')
   expect(root.querySelector<HTMLElement>('.play-how')?.hidden).toBe(true)
 })
@@ -276,23 +276,23 @@ test('the words never sit under a touch button', async () => {
   }
 })
 
-test('pushing the crate changes the words to say so', async () => {
-  const { play: made, frames } = await begin({ files: { [LEVEL]: levelWithCrate() } })
+test('reaching the goal changes the words to say so', async () => {
+  const { play: made, frames } = await begin({ files: filesWithGoal() })
   const game = made.game
   if (game === undefined) throw new Error('the game did not start')
-  expect(text('.play-goal')).toBe(say('goal.push'))
+  expect(text('.play-goal')).toBe(say('level.level-1.goal'))
   key('keydown', 'ArrowRight')
   frames.at(0)
   run(frames, 20)
-  // Still walking towards the crate: nothing has been pushed yet.
-  expect(text('.play-goal')).toBe(say('goal.push'))
+  // Still walking towards the goal: nothing has been reached yet.
+  expect(text('.play-goal')).toBe(say('level.level-1.goal'))
   run(frames, 100)
   key('keyup', 'ArrowRight')
   expect(heroX(game)).toBeGreaterThan(14.5)
-  expect(text('.play-goal')).toBe(say('goal.pushed'))
+  expect(text('.play-goal')).toBe(say('goal.done'))
   // And it stays said.
   run(frames, 30)
-  expect(text('.play-goal')).toBe(say('goal.pushed'))
+  expect(text('.play-goal')).toBe(say('goal.done'))
 })
 
 test('the words are chalk on black paper, in the one font', async () => {
@@ -411,15 +411,15 @@ test("the keyboard's place on a button is ringed in chalk", async () => {
   expect(style.outlineOffset).toBe('2px')
 })
 
-test('pushing the crate marks the words as done', async () => {
-  const { play: made, frames } = await begin({ files: { [LEVEL]: levelWithCrate() } })
+test('reaching the goal marks the words as done', async () => {
+  const { play: made, frames } = await begin({ files: filesWithGoal() })
   if (made.game === undefined) throw new Error('the game did not start')
   expect(root.querySelector('.play-goal')?.classList.contains('play-done')).toBe(false)
   key('keydown', 'ArrowRight')
   frames.at(0)
   run(frames, 120)
   key('keyup', 'ArrowRight')
-  expect(text('.play-goal')).toBe(say('goal.pushed'))
+  expect(text('.play-goal')).toBe(say('goal.done'))
   expect(root.querySelector('.play-goal')?.classList.contains('play-done')).toBe(true)
 })
 

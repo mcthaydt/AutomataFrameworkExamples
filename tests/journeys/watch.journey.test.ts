@@ -94,7 +94,7 @@ test('a moved crate still plays, with no problem screen', async () => {
   if (!parsed.ok) throw new Error('the level did not parse')
   const moved = writeContent('level', {
     ...parsed.value,
-    things: parsed.value.things.map((thing) => (thing.id === 'crate-1' ? { ...thing, x: 12.5 } : thing)),
+    things: parsed.value.things.map((thing) => (thing.id === 'crate-1' ? { ...thing, x: 8.5 } : thing)),
   })
   opened = await openGame({ search: '?watch', files: { [LEVEL]: moved } })
   const { page, errors } = opened
@@ -109,7 +109,7 @@ test('with no recording the game opens ready to play', async () => {
   const { page } = opened
   expect(await stateOf(page)).toBe('playing')
   expect(await page.evaluate(() => window.automataWatch)).toBeUndefined()
-  expect(await page.getByText(say('goal.push'), { exact: true }).isVisible()).toBe(true)
+  expect(await page.getByText(say('level.level-1.goal'), { exact: true }).isVisible()).toBe(true)
   await untilTick(page, 5)
 })
 
@@ -127,7 +127,7 @@ test('a tap on the game takes over, from the start, and then a touch brings up t
   await page.touchscreen.tap(195, 500)
   await untilState(page, 'playing')
   expect(await watchTickOf(page)).toBe(-1)
-  expect(await page.getByText(say('goal.push'), { exact: true }).isVisible()).toBe(true)
+  expect(await page.getByText(say('level.level-1.goal'), { exact: true }).isVisible()).toBe(true)
   expect(await page.locator('canvas').count()).toBe(1)
   await page.touchscreen.tap(97, 300)
   for (const name of [THUMB_WORDS.walk, THUMB_WORDS.jump]) {

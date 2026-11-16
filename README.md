@@ -25,16 +25,18 @@ pnpm dev
 
 The first `pnpm install` takes about a minute and says little. It is downloading the framework from GitHub and
 building it. That is normal; it is not stuck. `pnpm dev` prints an address. Open it. Hold the left or right arrow key
-to move and press Space to jump; on a phone, touch the screen and use the buttons.
+to move and press Space to jump; on a phone, touch the screen and use the buttons. The game has three levels: push the
+crate onto the plate to open the gate, hop over it and go through the door; press the button in the next level and run
+right, across the edge into the third, to reach the goal.
 
-**3. Make your first change.** Open `content/levels/level-1.json`. Find `crate-1` and change its `x` to `12.5`. Then
+**3. Make your first change.** Open `content/levels/level-1.json`. Find `crate-1` and change its `x` to `8.5`. Then
 run:
 
 ```sh
 pnpm content:write
 ```
 
-and reload the page. The other box starts further along. That is the whole loop: edit a content file, write it the
+and reload the page. The crate starts nearer. That is the whole loop: edit a content file, write it the
 standard way, look. An editor makes the same change, and so can an agent.
 
 **4. Share it.** Open a pull request. The checks run the game in Chromium, WebKit and Firefox and say in plain words
@@ -46,7 +48,7 @@ what is wrong if something is.
 | --- | --- |
 | `automata.toml` | The project file: the game's name, its first level, its hero, and the content files it lists. |
 | `content/` | The game's content, JSON: the level, the characters and the words (`content/messages/`, in six languages). Only `pnpm content:write` writes these. |
-| `replays/level-1.json` | A recorded play. CI plays it back in four engines and checks they all end the same. |
+| `replays/level-1.json`, `replays/level-2.json` | Recorded plays: level 1, and levels 2 and 3 (they are one place). CI plays each back in four engines and checks they all end the same. |
 | `content/tunings/hero-moves.json` | The hero's moves: walk, jump, double jump, wall jump and dash. The framework moves the hero from these numbers and the four controls, so the game has no hero code. |
 | `src/features/plugins/` | The list of everything the game's rules are made of (empty for now: the hero is the framework's). |
 | `src/features/play/` | The page: loads the files, asks a first-time player which language to play in, starts the game, and says what to do in the strip at the top. |
@@ -99,8 +101,9 @@ In the browser's console, `window.automataWatch` is the recording that is playin
 
 ## The recording
 
-`replays/level-1.json` is the recorded play of the level. It is the repo's golden file: once it holds hashes it changes
-only when the Owner has seen the hashes before and after. It is recorded in CI and never typed. To take a new one,
+`replays/level-1.json` is the recorded play of level 1, and `replays/level-2.json` is the recorded play of levels 2 and 3,
+which are one place. They are the repo's golden files: once one holds hashes it changes only when the Owner has seen the
+hashes before and after. It is recorded in CI and never typed. To take a new one,
 delete the file, push, and commit what the Node job prints.
 
 Moving the crate (or anything else in the content) is allowed and passes CI: the check says "the content changed" and

@@ -164,15 +164,15 @@ for (const [name, size] of sizes) {
   })
 }
 
-test('at desktop-1280x720, pushing the crate says well done, with a tick', async () => {
-  // The pinned level, so the crate is where the push needs it whatever an editor has done to the real level.
+test('at desktop-1280x720, reaching the goal says well done, with a tick', async () => {
+  // The pinned level, so the goal is where the run needs it whatever an editor has done to the real level.
   opened = await openGame({ size: 'desktop-1280x720', files: pinnedFiles })
   const { page } = opened
   await page.keyboard.down('ArrowRight')
   await untilTick(page, 180)
   await page.keyboard.up('ArrowRight')
   await fontsReady(page)
-  expect(await page.getByText(say('goal.pushed'), { exact: true }).isVisible()).toBe(true)
+  expect(await page.getByText(say('goal.done'), { exact: true }).isVisible()).toBe(true)
   const goal = await page.locator('.play-goal').evaluate((p) => {
     const tick = getComputedStyle(p, '::before')
     return {

@@ -48,7 +48,7 @@ test('a device that speaks Korean opens on the Korean flag, and Go starts the ga
   await page.locator('.automata-picker-go').click()
   await untilPlaying(page)
   expect(await page.evaluate(() => document.documentElement.lang)).toBe('ko')
-  expect(await page.getByText(say('goal.push', 'ko'), { exact: true }).isVisible()).toBe(true)
+  expect(await page.getByText(say('level.level-1.goal', 'ko'), { exact: true }).isVisible()).toBe(true)
   expect(errors).toEqual([])
 })
 
@@ -62,7 +62,7 @@ test('the choice is kept across a real reload: the second visit has no flags', a
   await untilPlaying(page)
   expect(await page.locator('.automata-picker').count()).toBe(0)
   expect(await page.evaluate(() => document.documentElement.lang)).toBe('ja')
-  expect(await page.getByText(say('goal.push', 'ja'), { exact: true }).isVisible()).toBe(true)
+  expect(await page.getByText(say('level.level-1.goal', 'ja'), { exact: true }).isVisible()).toBe(true)
 })
 
 for (const [name, size] of Object.entries(SIZES) as [

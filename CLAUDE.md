@@ -36,12 +36,12 @@ this repo; a shared rule is changed there, never here.
   App to commit to `main`, which requires `check` and the three `engines` checks, it must be on `main`'s bypass list
   here; that is a settings step when the editors are deployed. The journeys that check gameplay play a level of
   their own (`tests/fixtures/pinned-level.ts`), so a content save, wherever it puts the crate, cannot turn them red.
-- **`replays/level-1.json` and `replays/test-game.json` are the goldens.** Both are recorded in CI, never typed. Once
-  one holds hashes it changes only with the Owner seeing before and after. An editor never writes either. The first
-  is the real level's play, which a content edit may change without breaking CI (the check says "the content
-  changed"); the second is a play of a game built inside the tests, which no edit can reach, so a change to the
-  game's code that alters the play fails in every engine. The merge session stops on a golden moved without a commit
-  naming it, and these are the two files it watches.
+- **`replays/level-1.json`, `replays/level-2.json` and `replays/test-game.json` are the goldens.** All three are recorded
+  in CI, never typed. Once one holds hashes it changes only with the Owner seeing before and after. An editor never
+  writes any. The first two are the real levels' plays (level 1; levels 2 and 3, which are one place), which a content
+  edit may change without breaking CI (the check says "the content changed"); the third is a play of a game built inside
+  the tests, which no edit can reach, so a change to the game's code that alters the play fails in every engine. The
+  merge session stops on a golden moved without a commit naming it, and these are the three files it watches.
 - **Five build-time packages, named only in CSS.** `@fontsource/fredoka`, the rounded partners for the three languages Fredoka
   has no letters for (`@fontsource/m-plus-rounded-1c` for Japanese, `@fontsource/jua` for Korean, `@fontsource/zcool-kuaile`
   for Chinese; one weight each) and `@phosphor-icons/core` (exact versions, in `devDependencies`) give the game's own screens
@@ -89,7 +89,7 @@ this repo; a shared rule is changed there, never here.
 ```
 automata.toml                 the project file: the game's name, its first level, its hero, its content files
 content/                      the game's content, JSON, written only by writeContent
-replays/                      recorded plays; level-1.json and test-game.json are the goldens
+replays/                      recorded plays; level-1.json, level-2.json and test-game.json are the goldens
 index.html                    the page
 src/index.ts                  the public surface: everything, for a page
 src/headless.ts               everything that needs no page: the sim side of the game
@@ -105,7 +105,7 @@ tests/framework.test.ts       the pinned framework is installed and built
 tests/features/<feature>/     mirrors src/features
 tests/lib/                    tests of src/lib
 tests/game/                   checks of the game's own files at the root
-tests/replay/                 the recorded plays (level-1.json, test-game.json), in Node and three browsers
+tests/replay/                 the recorded plays (level-1.json, level-2.json, test-game.json), in Node and three browsers
 tests/journeys/               the built page driven in a real browser, end to end
 tests/fixtures/               shared test helpers, the test game and the pinned level the journeys play
 tests/workflows/, tests/docs/ checks that read a workflow or the README

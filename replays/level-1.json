@@ -3,9 +3,9 @@
   "framework": "0.1.0",
   "tickHz": 60,
   "seed": 1,
-  "contentHash": "b3dc48a2a42d105d",
-  "schemaHash": "c1f0deb33f7e1fe0",
-  "ticks": 360,
+  "contentHash": "caf07387ada0e639",
+  "schemaHash": "dd63800de0f585a1",
+  "ticks": 240,
   "commands": [
     {
       "tick": 10,
@@ -19,9 +19,18 @@
       }
     },
     {
-      "tick": 200,
+      "tick": 88,
       "source": 1,
       "seq": 1,
+      "type": "controls",
+      "payload": {
+        "held": []
+      }
+    },
+    {
+      "tick": 120,
+      "source": 1,
+      "seq": 2,
       "type": "controls",
       "payload": {
         "held": [
@@ -29,59 +38,22 @@
           "right"
         ]
       }
-    },
-    {
-      "tick": 260,
-      "source": 1,
-      "seq": 2,
-      "type": "controls",
-      "payload": {
-        "held": []
-      }
-    },
-    {
-      "tick": 300,
-      "source": 1,
-      "seq": 3,
-      "type": "controls",
-      "payload": {
-        "held": [
-          "left"
-        ]
-      }
-    },
-    {
-      "tick": 340,
-      "source": 1,
-      "seq": 4,
-      "type": "controls",
-      "payload": {
-        "held": []
-      }
     }
   ],
   "checks": [
     {
       "tick": 60,
-      "hash": "a054e7abdb12ad37"
+      "hash": "a9f7d8c512584e61"
     },
     {
       "tick": 120,
-      "hash": "ac7ef13ba1231e8d"
+      "hash": "cfa03ad749f09b32"
     },
     {
       "tick": 180,
-      "hash": "c0a0701e0e734476"
-    },
-    {
-      "tick": 240,
-      "hash": "1a1bcfef6dc19011"
-    },
-    {
-      "tick": 300,
-      "hash": "f0f696651c5c4f3e"
+      "hash": "b38df595e8463fe4"
     }
   ],
-  "finalHash": "abf065d7fe710d42",
+  "finalHash": "3adc9ac637d0a266",
   "meta": {}
 }

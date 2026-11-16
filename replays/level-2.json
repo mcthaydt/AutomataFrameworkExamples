@@ -1,0 +1,49 @@
+{
+  "format": 2,
+  "framework": "0.1.0",
+  "tickHz": 60,
+  "seed": 1,
+  "contentHash": "caf07387ada0e639",
+  "schemaHash": "5fb1707ad49864c7",
+  "ticks": 330,
+  "commands": [
+    {
+      "tick": 10,
+      "source": 1,
+      "seq": 0,
+      "type": "controls",
+      "payload": {
+        "held": [
+          "right"
+        ]
+      }
+    }
+  ],
+  "checks": [
+    {
+      "tick": 60,
+      "hash": "81f3df52f51845dd"
+    },
+    {
+      "tick": 120,
+      "hash": "7bfdd3ba5d722f9f"
+    },
+    {
+      "tick": 180,
+      "hash": "ffd92c4267936aad"
+    },
+    {
+      "tick": 240,
+      "hash": "4c5a0db61f88254c"
+    },
+    {
+      "tick": 300,
+      "hash": "cafa90754d7c149a"
+    }
+  ],
+  "finalHash": "ff5067bc5047bda3",
+  "meta": {
+    "level": "level-2",
+    "players": "1"
+  }
+}
