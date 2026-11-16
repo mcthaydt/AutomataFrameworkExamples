@@ -1,12 +1,12 @@
 # Progress
 
-Last updated: 2026-11-16 17:27 UTC (from `date`).
+Last updated: 2026-11-16 22:25 UTC (from `date`).
 
 ## Active milestone: the World slice (roadmap slice 3)
 
 ### Current work
 
-- Installing the new workflow and its CI gate (this repo's setup pull request).
+- E4 (the crate's "How heavy") is in a draft pull request: the pin moves to framework `3ab6e72` (F4 #205 and F5 #207), and both real levels' recordings move.
 
 ### Completed outcomes
 
@@ -25,7 +25,7 @@ Last updated: 2026-11-16 17:27 UTC (from `date`).
 
 ### Blockers
 
-- E4 waits for the framework's F4 and F5.
+None.
 
 ### Previews
 

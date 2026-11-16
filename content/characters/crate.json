@@ -7,5 +7,18 @@
     "h": 1
   },
   "color": "#afd472",
-  "upright": false
+  "upright": false,
+  "values": [
+    {
+      "id": "heavy",
+      "name": "How heavy",
+      "about": "How hard the crate is to push.",
+      "type": "number",
+      "least": 0.5,
+      "most": 16,
+      "step": 0.5,
+      "default": 1
+    }
+  ],
+  "weight": "heavy"
 }
