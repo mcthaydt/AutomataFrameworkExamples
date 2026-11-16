@@ -13,30 +13,23 @@ afterEach(async () => {
 })
 afterAll(closeBrowser)
 
-/** The first hero's box on the canvas, in CSS pixels: `x` and `w`. */
-const heroBox = (page: Opened['page']): Promise<{ x: number; w: number }> =>
+/** Where the first hero is, in tiles, read from the game's own snapshot (the one entity that has a player). */
+const heroX = (page: Opened['page']): Promise<number> =>
   page.evaluate(() => {
-    const box = window.automataGame?.heroes()[0]
-    return { x: box?.x ?? Number.NaN, w: box?.w ?? Number.NaN }
+    const game = window.automataGame
+    const hero = game?.sim.describeSnapshot().entities.find((entity) => 'player' in entity.components)
+    const at = hero?.components.transform as { x: number } | undefined
+    return at?.x ?? Number.NaN
   })
 
-/** The hero is 0.8 tiles wide, and stands at x 2.5 when level 1 opens: so a box's tile is read from how far it has moved. */
-const HERO_TILES = 0.8
-const START_X = 2.5
-
-/**
- * Waits until the first hero has walked to `x` tiles in level 1 (the camera of a level with no view never moves, so the
- * distance in pixels from where the hero started, over the pixels of a tile, is the distance in tiles).
- */
-async function untilHeroAt(page: Opened['page'], x: number, from: { x: number; w: number }): Promise<void> {
-  const tile = from.w / HERO_TILES
-  await page.waitForFunction(
-    ([start, size, wanted, begin]) => {
-      const box = window.automataGame?.heroes()[0]
-      return box !== undefined && (begin ?? 0) + (box.x - (start ?? 0)) / (size ?? 1) >= (wanted ?? 0)
-    },
-    [from.x, tile, x, START_X],
-  )
+/** Waits until the first hero has walked to `x` tiles. */
+async function untilHeroAt(page: Opened['page'], x: number): Promise<void> {
+  await page.waitForFunction((wanted) => {
+    const game = window.automataGame
+    const hero = game?.sim.describeSnapshot().entities.find((entity) => 'player' in entity.components)
+    const at = hero?.components.transform as { x: number } | undefined
+    return at !== undefined && at.x >= wanted
+  }, x)
 }
 
 const saysGoal = (page: Opened['page'], level: string): Promise<void> =>
@@ -46,11 +39,11 @@ test('the whole game: the plate, the gate, the door, the way back that stays shu
   opened = await openGame()
   const { page, errors } = opened
   await saysGoal(page, 'level-1')
-  const start = await heroBox(page)
+  expect(await heroX(page)).toBeCloseTo(2.5, 1)
 
   // Push the crate two tiles onto the plate, and let go as it lands: the gate opens and stays open while it is there.
   await page.keyboard.down('ArrowRight')
-  await untilHeroAt(page, 9.7, start)
+  await untilHeroAt(page, 10)
   await page.keyboard.up('ArrowRight')
   await untilTick(page, (await tickOf(page)) + 12)
 
