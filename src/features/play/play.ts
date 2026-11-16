@@ -326,6 +326,9 @@ export async function play(options: PlayOptions): Promise<Play> {
     /** A hero went through a door: the game is held still, and the level it leads to opens, with no screen between. */
     const through = async (door: Game, way: Way): Promise<void> => {
       door.pause()
+      // The hero went through during a step: let the frame finish with its sim before the game is stopped, or the rest
+      // of the frame would use a sim that is gone.
+      await Promise.resolve()
       door.stop()
       stage.replaceChildren()
       if (stopped) return
