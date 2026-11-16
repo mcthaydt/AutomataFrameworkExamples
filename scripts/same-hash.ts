@@ -6,7 +6,7 @@ import { describeDifference, type EngineHashes } from '#src/lib/same-hash.ts'
 
 const engines = process.argv.slice(2)
 /** The recorded plays: level 1's hashes are in `<engine>.json`, and each later one in `<engine>.<name>.json`. */
-const plays = ['', 'level-2']
+const plays = ['', 'level-2', 'heavy']
 
 for (const play of plays) {
   const runs: EngineHashes[] = []
