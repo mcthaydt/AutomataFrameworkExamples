@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-11-16 17:16 UTC (from `date`).
+Last updated: 2026-11-16 17:27 UTC (from `date`).
 
 ## Active milestone: the World slice (roadmap slice 3)
 
@@ -26,3 +26,13 @@ Last updated: 2026-11-16 17:16 UTC (from `date`).
 ### Blockers
 
 - E4 waits for the framework's F4 and F5.
+
+### Previews
+
+- CI's pictures: the `ci-screens` branch. The game as people see it: https://automataframework.pages.dev.
+
+### Material decisions
+
+- The Owner's, 2026-11-16: this is the test game, so a golden that moves for an asked-for change merges on green with a
+  before-and-after note.
+- The Owner's: "How heavy" is the thing's Rapier mass (the framework's F4), which E4 depends on.

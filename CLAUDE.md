@@ -9,7 +9,7 @@ anything new, is the owner's call.
 
 ## Stack and checks
 
-- Stack: TypeScript, strict; pnpm workspaces; Node 24. PixiJS 8 for drawing; Koota (ECS) for the sim; `@dimforge/rapier2d-deterministic` 0.21.0 for physics; Zod as the one schema language; Svelte 5 where noted below; Paraglide for words. Vite, Vitest 5 (Node, Chromium, WebKit, Firefox browser modes), Playwright 1.63 journeys, Biome, knip. GitHub-hosted CI; the framework installed as a git dependency pinned to a commit.
+- Stack: TypeScript, strict; pnpm; Node 24. The framework as a git dependency pinned to a commit (it brings PixiJS, Koota and Rapier; the game imports only the framework). Vite, Vitest 5 (Node, Chromium, WebKit, Firefox browser modes), Playwright 1.63 journeys, Biome, knip; Fredoka and its three partner fonts and Phosphor icons at build time. GitHub-hosted CI.
 - Install: `pnpm install --frozen-lockfile`
 - Lint: `pnpm lint && pnpm knip`
 - Typecheck: `pnpm typecheck`
@@ -317,7 +317,7 @@ Change a number or a model here and nowhere else.
 
 ## This repo
 
-What is particular to this repo, kept from its earlier notes.
+What is particular to this repo, kept from its earlier notes and the 2026-11-16 handoff.
 
 - **The game is at the root:** `automata.toml` (the project file), the content files it lists under `content/`, the
   game's code under `src/`, and one recorded play in `replays/`.
