@@ -79,3 +79,20 @@ test('a broken file is named in words', async () => {
     'content/levels/level-1.json: This file is not valid JSON. Check for a missing comma, quote or bracket.',
   ])
 })
+
+test('the crate has a real "How heavy", and its weight is that value', async () => {
+  const crate = (await loadTheGame()).characters.crate
+  expect(crate?.weight).toBe('heavy')
+  expect(crate?.values).toEqual([
+    {
+      id: 'heavy',
+      name: 'How heavy',
+      about: 'How hard the crate is to push.',
+      type: 'number',
+      least: 0.5,
+      most: 16,
+      step: 0.5,
+      default: 1,
+    },
+  ])
+})
