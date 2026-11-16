@@ -84,12 +84,13 @@ test('two doors lead between level 1 and level 2, each to a thing that is there'
   ])
 })
 
-test('level 2 and level 3 join along an edge into one place, and level 1 is a place of its own', async () => {
+test('level 2 and level 3 join along an edge into one place, and level 1 joins nothing', async () => {
   const game = await loadTheGame()
   const places = Object.values(game.places ?? {}).map((levels) => levels.map((l) => l.level).sort())
   const together = places.find((levels) => levels.includes('level-2'))
   expect(together).toEqual(['level-2', 'level-3'])
-  expect(places.find((levels) => levels.includes('level-1'))).toEqual(['level-1'])
+  // `places` holds only the places of two levels or more: a level that joins nothing is in none.
+  expect(places.find((levels) => levels.includes('level-1'))).toBeUndefined()
   expect(game.worlds?.world?.levels).toEqual([
     { level: 'level-1', at: { x: 0, y: 0 } },
     { level: 'level-2', at: { x: 20, y: 0 } },
