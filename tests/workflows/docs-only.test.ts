@@ -83,3 +83,13 @@ test('every job that tests is left out of a docs-only run, so no skipped job wea
   }
   expect(job('plan')).toContain("'skipped '")
 })
+
+// The quick run's engines (the Owner, 2026-11-16): a draft runs Chromium only; the run that gates merge runs all three
+// browsers, so the proof that every engine plays the same stays in it.
+test('a draft runs Chromium only, and a ready pull request or a `full-tests` draft runs all three browsers', () => {
+  expect(plan(['src/index.ts'])).toMatchObject({ engines: '["chromium"]' })
+  expect(plan(['src/index.ts'], { draft: false })).toMatchObject({ engines: '["chromium","webkit","firefox"]' })
+  expect(plan(['src/index.ts'], { labels: 'full-tests' })).toMatchObject({
+    engines: '["chromium","webkit","firefox"]',
+  })
+})

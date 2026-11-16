@@ -75,13 +75,14 @@ this repo; a shared rule is changed there, never here.
 - **Branches:** the editors' save branches (`automata/<login>`) do not count toward the five (the Owner, 2026-11-13):
   this repo is our test game, and the editors are a product for other teams' repos. The editors' notes branch,
   `automata/notes` (holding `automata.notes.toml`), is allowed too, and does not count either.
-- **Fast CI here.** A draft runs the Node tests the change reaches; the recorded plays in every engine, whole, since
-  they are short and are the proof that every engine plays the same; the journeys in Chromium only, and only when what
-  the page is made of changed (`src/`, `content/`, `replays/`, the page, `public/`, the journeys), stopping at the
-  first failure; the pictures journey only when something seen changed (a `.css` file, the words, the page, the art)
-  or the pull request has the `screenshots` label (`pictures` still works). `pnpm-workspace.yaml` also counts as build
-  setup. The docs-only path never covers the README. The full run's shards are `browsers (<engine> <n>/2)`, with
-  `engines (<engine>)` checks.
+- **Fast CI here.** A draft runs Chromium only (the Owner, 2026-11-16): WebKit and Firefox, and so the recorded plays
+  in every engine (the proof that every engine plays the same), run in the full run that gates merge. A draft runs the
+  Node tests the change reaches, the recorded plays in Chromium, and the journeys, only when what the page is made of
+  changed (`src/`, `content/`, `replays/`, the page, `public/`, the journeys), stopping at the first failure; the
+  pictures journey only when something seen changed (a `.css` file, the words, the page, the art) or the pull request
+  has the `screenshots` label (`pictures` still works). The game is one screen, so there is no narrower set of
+  pictures. `pnpm-workspace.yaml` also counts as build setup. The docs-only path never covers the README. The full
+  run's 18 shards are `browsers (<engine> <n>/6)`, with `engines (<engine>)` checks (the gate counts six each).
 
 ## Structure
 
