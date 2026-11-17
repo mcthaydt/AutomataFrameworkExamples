@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { expect, test } from 'vitest'
 
 // The workflow only runs on GitHub, so these checks read its text.
@@ -57,4 +57,23 @@ test('no job may write to the repository, and nothing pushes a branch', () => {
   expect(jobs).not.toContain('contents: write')
   expect(jobs).not.toContain('git push')
   expect(jobs).not.toContain('\n  screens:')
+})
+
+// CLAUDE.md: no flag that lets an empty suite pass in CI. A run that finds no tests must fail, so a typo in a path or
+// a filter can never turn a check green by testing nothing.
+test('no script lets a run that finds no tests pass', () => {
+  const { scripts } = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')) as {
+    scripts: Record<string, string>
+  }
+  for (const [name, command] of Object.entries(scripts))
+    expect(command, name).not.toMatch(/pass-?with-?no-?tests/i)
+})
+
+// Without that flag a shard with no journey fails, so every one of the six needs at least one, even on a run that
+// leaves the pictures journey out.
+test('there are enough journeys that none of the six shards is empty, the pictures journey left out', () => {
+  const journeys = readdirSync(new URL('../journeys/', import.meta.url)).filter(
+    (name) => name.endsWith('.journey.test.ts') && name !== 'pictures.journey.test.ts',
+  )
+  expect(journeys.length).toBeGreaterThanOrEqual(6)
 })
