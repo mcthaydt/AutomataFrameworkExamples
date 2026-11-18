@@ -88,7 +88,7 @@ git status --short
 
 A step that breaks or flakes is fixed in this skill first. Each known way a start or a step fails, what it looks like, and the fix:
 
-- `ERR_PNPM_FETCH_403` from `codeload.github.com` on `pnpm install`: the framework tarball is blocked in this container. The `if` branch in "Start it" is the fix; do not change the lockfile or the pin.
+- `ERR_PNPM_FETCH_403` from `codeload.github.com` on `pnpm install`: the framework tarball is blocked in this container. It happens when the session does not have `mcthaydt/AutomataFramework` attached, and the `if` branch in "Start it" covers it with no extra access; do not change the lockfile or the pin, and do not attach anything with push.
 - `vite: not found` on `pnpm build`: the install failed and nothing was installed; read the install's error first.
 - Port 4173 already taken (`strictPort`): a server from an earlier run is still up; run the stop commands, then start again.
 - The page shows the picker, not the game, and a script waits for `#game[data-state="playing"]`: a new browser has chosen no language, so press **Go** first, as the script does.
