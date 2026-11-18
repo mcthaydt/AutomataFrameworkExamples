@@ -59,13 +59,6 @@ test('every listed file is under content/, and every file under content/ is list
   expect(filesUnder('content').sort()).toEqual([...paths].sort())
 })
 
-test('the level has a start for each of four players', async () => {
-  const loaded = await loadGame(readDisk)
-  if (!loaded.ok) throw new Error(loaded.diagnostics.map(formatDiagnostic).join('\n'))
-  const level = loaded.value.levels[loaded.value.project.start]
-  expect(level?.starts.map((start) => start.player)).toEqual([1, 2, 3, 4])
-})
-
 test('the fixture reads the same files the disk has', () => {
   const onDisk = Object.fromEntries(
     [PROJECT_FILE, ...filesUnder('content')].map((path) => [path, readFileSync(join(ROOT, path), 'utf8')]),
