@@ -9,7 +9,7 @@ The test game ("Crate Game"): push the crate onto the plate in a browser game bu
 
 ## Start it
 
-From a clean checkout in a cloud container, in order. First pick the Node version (or other runtime) that `engines` in `package.json` asks for. Then install, build, and start every stand-in for an outside service (a database, payments, mail, sign-in), never the real one.
+From a clean checkout in a cloud container, in order. Run each block below as one script (one Bash tool call, or saved to a file and run with `bash`), not line by line in an interactive shell: `|| exit 1` stops the script at the first failed step, and would close an interactive shell. First pick the Node version (or other runtime) that `engines` in `package.json` asks for. Then install, build, and start every stand-in for an outside service (a database, payments, mail, sign-in), never the real one.
 
 ```sh
 export PATH=/opt/node24/bin:$PATH && node -v
@@ -30,13 +30,13 @@ for i in $(seq 1 60); do curl -sf -o /dev/null http://127.0.0.1:4173/ && break; 
 curl -sf -o /dev/null http://127.0.0.1:4173/ && echo "ready: $(git rev-parse --short HEAD)"
 ```
 
-It works in a fresh clone of the checkout under the scratchpad (`$WORK/repo`), because `git clean -xfd` may be refused in a container, and only the committed files are used, so commit first. The framework is a git dependency pinned to a commit, and its tarball comes from `codeload.github.com`. In a container where that host answers 403 ("GitHub access to this repository is not enabled for this session"), the first `pnpm install` fails and the `if` branch builds the framework from the same commit with `git` instead, installs from that copy, keeps that copy in `$WORK/framework` (about 600 MB), and puts `package.json` and `pnpm-lock.yaml` back in the clone. Your own checkout is never touched. `node server.ts` is the online room's server; the player's first screen does not need it.
+It works in a fresh clone of the checkout in `$WORK/repo`, where `$WORK` is `${TMPDIR:-/tmp}/examples-verify` (`/tmp/examples-verify` when `TMPDIR` is unset, as in a cloud container); only the screenshots go to the scratchpad. It uses a clone because `git clean -xfd` may be refused in a container, and only the committed files are used, so commit first. The framework is a git dependency pinned to a commit, and its tarball comes from `codeload.github.com`. In a container where that host answers 403 ("GitHub access to this repository is not enabled for this session"), the first `pnpm install` fails and the `if` branch builds the framework from the same commit with `git` instead, installs from that copy, keeps that copy in `$WORK/framework` (about 600 MB), and puts `package.json` and `pnpm-lock.yaml` back in the clone. Your own checkout is never touched. `node server.ts` is the online room's server; the player's first screen does not need it.
 
-It is ready when `curl` gets the page from `http://127.0.0.1:4173/` (the start commands end with that check). Last clean start, timed with `date` before and after: about 14 seconds with the three sizes driven, 13 to 20 seconds in fresh runs (clone, framework build, install, build, the preview answering; measured 02:09:44 to 02:09:58 UTC), on commit 075225a.
+It is ready when `curl` gets the page from `http://127.0.0.1:4173/` (the start commands end with that check). Last clean starts, timed with `date` before and after (clone, framework build, install, build, the preview answering): 21.5 seconds cold, the first start in a new container, and 14.0 and 13.2 seconds warm, on commit 1959b32.
 
 ## Drive it
 
-Open it in a real browser: the Chromium and Playwright the container already has (`require('playwright')`, then `chromium.launch()`), at each size in the device matrix in Settings. Tap, click, type and press keys the way a person would, and find things by their label or role. Take a screenshot at deviceScaleFactor 1 for your own check, and save it in the scratchpad, never in the repo. The main screen, what it shows and how to use it:
+Open it in a real browser: the Chromium and Playwright the container already has (`require('playwright')`, then `chromium.launch()`), at each size in the device matrix in Settings. The sizes come from `SIZES` in `tests/journeys/open.ts` (phone 390x844, tablet 820x1180, computer 1280x720); if they differ from the script below, that file wins. Tap, click, type and press keys the way a person would, and find things by their label or role. Take a screenshot at deviceScaleFactor 1 for your own check, and save it in the scratchpad, never in the repo. The main screen, what it shows and how to use it:
 
 The first screen is the language picker: six flags and a **Go** button under "Play in English" (English is already chosen from the device). Press **Go** and the game opens: a dark page with the words "Push the crate onto the plate" on top (on a computer, also "Arrow keys to move. Space to jump. Shift to dash."), one canvas below with the crate, the plate and the walls, and two thumbs and a dash button on a touch screen. `#game` has `data-state="playing"` once the game runs. Save this as `drive.cjs` in the scratchpad and run it with `NODE_PATH="$WORK/repo/node_modules" node <scratchpad>/drive.cjs <scratchpad>` (Node 24); it shows the picker and the game at a phone, a tablet and a computer size and prints any console error:
 
@@ -79,12 +79,14 @@ One line each, from a person's side: where it starts, the steps, and what they s
 Stop every server it started and clear what it wrote, so the next run starts clean.
 
 ```sh
+WORK="${TMPDIR:-/tmp}/examples-verify"
+cd "$(git -C "$WORK/repo" remote get-url origin)" || exit 1
 pkill -f "vite preview" || true
-rm -rf "${TMPDIR:-/tmp}/examples-verify"
+rm -rf "$WORK"
 git status --short
 ```
 
-`git status --short`, run in your own checkout, prints nothing: the run never wrote there. The clone, the framework copy, `node_modules`, `dist` and the server log all lived in `examples-verify`, and are gone.
+The `cd` goes back to your own checkout (the clone's `origin`) before the clone is deleted, so `git status --short` runs there and prints nothing: the run never wrote there. The clone, the framework copy, `node_modules`, `dist` and the server log all lived in `examples-verify`, and are gone.
 
 ## When it breaks
 
