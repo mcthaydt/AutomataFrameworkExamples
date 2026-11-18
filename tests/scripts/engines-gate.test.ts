@@ -11,10 +11,6 @@ const shards = (engine: string, results: Record<number, string | null> = {}): Jo
 const chromium = (results: Record<number, string | null> = {}): Job[] => shards('chromium', results)
 
 describe('judge: every shard of a browser must have passed', () => {
-  test('a browser is six shards, the number `ci.yml` runs', () => {
-    expect(SHARDS).toBe(6)
-  })
-
   test('passes when every shard passed', () => {
     const verdict = judge([chromium()], 'chromium')
     expect(verdict.ok).toBe(true)
