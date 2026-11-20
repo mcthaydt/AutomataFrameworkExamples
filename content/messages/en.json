@@ -13,6 +13,7 @@
     "page.cannot-start": "This game could not start in this browser. Try another browser.",
     "page.problem-fix": "Fix the file named above, then load this page again.",
     "page.problem-title": "This game has a problem and cannot start.",
+    "players.touch": "On a touch screen, one person plays. For two players, use a keyboard or gamepads.",
     "watch.click": "The game is playing by itself. Click it to play.",
     "watch.tap": "The game is playing by itself. Tap it to play."
   }

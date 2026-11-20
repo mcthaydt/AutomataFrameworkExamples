@@ -24,6 +24,17 @@
   --automata-picker-radius: 2px;
   --automata-picker-font: 600 22px / 1.2 var(--label);
 
+  /* What the framework's own screens read (its eight `--automata-ui-*` properties): the "Add a player" screen is a
+     panel of the same paper and chalk on a dimmed level, with Done in peach red. */
+  --automata-ui-background: var(--paper);
+  --automata-ui-color: var(--chalk);
+  --automata-ui-border: 1px solid var(--chalk);
+  --automata-ui-radius: 2px;
+  --automata-ui-font: 600 18px / 1.3 var(--label);
+  --automata-ui-accent: var(--marker);
+  --automata-ui-accent-color: var(--paper);
+  --automata-ui-scrim: color-mix(in srgb, var(--paper) 80%, transparent);
+
   position: relative;
   display: flex;
   flex-direction: column;
@@ -111,7 +122,13 @@
 /* The strip: inside the safe area, never taking a touch meant for the game. The buttons are at the bottom of the stage,
    so the words are never under one. A chalk line along its bottom edge is where the game begins. */
 .play-words {
+  position: relative;
   flex: none;
+  /* Tall enough for the people button even with one line of words, the words in the middle of it. */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 60px;
   box-sizing: border-box;
   padding: max(8px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 8px
     max(14px, env(safe-area-inset-left));
@@ -167,6 +184,58 @@ body:has(#game[data-state="watching"]) {
   -webkit-mask-position: center;
   -webkit-mask-size: contain;
   -webkit-mask-repeat: no-repeat;
+}
+
+/* The people button: a 44 px chalk-edged square at the strip's right end, a picture of two people and no word (its name
+   is spoken, and shown on hover). The strip itself lets every touch through to the game; this one button takes its own. */
+.play-words .play-people {
+  position: absolute;
+  top: 50%;
+  right: max(8px, env(safe-area-inset-right));
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  padding: 0;
+  border: 1px solid var(--chalk);
+  border-radius: 2px;
+  background: var(--paper);
+  color: var(--chalk);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.play-words .play-people::before {
+  content: "";
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin: auto;
+  background: currentColor;
+  mask: url("@phosphor-icons/core/assets/regular/users-three.svg") center / contain no-repeat;
+  -webkit-mask: url("@phosphor-icons/core/assets/regular/users-three.svg") center / contain no-repeat;
+}
+
+.play-words .play-people:active {
+  background: var(--marker);
+  color: var(--paper);
+}
+
+.play-words .play-people:focus-visible {
+  outline: 3px solid var(--chalk);
+  outline-offset: 2px;
+}
+
+/* The words stay clear of the button on both sides, so the line stays centred and never runs under it. */
+.play-words p {
+  padding: 0 52px;
+}
+
+/* The "Add a player" screen, over the whole game. */
+.play-players {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
 }
 
 /* "Well done": a tick before the words, on the same line. */

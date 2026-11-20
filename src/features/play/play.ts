@@ -33,6 +33,7 @@ import './play.css'
 import type { Mode } from './mode.ts'
 import { whileSeen } from './seen.ts'
 import { createStrip, type Strip } from './strip.ts'
+import { createTogether, type Together } from './together.ts'
 import { listenToTakeOver, loadRecording, takeOverKeys } from './watching.ts'
 import { followVisit } from './ways.ts'
 import { GAME_ID, WORDS } from './words.ts'
@@ -133,6 +134,7 @@ export async function play(options: PlayOptions): Promise<Play> {
   let picker: { destroy(): void } | undefined
   let unfollowDevice: (() => void) | undefined
   let stopVisit: (() => void) | undefined
+  let together: Together | undefined
 
   const setState = (next: PlayState): void => {
     state = next
@@ -163,6 +165,7 @@ export async function play(options: PlayOptions): Promise<Play> {
     unfollowLanguage?.()
     unfollowDevice?.()
     stopVisit?.()
+    together?.destroy()
     game?.stop()
     root.replaceChildren()
     root.classList.remove('play-root')
@@ -250,21 +253,40 @@ export async function play(options: PlayOptions): Promise<Play> {
     let used: ReturnType<Input['device']> | undefined
     const device = (): ReturnType<Input['device']> => used ?? (coarse ? 'touch' : 'keyboard')
     const dash = content.characters[content.project.hero]?.moves?.dash === true
+    // A sentence the people button asked the second line to say instead of how to move, until the level changes.
+    let told: string | undefined
+    together?.destroy()
+    together = createTogether({
+      strip: words,
+      over: root,
+      locale: spoken,
+      game: () => game,
+      touch: () => device() === 'touch',
+      tell: (text) => {
+        told = text
+        drawWords()
+      },
+    })
+    const people = together
     drawWords = (): void => {
       if (reached) strip.done(spoken.words('goal.done'))
       else strip.say(spoken.words(`level.${here}.goal`))
       strip.how(
-        playHint({
-          device: device(),
-          first: (action) => game?.input.inputsFor(1, action)[0],
-          dash,
-          words: spoken.words,
-        }),
+        told ??
+          playHint({
+            device: device(),
+            first: (action) => game?.input.inputsFor(1, action)[0],
+            dash,
+            words: spoken.words,
+          }),
       )
     }
     drawWords()
     unfollowWords?.()
-    unfollowWords = spoken.onChange(() => drawWords())
+    unfollowWords = spoken.onChange(() => {
+      people.relabel()
+      drawWords()
+    })
 
     // What was done for good in this visit: the next level opens with it, so a gate a button held open stays open.
     const kept: string[] = []
@@ -281,6 +303,8 @@ export async function play(options: PlayOptions): Promise<Play> {
           locale: spoken,
           frames,
           level,
+          // Everyone who joined comes through the door too. One player is the game's default, so it is not said.
+          ...(people.players().length > 1 ? { players: people.players() } : {}),
           ...(arrive === undefined ? {} : { arrive }),
           ...(kept.length === 0 ? {} : { facts: [...kept] }),
         })
@@ -293,6 +317,7 @@ export async function play(options: PlayOptions): Promise<Play> {
         return
       }
       game = started
+      people.seat(started)
       unfollowDevice?.()
       unfollowDevice = started.input.onDevice((player, kind) => {
         if (player !== 1) return
@@ -306,6 +331,7 @@ export async function play(options: PlayOptions): Promise<Play> {
         onDoor: (way) => void through(started, way),
         onEntered: (entered) => {
           here = entered
+          told = undefined
           reached = false
           drawWords()
         },
@@ -319,6 +345,7 @@ export async function play(options: PlayOptions): Promise<Play> {
       })
       here = level
       reached = false
+      told = undefined
       drawWords()
       setState('playing')
     }
