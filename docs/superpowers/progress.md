@@ -1,6 +1,6 @@
 # Progress
 
-Last updated: 2026-11-17 03:58 UTC (from `date`).
+Last updated: 2026-11-20 14:56 UTC (from `date`).
 
 ## Active milestone: the World slice (roadmap slice 3)
 
@@ -18,6 +18,10 @@ Last updated: 2026-11-17 03:58 UTC (from `date`).
 
 ### Completed outcomes
 
+- The website demo's part of the test game is merged: #81 as `f551ea3` (2026-11-20, reviewed head `c002f6d`, three
+  review cycles): one or two players, player 2's hero in blue, the world map part. The recorded plays of level 1 and
+  level 2 moved; the Owner saw the before and after and chose "Merge both" (decision card, 2026-11-20 07:39 UTC, with
+  Site #63). The Site shows it live. Left as a note: no word says whose colour is whose.
 - E1, the framework pin moves to `19aaa73` (#58). E2 and E3, three levels, a door and an edge, the page follows doors,
   the plays recorded (#59). CI: 18 browser shards (#60), the engines gate retries (#61).
 
@@ -28,8 +32,7 @@ Last updated: 2026-11-17 03:58 UTC (from `date`).
   `weight: "heavy"`. It moves the pin to a commit with F4, F5 and Plan Q (framework #189 to #191), and the crate's
   play, so `replays/level-1.json` moves: merges on green under the standing yes, with a before-and-after note. Tell
   the Site its crate numbers changed.
-- The website demo uses World: E2 and E3 built the levels and the door; the world map part and the Site picking it up
-  are left (the earlier attempt was #41, closed).
+- The website demo uses World: done (#81, and Site #63).
 
 ### Blockers
 
