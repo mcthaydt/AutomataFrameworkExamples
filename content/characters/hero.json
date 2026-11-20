@@ -8,6 +8,7 @@
   },
   "color": "#f37f94",
   "upright": true,
+  "figure": "hero",
   "moves": {
     "tuning": "hero-moves",
     "double-jump": true,

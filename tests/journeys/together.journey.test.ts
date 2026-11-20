@@ -5,7 +5,7 @@
 // played by its own keys; the journey waits on its tick and its state, never on a sleep.
 import { frameworkWords } from '@automataframework/framework/headless'
 import { afterAll, afterEach, expect, test } from 'vitest'
-import { say } from '../fixtures/words.ts'
+import { KEYBOARD_WORDS, type PlayerInputs, say, twoPlayerWords } from '../fixtures/words.ts'
 import { closeBrowser, type Opened, openGame, tickOf, untilTick } from './open.ts'
 
 let opened: Opened | undefined
@@ -33,6 +33,27 @@ const heroes = (page: Opened['page']): Promise<Record<number, number>> =>
 const playersOf = (page: Opened['page']): Promise<readonly number[]> =>
   page.evaluate(() => [...(window.automataGame?.players() ?? [])])
 
+// Each player's own keys once the keyboard is shared, and a gamepad's first inputs, written out here.
+const LETTERS: PlayerInputs = {
+  device: 'keyboard',
+  first: { left: 'KeyA', right: 'KeyD', jump: 'KeyW', dash: 'ShiftLeft' },
+}
+const ARROWS: PlayerInputs = {
+  device: 'keyboard',
+  first: { left: 'ArrowLeft', right: 'ArrowRight', jump: 'ArrowUp', dash: 'ShiftRight' },
+}
+const WHOLE_KEYBOARD: PlayerInputs = {
+  device: 'keyboard',
+  first: { left: 'ArrowLeft', right: 'ArrowRight', jump: 'Space', dash: 'ShiftLeft' },
+}
+const PAD: PlayerInputs = {
+  device: 'gamepad',
+  first: { left: 'dpad-left', right: 'dpad-right', jump: 'south', dash: 'west' },
+}
+
+/** The strip's second line, where it says how to move. */
+const howTo = (page: Opened['page']): Promise<string | null> => page.locator('.play-how').textContent()
+
 const saysGoal = (page: Opened['page'], level: string): Promise<void> =>
   page.getByText(say(`level.${level}.goal`), { exact: true }).waitFor({ state: 'visible' })
 
@@ -51,9 +72,10 @@ test('two on one keyboard: add a player, share the keys, and both go on through 
   await page.getByRole('button', { name: framework('automata.players.done'), exact: true }).click()
   await page.getByText(framework('automata.players.title'), { exact: true }).waitFor({ state: 'detached' })
 
-  // Back in the level, the game runs again and player 2's hero has come in.
+  // Back in the level, the game runs again and player 2's hero has come in, and the strip says each player's own keys.
   await untilTick(page, (await tickOf(page)) + 10)
   expect(await playersOf(page)).toEqual([1, 2])
+  expect(await howTo(page)).toBe(twoPlayerWords([LETTERS, ARROWS]))
   const before = await heroes(page)
   expect(Object.keys(before)).toEqual(['1', '2'])
 
@@ -81,6 +103,7 @@ test('two on one keyboard: add a player, share the keys, and both go on through 
   // door) and not player 1.
   await untilTick(page, (await tickOf(page)) + 30)
   expect(await playersOf(page)).toEqual([1, 2])
+  expect(await howTo(page)).toBe(twoPlayerWords([LETTERS, ARROWS]))
   const arrived = await heroes(page)
   await page.keyboard.down('ArrowRight')
   await untilTick(page, (await tickOf(page)) + 20)
@@ -88,6 +111,49 @@ test('two on one keyboard: add a player, share the keys, and both go on through 
   const after = await heroes(page)
   expect(after[2]).toBeGreaterThan((arrived[2] ?? Number.NaN) + 0.5)
   expect(after[1]).toBeCloseTo(arrived[1] ?? Number.NaN, 1)
+  expect(errors).toEqual([])
+})
+
+test('a second player joins with a gamepad: the strip says player 1 keeps the keyboard and player 2 has the pad', async () => {
+  opened = await openGame()
+  const { page, errors } = opened
+  // One standard gamepad, its bottom button held down while the page says so.
+  await page.addInitScript(() => {
+    const held = { south: false }
+    ;(window as unknown as { pressSouth(down: boolean): void }).pressSouth = (down) => {
+      held.south = down
+    }
+    const pad = () => ({
+      id: 'Stand-in pad',
+      index: 0,
+      connected: true,
+      mapping: 'standard',
+      timestamp: performance.now(),
+      axes: [0, 0, 0, 0],
+      buttons: Array.from({ length: 17 }, (_, i) => ({
+        pressed: i === 0 && held.south,
+        touched: i === 0 && held.south,
+        value: i === 0 && held.south ? 1 : 0,
+      })),
+    })
+    Object.defineProperty(navigator, 'getGamepads', { value: () => [pad(), null, null, null] })
+  })
+  await page.reload()
+  await saysGoal(page, 'level-1')
+  await untilTick(page, 5)
+  expect(await howTo(page)).toBe(KEYBOARD_WORDS)
+
+  await page.getByRole('button', { name: ADD, exact: true }).click()
+  await page.getByText(framework('automata.players.in', { player: 1 }), { exact: true }).waitFor()
+  const press = (down: boolean) =>
+    page.evaluate((d) => (window as unknown as { pressSouth(down: boolean): void }).pressSouth(d), down)
+  await press(true)
+  await page.getByText(framework('automata.players.in', { player: 2 }), { exact: true }).waitFor()
+  await press(false)
+  await page.getByRole('button', { name: framework('automata.players.done'), exact: true }).click()
+  await untilTick(page, (await tickOf(page)) + 10)
+  expect(await playersOf(page)).toEqual([1, 2])
+  expect(await howTo(page)).toBe(twoPlayerWords([WHOLE_KEYBOARD, PAD]))
   expect(errors).toEqual([])
 })
 

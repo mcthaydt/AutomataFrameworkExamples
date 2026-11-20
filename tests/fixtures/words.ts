@@ -44,3 +44,31 @@ export const THUMB_WORDS: { readonly walk: string; readonly jump: string; readon
   jump: frameworkWords('en')('automata.thumbs.jump'),
   dash: say('controls.dash'),
 }
+
+/** One player's own inputs, as a test writes them down: the device and the first input of each action. */
+export interface PlayerInputs {
+  readonly device: 'keyboard' | 'gamepad'
+  readonly first: Readonly<Record<string, string>>
+}
+
+/**
+ * The second line of the strip once two play: each player's number with the words about their own keys or gamepad,
+ * from the game's `players.hint` sentence and the framework's `playHint`.
+ */
+export function twoPlayerWords(players: readonly PlayerInputs[]): string {
+  return players
+    .map((inputs, i) =>
+      say('players.hint')
+        .replace('{player}', String(i + 1))
+        .replace(
+          '{hint}',
+          playHint({
+            device: inputs.device,
+            first: (action) => inputs.first[action],
+            dash: true,
+            words: frameworkWords('en'),
+          }),
+        ),
+    )
+    .join(' ')
+}

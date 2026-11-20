@@ -15,3 +15,16 @@ export function readFrom(base: string | URL): (path: string) => Promise<string> 
     return response.text()
   }
 }
+
+/**
+ * A `readPicture` for the game's painted pictures (`content/figures/hero.png`): the same fetch beside `base`, giving the
+ * picture's bytes. Rejects, naming the path, for a missing picture or a web page in its place, as `readFrom` does.
+ */
+export function picturesFrom(base: string | URL): (path: string) => Promise<Blob> {
+  return async (path) => {
+    const response = await fetch(new URL(path, base))
+    const type = response.headers.get('content-type') ?? ''
+    if (!response.ok || type.toLowerCase().startsWith('text/html')) throw new Error(`${path}: no such file`)
+    return response.blob()
+  }
+}

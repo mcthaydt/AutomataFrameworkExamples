@@ -5,8 +5,10 @@
 // editor cannot reach, holds the sky and ground it wears (`pinned-level.test.ts`).
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { artFiles, artProblems, formatDiagnostic } from '@automataframework/framework/headless'
 import { expect, test } from 'vitest'
 import { WORDS } from '#src/features/play/words.ts'
+import { loadTheGame } from '../fixtures/game-files.ts'
 import { messagesOf } from '../fixtures/words.ts'
 
 const colourOf = (character: string): string => {
@@ -62,4 +64,41 @@ test('the hero, the crate and the ground each stand clear of the sky: 3 to 1 at 
     ['the ground', ground],
   ] as const)
     expect(contrast(colour, sky), `${name} on the sky`).toBeGreaterThanOrEqual(3)
+})
+
+/** The hero's figure, read from its file: the paints and the variants (player 2 wears the first). */
+const heroFigure = (): {
+  paints: { id: string; color: string }[]
+  variants?: { id: string; paints: { id: string; color: string }[] }[]
+} => {
+  const hero = JSON.parse(
+    readFileSync(join(import.meta.dirname, '..', '..', 'content', 'characters', 'hero.json'), 'utf8'),
+  ) as { figure?: string }
+  expect(hero.figure, 'the hero is drawn from a figure').toBeDefined()
+  return JSON.parse(
+    readFileSync(join(import.meta.dirname, '..', '..', 'content', 'figures', `${hero.figure}.json`), 'utf8'),
+  )
+}
+
+test('two heroes can be told apart: player 2 is lighter or darker than player 1, not only another hue, and clear of the sky', () => {
+  const { sky } = levelColours()
+  const figure = heroFigure()
+  const one = figure.paints.find((paint) => paint.id === 'body')?.color ?? ''
+  const two = figure.variants?.[0]?.paints.find((paint) => paint.id === 'body')?.color ?? ''
+  expect(one, "player 1's hero is the hero's own colour").toBe(colourOf('hero'))
+  expect(contrast(one, two), "player 1's hero beside player 2's").toBeGreaterThanOrEqual(1.5)
+  expect(contrast(two, sky), "player 2's hero on the sky").toBeGreaterThanOrEqual(3)
+})
+
+test('the pictures the figures paint are in the game, as `automata art` paints them now', async () => {
+  const content = await loadTheGame()
+  expect(artFiles(content).length, 'the hero has a picture').toBeGreaterThan(0)
+  const problems = await artProblems(content, async (path) => {
+    try {
+      return new Uint8Array(readFileSync(join(import.meta.dirname, '..', '..', path)))
+    } catch {
+      return undefined
+    }
+  })
+  expect(problems.map(formatDiagnostic)).toEqual([])
 })

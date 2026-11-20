@@ -1,8 +1,16 @@
-// The page's script: starts the game in #game. The game's files (`automata.toml` and the content it lists) are read
-// beside the page, so the same build works from any path. With `?watch` in the address the game first plays its own
+// The page's script: starts the game in #game. The game's files (`automata.toml`, the content it lists and the pictures
+// its figures paint) are read beside the page, so the same build works from any path. With `?watch` in the address the game first plays its own
 // recording, and a page that frames it can tell it to play (see `features/play/handover.ts`).
 import type { Game, Watch } from '@automataframework/framework'
-import { listenForPlay, modeOf, type Play, play, readFrom, tellParent } from './features/play/play.ts'
+import {
+  listenForPlay,
+  modeOf,
+  type Play,
+  picturesFrom,
+  play,
+  readFrom,
+  tellParent,
+} from './features/play/play.ts'
 
 declare global {
   interface Window {
@@ -30,6 +38,7 @@ Object.defineProperty(window, 'automataWatch', { get: () => running?.watch, conf
 running = await play({
   root,
   read: readFrom(new URL('./', location.href)),
+  readPicture: picturesFrom(new URL('./', location.href)),
   mode: modeOf(location.search),
   // The page that frames the game knows three states. Choosing a language is the game's own screen, so it is `playing`.
   onState: (state) => tellParent(window, state === 'picking' ? 'playing' : state),

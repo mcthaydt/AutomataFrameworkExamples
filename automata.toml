@@ -22,6 +22,13 @@ path = "content/levels/level-3.json"
 type = "character"
 path = "content/characters/hero.json"
 
+# The hero's picture: one block in the hero's colour, and a second colour for player 2's hero, so two players can tell
+# which is theirs.
+
+[[content]]
+type = "figure"
+path = "content/figures/hero.json"
+
 [[content]]
 type = "character"
 path = "content/characters/crate.json"

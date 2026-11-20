@@ -3,8 +3,8 @@
   "framework": "0.1.0",
   "tickHz": 60,
   "seed": 1,
-  "contentHash": "79ff6ae3df1090da",
-  "schemaHash": "127c43afa9ee0f8f",
+  "contentHash": "63a3653adc3af27c",
+  "schemaHash": "7c0b185116c78fc1",
   "ticks": 330,
   "commands": [
     {
@@ -22,26 +22,26 @@
   "checks": [
     {
       "tick": 60,
-      "hash": "b9bba96851813b17"
+      "hash": "7a3678a2bd5923ac"
     },
     {
       "tick": 120,
-      "hash": "57dcf53f8fae20b4"
+      "hash": "9ba67cf0eedbfbd0"
     },
     {
       "tick": 180,
-      "hash": "b102df4db930c764"
+      "hash": "13b01bc875907288"
     },
     {
       "tick": 240,
-      "hash": "89eeb30f18a07138"
+      "hash": "10e2719199674254"
     },
     {
       "tick": 300,
-      "hash": "5f1198a47b3a4d12"
+      "hash": "600b0f37dd23d965"
     }
   ],
-  "finalHash": "26ae98fee6c696f6",
+  "finalHash": "49bf3166aa28db40",
   "meta": {
     "level": "level-2",
     "players": "1"

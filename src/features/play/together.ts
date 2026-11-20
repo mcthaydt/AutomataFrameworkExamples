@@ -28,6 +28,10 @@ export interface TogetherOptions {
   readonly touch: () => boolean
   /** Says the touch sentence in the strip's second line, or puts the usual words back with `undefined`. */
   readonly tell: (text: string | undefined) => void
+  /** How many can play this game at once: the project's `players`. */
+  readonly most: number
+  /** Someone joined, or the screen closed: the strip says again who plays with what. */
+  readonly changed: () => void
 }
 
 /** The people button in `strip`; it opens the "Add a player" screen in `over`. */
@@ -63,15 +67,20 @@ export function createTogether(options: TogetherOptions): Together {
       layer.className = 'play-players'
       over.append(layer)
     }
+    // With everyone in, the screen says so and points at Done; the keyboard is offered no more.
+    const full = 1 + joined.size >= options.most
     const keyboardIsFree = ![...joined.values()].includes('keyboard')
     const canShare =
-      keyboardIsFree && Object.values(game.input.controls()).every((control) => control.shared !== undefined)
+      !full &&
+      keyboardIsFree &&
+      Object.values(game.input.controls()).every((control) => control.shared !== undefined)
+    const said = refused ?? (full ? locale.words('players.full') : undefined)
     shown = playersScreen({
       mount: layer,
       locale,
       players: [1, ...joined.keys()].sort((a, b) => a - b),
       canShare,
-      ...(refused === undefined ? {} : { refused }),
+      ...(said === undefined ? {} : { refused: said }),
       invite: (onPad) => game.input.invite(onPad),
       onJoin: (claim) => {
         const answer = game.addPlayer(claim)
@@ -81,11 +90,13 @@ export function createTogether(options: TogetherOptions): Together {
         }
         joined.set(answer.player, claim)
         draw(game)
+        options.changed()
       },
       onDone: () => {
         close()
         game.resume()
         button.focus()
+        options.changed()
       },
     })
   }

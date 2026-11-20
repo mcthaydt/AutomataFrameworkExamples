@@ -1,0 +1,28 @@
+{
+  "frames": {
+    "idle": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 10
+      }
+    },
+    "player-2/idle": {
+      "frame": {
+        "x": 8,
+        "y": 0,
+        "w": 8,
+        "h": 10
+      }
+    }
+  },
+  "meta": {
+    "image": "hero.png",
+    "size": {
+      "w": 16,
+      "h": 10
+    },
+    "scale": "1"
+  }
+}
