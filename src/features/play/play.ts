@@ -281,7 +281,8 @@ export async function play(options: PlayOptions): Promise<Play> {
       const hint = (
         kind: ReturnType<Input['device']>,
         first: (action: string) => string | undefined,
-      ): string => playHint({ device: kind, first, dash, words: spoken.words })
+        shift?: 'left' | 'right',
+      ): string => playHint({ device: kind, first, dash, words: shiftSaid(spoken.words, shift) })
       strip.how(
         told ??
           (playing.length < 2 || game === undefined || device() === 'touch'
@@ -289,7 +290,10 @@ export async function play(options: PlayOptions): Promise<Play> {
             : playing
                 .map((player) => {
                   const own = inputsOf(game as Game, player)
-                  return spoken.words('players.hint', { player, hint: hint(own.kind, own.first) })
+                  return spoken.words('players.hint', {
+                    player,
+                    hint: hint(own.kind, own.first, own.shift),
+                  })
                 })
                 .join(' ')),
       )
@@ -478,7 +482,11 @@ export async function play(options: PlayOptions): Promise<Play> {
 function inputsOf(
   game: Game,
   player: number,
-): { kind: ReturnType<Input['device']>; first: (action: string) => string | undefined } {
+): {
+  kind: ReturnType<Input['device']>
+  first: (action: string) => string | undefined
+  shift?: 'left' | 'right'
+} {
   const devices = game.input.seats().find((seat) => seat.player === player)?.devices ?? []
   const pads = devices.some((device) => device.startsWith('pad-'))
   const keyboard = devices.find((device) => device.startsWith('keyboard'))
@@ -497,5 +505,18 @@ function inputsOf(
     if (keyboard === 'keyboard-2') return control.shared?.[1][0]
     return control.keys[0]
   }
-  return { kind, first }
+  // Each half of a shared keyboard has one Shift of its own, and the framework calls both "Shift": say which.
+  const half = keyboard === 'keyboard-1' ? 0 : keyboard === 'keyboard-2' ? 1 : undefined
+  if (kind !== 'keyboard' || half === undefined) return { kind, first }
+  const keys = Object.values(controls).flatMap((control) => control.shared?.[half] ?? [])
+  const left = keys.includes('ShiftLeft')
+  const right = keys.includes('ShiftRight')
+  return left === right ? { kind, first } : { kind, first, shift: left ? 'left' : 'right' }
+}
+
+/** `words`, with the framework's one word for Shift said as the game's left or right Shift when `side` is given. */
+function shiftSaid(words: Locale['words'], side: 'left' | 'right' | undefined): Locale['words'] {
+  if (side === undefined) return words
+  return ((key: string, values?: Parameters<Locale['words']>[1]) =>
+    key === 'automata.key.shift' ? words(`keys.shift-${side}`) : words(key, values)) as Locale['words']
 }

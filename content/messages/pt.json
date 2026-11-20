@@ -4,6 +4,8 @@
   "messages": {
     "controls.dash": "Arrancada",
     "goal.done": "Você chegou ao objetivo. Muito bem!",
+    "keys.shift-left": "Shift esquerdo",
+    "keys.shift-right": "Shift direito",
     "level.level-1.goal": "Empurre a caixa para cima da placa",
     "level.level-1.name": "Nível 1",
     "level.level-2.goal": "Aperte o botão e corra para a direita",

@@ -33,14 +33,17 @@ const heroes = (page: Opened['page']): Promise<Record<number, number>> =>
 const playersOf = (page: Opened['page']): Promise<readonly number[]> =>
   page.evaluate(() => [...(window.automataGame?.players() ?? [])])
 
-// Each player's own keys once the keyboard is shared, and a gamepad's first inputs, written out here.
+// Each player's own keys once the keyboard is shared (each half with its own Shift), and a gamepad's first inputs,
+// written out here.
 const LETTERS: PlayerInputs = {
   device: 'keyboard',
   first: { left: 'KeyA', right: 'KeyD', jump: 'KeyW', dash: 'ShiftLeft' },
+  shift: 'left',
 }
 const ARROWS: PlayerInputs = {
   device: 'keyboard',
   first: { left: 'ArrowLeft', right: 'ArrowRight', jump: 'ArrowUp', dash: 'ShiftRight' },
+  shift: 'right',
 }
 const WHOLE_KEYBOARD: PlayerInputs = {
   device: 'keyboard',

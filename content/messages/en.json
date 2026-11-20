@@ -4,6 +4,8 @@
   "messages": {
     "controls.dash": "Dash",
     "goal.done": "You reached the goal. Well done!",
+    "keys.shift-left": "Left Shift",
+    "keys.shift-right": "Right Shift",
     "level.level-1.goal": "Push the crate onto the plate",
     "level.level-1.name": "Level 1",
     "level.level-2.goal": "Press the button, then run right",

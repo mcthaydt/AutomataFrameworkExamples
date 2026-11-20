@@ -4,6 +4,8 @@
   "messages": {
     "controls.dash": "ダッシュ",
     "goal.done": "ゴールにさわれました。よくできました！",
+    "keys.shift-left": "左Shift",
+    "keys.shift-right": "右Shift",
     "level.level-1.goal": "箱を板の上まで押しましょう",
     "level.level-1.name": "レベル1",
     "level.level-2.goal": "ボタンを押してから右へ走りましょう",

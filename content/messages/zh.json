@@ -4,6 +4,8 @@
   "messages": {
     "controls.dash": "冲刺",
     "goal.done": "你到达了终点。真棒！",
+    "keys.shift-left": "左Shift",
+    "keys.shift-right": "右Shift",
     "level.level-1.goal": "把箱子推到踏板上",
     "level.level-1.name": "第1关",
     "level.level-2.goal": "按下按钮，然后向右跑",

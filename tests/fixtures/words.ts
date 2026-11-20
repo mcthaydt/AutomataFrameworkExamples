@@ -49,6 +49,8 @@ export const THUMB_WORDS: { readonly walk: string; readonly jump: string; readon
 export interface PlayerInputs {
   readonly device: 'keyboard' | 'gamepad'
   readonly first: Readonly<Record<string, string>>
+  /** On a shared keyboard each half has its own Shift, and the words say which: the game's `keys.shift-<side>`. */
+  readonly shift?: 'left' | 'right'
 }
 
 /**
@@ -66,9 +68,19 @@ export function twoPlayerWords(players: readonly PlayerInputs[]): string {
             device: inputs.device,
             first: (action) => inputs.first[action],
             dash: true,
-            words: frameworkWords('en'),
+            words: sideOfShift(inputs.shift),
           }),
         ),
     )
     .join(' ')
+}
+
+/** The framework's words, with its one word for Shift said as the game's left or right Shift when `side` is given. */
+function sideOfShift(side: 'left' | 'right' | undefined): ReturnType<typeof frameworkWords> {
+  const words = frameworkWords('en')
+  if (side === undefined) return words
+  return ((key: string, values?: Record<string, unknown>) =>
+    key === 'automata.key.shift' ? say(`keys.shift-${side}`) : words(key, values as never)) as ReturnType<
+    typeof frameworkWords
+  >
 }

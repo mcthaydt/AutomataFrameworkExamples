@@ -4,6 +4,8 @@
   "messages": {
     "controls.dash": "Impulso",
     "goal.done": "Llegaste a la meta. ¡Muy bien!",
+    "keys.shift-left": "Mayús izquierda",
+    "keys.shift-right": "Mayús derecha",
     "level.level-1.goal": "Empuja la caja sobre la placa",
     "level.level-1.name": "Nivel 1",
     "level.level-2.goal": "Pulsa el botón y corre a la derecha",

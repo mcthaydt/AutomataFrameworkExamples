@@ -4,6 +4,8 @@
   "messages": {
     "controls.dash": "대시",
     "goal.done": "목표에 닿았어요. 잘했어요!",
+    "keys.shift-left": "왼쪽 Shift",
+    "keys.shift-right": "오른쪽 Shift",
     "level.level-1.goal": "상자를 판 위로 밀어 보세요",
     "level.level-1.name": "1단계",
     "level.level-2.goal": "버튼을 누른 다음 오른쪽으로 달려 보세요",
