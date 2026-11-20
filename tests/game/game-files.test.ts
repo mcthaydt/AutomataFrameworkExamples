@@ -3,6 +3,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
+  artFiles,
   type ContentType,
   formatDiagnostic,
   loadGame,
@@ -53,15 +54,21 @@ test('every content file is written the one standard way', async () => {
   }
 })
 
-test('every listed file is under content/, and every file under content/ is listed', () => {
+test('every listed file is under content/, and every file under content/ is listed or painted from one that is', async () => {
   const paths = listed().map((entry) => entry.path)
   expect(paths.every((path) => path.startsWith('content/'))).toBe(true)
-  expect(filesUnder('content').sort()).toEqual([...paths].sort())
+  // A figure's picture and atlas sit beside it, as `automata art` paints them (`art.test.ts` checks they are current).
+  const painted = artFiles(await loadTheGame()).map((file) => file.path)
+  expect(filesUnder('content').sort()).toEqual([...paths, ...painted].sort())
 })
 
-test('the fixture reads the same files the disk has', () => {
+test('the fixture reads the same text files the disk has', () => {
+  // The fixture reads text; a painted picture (`.png`) is bytes, which only `art.test.ts` reads.
   const onDisk = Object.fromEntries(
-    [PROJECT_FILE, ...filesUnder('content')].map((path) => [path, readFileSync(join(ROOT, path), 'utf8')]),
+    [PROJECT_FILE, ...filesUnder('content').filter((path) => path.endsWith('.json'))].map((path) => [
+      path,
+      readFileSync(join(ROOT, path), 'utf8'),
+    ]),
   )
   expect(gameFiles).toEqual(onDisk)
 })
