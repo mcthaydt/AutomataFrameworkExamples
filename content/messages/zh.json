@@ -4,6 +4,8 @@
   "messages": {
     "controls.dash": "冲刺",
     "goal.done": "你到达了终点。真棒！",
+    "keys.shift-left": "左Shift",
+    "keys.shift-right": "右Shift",
     "level.level-1.goal": "把箱子推到踏板上",
     "level.level-1.name": "第1关",
     "level.level-2.goal": "按下按钮，然后向右跑",
@@ -13,6 +15,9 @@
     "page.cannot-start": "这个浏览器无法启动游戏。请换一个浏览器试试。",
     "page.problem-fix": "请修好上面列出的文件，然后重新加载此页面。",
     "page.problem-title": "这个游戏有问题，无法启动。",
+    "players.full": "两个玩家都加入了。按完成开始玩。",
+    "players.hint": "玩家{player}：{hint}",
+    "players.touch": "触屏上只能一个人玩。两个人玩，请用键盘或手柄。",
     "watch.click": "游戏正在自己玩。点击一下就可以自己玩了。",
     "watch.tap": "游戏正在自己玩。点一下就可以自己玩了。"
   }

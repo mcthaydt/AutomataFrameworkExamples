@@ -1,6 +1,7 @@
-// Copies the game's own files into `dist/` beside the built page, at the same paths: `automata.toml` and every file
-// it lists. The page fetches them at run time, so an editor's change to a content file needs no new build of the
-// page's code. Run by `pnpm build` after Vite.
+// Copies the game's own files into `dist/` beside the built page, at the same paths: `automata.toml`, every file
+// it lists, and the picture and atlas each figure or backdrop file is painted into (`automata art`), beside it. The
+// page fetches them at run time, so an editor's change to a content file needs no new build of the page's code. Run
+// by `pnpm build` after Vite.
 import { existsSync } from 'node:fs'
 import { copyFile, mkdir, readFile } from 'node:fs/promises'
 import { dirname } from 'node:path'
@@ -18,7 +19,11 @@ if (!project.ok) {
   process.exit(1)
 }
 
-for (const path of [PROJECT_FILE, ...project.value.content.map((entry) => entry.path)]) {
+const painted = project.value.content
+  .filter((entry) => entry.type === 'figure' || entry.type === 'backdrop')
+  .flatMap((entry) => [entry.path.replace(/\.json$/, '.png'), entry.path.replace(/\.json$/, '.atlas.json')])
+  .filter((path) => existsSync(new URL(path, root)))
+for (const path of [PROJECT_FILE, ...project.value.content.map((entry) => entry.path), ...painted]) {
   const target = new URL(path, out)
   await mkdir(dirname(target.pathname), { recursive: true })
   await copyFile(new URL(path, root), target)

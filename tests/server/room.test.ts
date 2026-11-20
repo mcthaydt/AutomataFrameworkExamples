@@ -5,6 +5,7 @@
 import {
   type Command,
   controlsCommand,
+  coopSeats,
   createGameSim,
   type Joined,
   joinSession,
@@ -50,7 +51,10 @@ const script = (seat: number, tick: number): Command[] => {
 
 async function makeSim(): Promise<Sim> {
   const { content, plugins } = await serverGame()
-  const sim = await createGameSim({ content, plugins, players: [1, 2] })
+  // The game is for two players together, so its room is a co-op room: its sims, the room's and each player's, start
+  // with nobody, and each hero comes by the sim's own join when its seat is taken (the framework's `coopSeats`).
+  expect(coopSeats(content.project, content.levels['level-1']?.starts ?? [])).toBe(2)
+  const sim = await createGameSim({ content, plugins, players: [] })
   sims.push(sim)
   return sim
 }

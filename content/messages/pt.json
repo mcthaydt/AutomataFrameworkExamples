@@ -4,6 +4,8 @@
   "messages": {
     "controls.dash": "Arrancada",
     "goal.done": "Você chegou ao objetivo. Muito bem!",
+    "keys.shift-left": "Shift esquerdo",
+    "keys.shift-right": "Shift direito",
     "level.level-1.goal": "Empurre a caixa para cima da placa",
     "level.level-1.name": "Nível 1",
     "level.level-2.goal": "Aperte o botão e corra para a direita",
@@ -13,6 +15,9 @@
     "page.cannot-start": "Este jogo não pôde começar neste navegador. Tente outro navegador.",
     "page.problem-fix": "Corrija o arquivo indicado acima e carregue esta página de novo.",
     "page.problem-title": "Este jogo tem um problema e não pode começar.",
+    "players.full": "Os dois jogadores já entraram. Aperte Pronto para jogar.",
+    "players.hint": "Jogador {player}: {hint}",
+    "players.touch": "Na tela de toque, joga uma pessoa. Para dois jogadores, use um teclado ou controles.",
     "watch.click": "O jogo está jogando sozinho. Clique nele para jogar.",
     "watch.tap": "O jogo está jogando sozinho. Toque nele para jogar."
   }

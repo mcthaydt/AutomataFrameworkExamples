@@ -33,13 +33,14 @@ import './play.css'
 import type { Mode } from './mode.ts'
 import { whileSeen } from './seen.ts'
 import { createStrip, type Strip } from './strip.ts'
+import { createTogether, type Together } from './together.ts'
 import { listenToTakeOver, loadRecording, takeOverKeys } from './watching.ts'
 import { followVisit } from './ways.ts'
 import { GAME_ID, WORDS } from './words.ts'
 
 export { listenForPlay, PLAY_MESSAGE, tellParent } from './handover.ts'
 export { modeOf } from './mode.ts'
-export { readFrom } from './read.ts'
+export { picturesFrom, readFrom } from './read.ts'
 export { createStrip, type Strip } from './strip.ts'
 export { GAME_ID, WORDS } from './words.ts'
 
@@ -49,6 +50,8 @@ export type PlayState = 'loading' | 'picking' | 'watching' | 'playing' | 'proble
 export interface PlayOptions {
   readonly root: HTMLElement
   readonly read: (path: string) => Promise<string>
+  /** Fetches the game's painted pictures, like `content/figures/hero.png`. A game with a figure cannot start without it. */
+  readonly readPicture?: (path: string) => Promise<Blob>
   /** Default `webHost()`. */
   readonly host?: Host
   /** Default: the page's animation frames. */
@@ -112,6 +115,7 @@ const lineOf = (d: Diagnostic): ProblemLine => ({
 /** Loads the game through `read` and starts it in `root`. Never rejects: anything that goes wrong is a screen of words. */
 export async function play(options: PlayOptions): Promise<Play> {
   const { root, read, host = webHost(), start = startGame, mode = 'play', watch = watchReplay } = options
+  const pictures = options.readPicture === undefined ? {} : { readPicture: options.readPicture }
   const coarse = options.coarse ?? window.matchMedia('(pointer: coarse)').matches
   const frames = options.frames ?? pageFrames
   let state: PlayState = 'loading'
@@ -133,6 +137,7 @@ export async function play(options: PlayOptions): Promise<Play> {
   let picker: { destroy(): void } | undefined
   let unfollowDevice: (() => void) | undefined
   let stopVisit: (() => void) | undefined
+  let together: Together | undefined
 
   const setState = (next: PlayState): void => {
     state = next
@@ -163,6 +168,7 @@ export async function play(options: PlayOptions): Promise<Play> {
     unfollowLanguage?.()
     unfollowDevice?.()
     stopVisit?.()
+    together?.destroy()
     game?.stop()
     root.replaceChildren()
     root.classList.remove('play-root')
@@ -250,21 +256,54 @@ export async function play(options: PlayOptions): Promise<Play> {
     let used: ReturnType<Input['device']> | undefined
     const device = (): ReturnType<Input['device']> => used ?? (coarse ? 'touch' : 'keyboard')
     const dash = content.characters[content.project.hero]?.moves?.dash === true
+    // A sentence the people button asked the second line to say instead of how to move, until the level changes.
+    let told: string | undefined
+    together?.destroy()
+    together = createTogether({
+      strip: words,
+      over: root,
+      locale: spoken,
+      game: () => game,
+      touch: () => device() === 'touch',
+      tell: (text) => {
+        told = text
+        drawWords()
+      },
+      most: content.project.players ?? 1,
+      changed: () => drawWords(),
+    })
+    const people = together
     drawWords = (): void => {
       if (reached) strip.done(spoken.words('goal.done'))
       else strip.say(spoken.words(`level.${here}.goal`))
+      // Who has a seat now: a player who has just joined has one only once the game has let them in.
+      const playing = game?.input.seats().map((seat) => seat.player) ?? [1]
+      const hint = (
+        kind: ReturnType<Input['device']>,
+        first: (action: string) => string | undefined,
+        shift?: 'left' | 'right',
+      ): string => playHint({ device: kind, first, dash, words: shiftSaid(spoken.words, shift) })
       strip.how(
-        playHint({
-          device: device(),
-          first: (action) => game?.input.inputsFor(1, action)[0],
-          dash,
-          words: spoken.words,
-        }),
+        told ??
+          (playing.length < 2 || game === undefined || device() === 'touch'
+            ? hint(device(), (action) => game?.input.inputsFor(1, action)[0])
+            : playing
+                .map((player) => {
+                  const own = inputsOf(game as Game, player)
+                  return spoken.words('players.hint', {
+                    player,
+                    hint: hint(own.kind, own.first, own.shift),
+                  })
+                })
+                .join(' ')),
       )
     }
     drawWords()
     unfollowWords?.()
-    unfollowWords = spoken.onChange(() => drawWords())
+    unfollowWords = spoken.onChange(() => {
+      people.relabel()
+      drawWords()
+    })
 
     // What was done for good in this visit: the next level opens with it, so a gate a button held open stays open.
     const kept: string[] = []
@@ -276,11 +315,14 @@ export async function play(options: PlayOptions): Promise<Play> {
         started = await start({
           content,
           plugins: gamePlugins,
+          ...pictures,
           mount: stage,
           host,
           locale: spoken,
           frames,
           level,
+          // Everyone who joined comes through the door too. One player is the game's default, so it is not said.
+          ...(people.players().length > 1 ? { players: people.players() } : {}),
           ...(arrive === undefined ? {} : { arrive }),
           ...(kept.length === 0 ? {} : { facts: [...kept] }),
         })
@@ -293,12 +335,18 @@ export async function play(options: PlayOptions): Promise<Play> {
         return
       }
       game = started
+      people.seat(started)
       unfollowDevice?.()
-      unfollowDevice = started.input.onDevice((player, kind) => {
-        if (player !== 1) return
-        used = kind
+      const unfollowKind = started.input.onDevice((player, kind) => {
+        if (player === 1) used = kind
         drawWords()
       })
+      // A player joining, or a gamepad coming or going, changes who holds which keys: the strip says it again.
+      const unfollowSeats = started.input.onSeats(() => drawWords())
+      unfollowDevice = () => {
+        unfollowKind()
+        unfollowSeats()
+      }
       stopVisit = followVisit({
         game: started,
         content,
@@ -306,6 +354,7 @@ export async function play(options: PlayOptions): Promise<Play> {
         onDoor: (way) => void through(started, way),
         onEntered: (entered) => {
           here = entered
+          told = undefined
           reached = false
           drawWords()
         },
@@ -319,6 +368,7 @@ export async function play(options: PlayOptions): Promise<Play> {
       })
       here = level
       reached = false
+      told = undefined
       drawWords()
       setState('playing')
     }
@@ -361,6 +411,7 @@ export async function play(options: PlayOptions): Promise<Play> {
       watching = await watch({
         content,
         plugins: gamePlugins,
+        ...pictures,
         mount: stage,
         host: looking,
         frames,
@@ -420,4 +471,52 @@ export async function play(options: PlayOptions): Promise<Play> {
     // `loadGame` reports a bad file as words; this is a read that failed in some other way.
     return problem(say('page.cannot-start', WORDS.cannotStart), [{ what: reasonOf(error) }])
   }
+}
+
+/**
+ * What a player plays with, and the first input of each action on it, for the words that say so. A player who holds
+ * only keys is at the keyboard and one who holds only a gamepad is on it, whatever was pressed last (the press that let
+ * a gamepad join counts as player 1's, before the pad was theirs); one who holds both is on what they used last. The
+ * keys are the player's own half of a shared keyboard, or the whole keyboard's.
+ */
+function inputsOf(
+  game: Game,
+  player: number,
+): {
+  kind: ReturnType<Input['device']>
+  first: (action: string) => string | undefined
+  shift?: 'left' | 'right'
+} {
+  const devices = game.input.seats().find((seat) => seat.player === player)?.devices ?? []
+  const pads = devices.some((device) => device.startsWith('pad-'))
+  const keyboard = devices.find((device) => device.startsWith('keyboard'))
+  const kind =
+    keyboard !== undefined && !pads
+      ? 'keyboard'
+      : pads && keyboard === undefined
+        ? 'gamepad'
+        : game.input.device(player)
+  const controls = game.input.controls()
+  const first = (action: string): string | undefined => {
+    const control = controls[action]
+    if (control === undefined) return undefined
+    if (kind === 'gamepad') return control.pad?.[0]
+    if (keyboard === 'keyboard-1') return control.shared?.[0][0]
+    if (keyboard === 'keyboard-2') return control.shared?.[1][0]
+    return control.keys[0]
+  }
+  // Each half of a shared keyboard has one Shift of its own, and the framework calls both "Shift": say which.
+  const half = keyboard === 'keyboard-1' ? 0 : keyboard === 'keyboard-2' ? 1 : undefined
+  if (kind !== 'keyboard' || half === undefined) return { kind, first }
+  const keys = Object.values(controls).flatMap((control) => control.shared?.[half] ?? [])
+  const left = keys.includes('ShiftLeft')
+  const right = keys.includes('ShiftRight')
+  return left === right ? { kind, first } : { kind, first, shift: left ? 'left' : 'right' }
+}
+
+/** `words`, with the framework's one word for Shift said as the game's left or right Shift when `side` is given. */
+function shiftSaid(words: Locale['words'], side: 'left' | 'right' | undefined): Locale['words'] {
+  if (side === undefined) return words
+  return ((key: string, values?: Parameters<Locale['words']>[1]) =>
+    key === 'automata.key.shift' ? words(`keys.shift-${side}`) : words(key, values)) as Locale['words']
 }

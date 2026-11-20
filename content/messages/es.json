@@ -4,6 +4,8 @@
   "messages": {
     "controls.dash": "Impulso",
     "goal.done": "Llegaste a la meta. ¡Muy bien!",
+    "keys.shift-left": "Mayús izquierda",
+    "keys.shift-right": "Mayús derecha",
     "level.level-1.goal": "Empuja la caja sobre la placa",
     "level.level-1.name": "Nivel 1",
     "level.level-2.goal": "Pulsa el botón y corre a la derecha",
@@ -13,6 +15,9 @@
     "page.cannot-start": "Este juego no pudo empezar en este navegador. Prueba con otro navegador.",
     "page.problem-fix": "Arregla el archivo que aparece arriba y vuelve a cargar esta página.",
     "page.problem-title": "Este juego tiene un problema y no puede empezar.",
+    "players.full": "Ya están los dos jugadores. Pulsa Listo para jugar.",
+    "players.hint": "Jugador {player}: {hint}",
+    "players.touch": "En una pantalla táctil juega una persona. Para dos jugadores, usa un teclado o controles.",
     "watch.click": "El juego está jugando solo. Haz clic para jugar.",
     "watch.tap": "El juego está jugando solo. Tócalo para jugar."
   }

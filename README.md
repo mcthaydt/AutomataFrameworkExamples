@@ -51,7 +51,7 @@ what is wrong if something is.
 | `replays/level-1.json`, `replays/level-2.json` | Recorded plays: level 1, and levels 2 and 3 (they are one place). CI plays each back in four engines and checks they all end the same. |
 | `content/tunings/hero-moves.json` | The hero's moves: walk, jump, double jump, wall jump and dash. The framework moves the hero from these numbers and the four controls, so the game has no hero code. |
 | `src/features/plugins/` | The list of everything the game's rules are made of (empty for now: the hero is the framework's). |
-| `src/features/play/` | The page: loads the files, asks a first-time player which language to play in, starts the game, and says what to do in the strip at the top. |
+| `src/features/play/` | The page: loads the files, asks a first-time player which language to play in, starts the game, and says what to do in the strip at the top. Its people button lets a second person join, on a gamepad or sharing the keyboard (`players = 2` in `automata.toml`). |
 | `src/features/play/blueprint.css` | The look's colours, font and icons, in one place. `play.css` takes every colour from here. |
 | `server.ts` | This game's room server, for online play: `node server.ts`. The pages of this game stay offline; `tests/server/` proves two players in a room end on one hash. |
 | `tests/` | The checks. They mirror `src/`. |

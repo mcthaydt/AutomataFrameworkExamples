@@ -62,6 +62,14 @@ test('every level has a start for each of four players', async () => {
     ).toEqual([1, 2, 3, 4])
 })
 
+test('the game is for one or two players, and every one of its controls can be shared on one keyboard', async () => {
+  const game = await loadTheGame()
+  expect(game.project.players).toBe(2)
+  const controls = Object.values(game.tunings ?? {}).flatMap((tuning) => tuning.controls ?? [])
+  expect(controls.length).toBeGreaterThan(0)
+  for (const control of controls) expect(control.shared, control.action).toHaveLength(2)
+})
+
 test('level 1 keeps its crate first, where it was', async () => {
   const game = await loadTheGame()
   const first = game.levels['level-1']?.things[0]

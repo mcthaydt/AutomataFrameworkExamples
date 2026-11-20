@@ -4,6 +4,8 @@
   "messages": {
     "controls.dash": "ダッシュ",
     "goal.done": "ゴールにさわれました。よくできました！",
+    "keys.shift-left": "左Shift",
+    "keys.shift-right": "右Shift",
     "level.level-1.goal": "箱を板の上まで押しましょう",
     "level.level-1.name": "レベル1",
     "level.level-2.goal": "ボタンを押してから右へ走りましょう",
@@ -13,6 +15,9 @@
     "page.cannot-start": "このブラウザではゲームを始められませんでした。別のブラウザで試してください。",
     "page.problem-fix": "上に書かれているファイルを直してから、このページを読み込み直してください。",
     "page.problem-title": "このゲームには問題があり、始められません。",
+    "players.full": "二人とも参加しました。完了を押して遊びましょう。",
+    "players.hint": "プレイヤー{player}：{hint}",
+    "players.touch": "タッチ画面では一人で遊びます。二人で遊ぶときは、キーボードかゲームパッドを使ってください。",
     "watch.click": "ゲームがひとりで遊んでいます。クリックすると自分で遊べます。",
     "watch.tap": "ゲームがひとりで遊んでいます。タップすると自分で遊べます。"
   }

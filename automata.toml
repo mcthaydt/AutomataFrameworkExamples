@@ -2,6 +2,7 @@ format = 1
 name = "Crate Game"
 start = "level-1"   # the level a new game opens
 hero = "hero"       # the character each player controls
+players = 2         # up to two people play together: a second gamepad, or two on one keyboard
 levels = ["level-1", "level-2", "level-3"]   # the order the levels are played in
 source = "en"       # the language the game is written in: its words are in content/messages/, and English says what each is for
 
@@ -20,6 +21,13 @@ path = "content/levels/level-3.json"
 [[content]]
 type = "character"
 path = "content/characters/hero.json"
+
+# The hero's picture: one block in the hero's colour, and a second colour for player 2's hero, so two players can tell
+# which is theirs.
+
+[[content]]
+type = "figure"
+path = "content/figures/hero.json"
 
 [[content]]
 type = "character"

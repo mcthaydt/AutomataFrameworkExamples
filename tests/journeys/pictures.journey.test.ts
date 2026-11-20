@@ -45,9 +45,21 @@ for (const [name, size] of Object.entries(SIZES) as [
     if (words !== null) {
       expect(words.x).toBeGreaterThanOrEqual(0)
       expect(words.x + words.width).toBeLessThanOrEqual(size.width)
+      // The words themselves (each line's letters, not the strip around them, which holds the people button at its end).
+      const lines = await page.evaluate(() =>
+        [...document.querySelectorAll('.play-words p')].flatMap((line) => {
+          if ((line as HTMLElement).hidden || line.textContent === '') return []
+          const range = document.createRange()
+          range.selectNodeContents(line)
+          const { x, y, width, height } = range.getBoundingClientRect()
+          return [{ x, y, width, height }]
+        }),
+      )
+      expect(lines.length, 'the strip says something').toBeGreaterThan(0)
       for (const button of await page.getByRole('button').all()) {
         const box = await button.boundingBox()
-        expect(box !== null && overlaps(words, box), 'the words sit under no button').toBe(false)
+        for (const line of lines)
+          expect(box !== null && overlaps(line, box), 'the words sit under no button').toBe(false)
       }
     }
     await fontsReady(page)

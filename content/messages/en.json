@@ -4,6 +4,8 @@
   "messages": {
     "controls.dash": "Dash",
     "goal.done": "You reached the goal. Well done!",
+    "keys.shift-left": "Left Shift",
+    "keys.shift-right": "Right Shift",
     "level.level-1.goal": "Push the crate onto the plate",
     "level.level-1.name": "Level 1",
     "level.level-2.goal": "Press the button, then run right",
@@ -13,6 +15,9 @@
     "page.cannot-start": "This game could not start in this browser. Try another browser.",
     "page.problem-fix": "Fix the file named above, then load this page again.",
     "page.problem-title": "This game has a problem and cannot start.",
+    "players.full": "Both players are in. Press Done to play.",
+    "players.hint": "Player {player}: {hint}",
+    "players.touch": "On a touch screen, one person plays. For two players, use a keyboard or gamepads.",
     "watch.click": "The game is playing by itself. Click it to play.",
     "watch.tap": "The game is playing by itself. Tap it to play."
   }

@@ -1,0 +1,43 @@
+{
+  "format": 1,
+  "id": "hero",
+  "tile": 10,
+  "frame": {
+    "w": 8,
+    "h": 10
+  },
+  "paints": [
+    {
+      "id": "body",
+      "color": "#f37f94"
+    }
+  ],
+  "parts": [
+    {
+      "id": "body",
+      "shape": "block",
+      "x": 4,
+      "y": 5,
+      "w": 8,
+      "h": 10,
+      "paint": "body"
+    }
+  ],
+  "poses": [
+    {
+      "id": "idle",
+      "moves": []
+    }
+  ],
+  "variants": [
+    {
+      "id": "player-2",
+      "paints": [
+        {
+          "id": "body",
+          "color": "#3a7bd5"
+        }
+      ]
+    }
+  ]
+}
