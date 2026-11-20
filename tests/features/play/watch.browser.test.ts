@@ -178,7 +178,9 @@ test('takeOver twice starts one game', async () => {
   // A touch brings up the framework's thumbs: one set, not two, with the one button they do not do.
   root.dispatchEvent(new PointerEvent('pointerdown', { pointerId: 1, pointerType: 'touch', bubbles: true }))
   expect(root.querySelectorAll('.automata-thumbs')).toHaveLength(1)
-  expect([...root.querySelectorAll('button')].map((b) => b.textContent)).toEqual([say('controls.dash')])
+  expect([...root.querySelectorAll('.play-stage button')].map((b) => b.textContent)).toEqual([
+    say('controls.dash'),
+  ])
   await made.takeOver()
   expect(root.querySelectorAll('canvas')).toHaveLength(1)
 })

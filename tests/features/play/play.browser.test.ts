@@ -114,10 +114,13 @@ const touchOn = (target: Element, type: 'pointerdown' | 'pointerup'): void => {
   )
 }
 
-/** A touch brings the framework's buttons up (this file says "no touch screen", so they start hidden). */
+/**
+ * A touch brings the framework's buttons up (this file says "no touch screen", so they start hidden). They are on the
+ * stage; the strip's people button is the page's own.
+ */
 const touchButtons = (): HTMLButtonElement[] => {
   pointer('pointerdown', 'touch')
-  return [...root.querySelectorAll('button')]
+  return [...root.querySelectorAll<HTMLButtonElement>('.play-stage button')]
 }
 
 /** One of the two thumbs' halves of the screen: the one that walks, or the one that jumps. */
@@ -263,7 +266,7 @@ test('the words never sit under a touch button', async () => {
     await begin()
     pointer('pointerdown', 'touch')
     const words = root.querySelector('.play-words')?.getBoundingClientRect()
-    const buttons = [...root.querySelectorAll('button')]
+    const buttons = [...root.querySelectorAll('.play-stage button')]
     expect(buttons.map((button) => button.textContent)).toEqual([say('controls.dash')])
     for (const button of buttons) {
       const box = button.getBoundingClientRect()
