@@ -588,4 +588,12 @@ test('audit 3: the hooks cannot be switched off', () => {
   ])
     assert.equal(mcp(n, { setup_script: 'true' }).denied, true, n)
   assert.equal(mcp('mcp__claude-code-remote__list_environments', {}).denied, false)
+  assert.equal(mcp('mcp__hearthbot__message_thread', { text: `The hook now refuses ${off}.` }).denied, false)
+  assert.equal(
+    mcp('mcp__github__create_or_update_file', {
+      path: '.claude/settings.local.json',
+      content: `{"${off}":true}`,
+    }).denied,
+    true,
+  )
 })

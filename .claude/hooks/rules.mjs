@@ -1662,7 +1662,7 @@ function preToolUse(root, config, input, ctx) {
   } else if (/^(Write|Edit|MultiEdit|NotebookEdit)$/.test(name)) {
     checkWriteRoutes(ti, base, root, deny);
     if (!reasons.length) checkFileWrite(ti, base, root, deny);
-  } else if (name?.startsWith('mcp__') && (/__(create|update|switch|delete)_environment$/.test(name) || HOOKS_OFF.test(JSON.stringify(ti)))) {
+  } else if (name?.startsWith('mcp__') && (/__(create|update|switch|delete)_environment$/.test(name) || (/(file|files|write|edit|create|update|push)/i.test(name.split('__').at(-1)) && !/^mcp__hearthbot__/.test(name) && HOOKS_OFF.test(JSON.stringify(ti))))) {
     deny(refusal(ROUTE_RULE, `${name}, which changes the cloud environment or its setup script (where the user hooks are installed) or switches hooks off`, 'list it as a step for the owner'));
   } else if (name?.startsWith('mcp__') || toolMatches(name ?? '', (config.sessionTools?.tools ?? []).map((t) => t.tool))) {
     const slug = ti.owner && ti.repo ? `${ti.owner}/${ti.repo}` : null;
