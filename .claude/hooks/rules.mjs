@@ -1340,9 +1340,11 @@ function checkWriteRoutes(input, config, root, deny) {
   if (/(^|\/)\.git\/(hooks\/|config$|info\/attributes$)|(^|\/)\.gitconfig$|(^|\/)\.gitattributes$|\/\.config\/(gh|git)\/|(^|\/)\.claude\/settings\.local\.json$|managed-settings\.json$|(^|\/)\.claude\.json$/.test(path) || (path.startsWith(join(home, '.claude') + sep) && /settings[^/]*\.json$/.test(path))) {
     deny(refusal(ROUTE_RULE, `a write to ${path}, a file that can run programs later or switch the hooks off`, 'leave it; list the change as a command for the owner')); return;
   }
-  if (HOOKS_OFF.test(added)) { deny(refusal(ROUTE_RULE, `${path} gains disableAllHooks or core.hooksPath`, 'leave the hooks on')); return; }
+  // The hook and its own test hold these words on purpose; notes (.md, .txt) only quote them.
+  if (/(^|\/)\.claude\/hooks\/rules(\.test)?\.mjs$/.test(path)) return;
+  const note = /\.(md|mdx|txt)$/i.test(path);
+  if (HOOKS_OFF.test(added) && !note) { deny(refusal(ROUTE_RULE, `${path} gains disableAllHooks or core.hooksPath`, 'leave the hooks on')); return; }
   if (/(^|\/)\.claude\/settings\.json$/.test(path) && t && /\.claude\/hooks\/rules\.mjs/.test(t.before ?? '') && !/\.claude\/hooks\/rules\.mjs/.test(t.after ?? '')) { deny(refusal(ROUTE_RULE, `${path} loses the rule hooks`, 'keep the rules.mjs hook lines')); return; }
-  if (/(^|\/)\.claude\/hooks\/rules(\.test)?\.mjs$/.test(path)) return; // the hook and its own test hold these words on purpose
   if (RUNS_LATER.test(path) && (ghWriteText(added) || (GITHUB_API.test(added) && WRITE_WORDS.test(added)))) deny(refusal(ROUTE_RULE, `${path} would carry a gh or GitHub API write that runs later, out of the hooks' sight`, 'run the gh command in Bash, where the hooks read it; quote gh commands only in .md or .txt notes'));
 }
 // True when every URL an HTTP tool call names can be read and none is GitHub's API: no config file

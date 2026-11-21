@@ -578,6 +578,7 @@ test('audit 3: the hooks cannot be switched off', () => {
   assert.equal(write(join(repo, '.claude', 'settings.local.json'), '{}').denied, true)
   assert.equal(write(join(process.env.HOME ?? '/root', '.claude', 'settings.json'), '{}').denied, true)
   assert.equal(write(join(repo, '.claude', 'other.json'), `{"${off}": true}`).denied, true)
+  assert.equal(write(join(repo, 'notes.md'), `A session must never set ${off}.`).denied, false)
   assert.equal(bash(`echo '{"${off}":true}' > x.json`).denied, true)
   assert.equal(bash(`git -c core.${'hooks'}Path=/tmp/h push origin feature`).denied, true)
   for (const n of [
