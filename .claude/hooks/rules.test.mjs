@@ -3,7 +3,7 @@
 // folder's rules.mjs and rules.json, and a stand-in `gh` that answers from a table and logs every call.
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { chmodSync, cpSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { chmodSync, cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
@@ -265,7 +265,8 @@ test('routes the hooks cannot read are refused: raw HTTP, scripts, aliases, exte
   assert.match(bash('gh pc --draft').reason, /alias or extension/)
   assert.match(bash('gh extension install someone/gh-thing').reason, /gh extension/)
   assert.match(bash('git -c alias.p=push p origin feature').reason, /alias/)
-  assert.match(bash("git config alias.p '!gh api -X POST repos/o/r/pulls'").reason, /alias/)
+  assert.match(bash("git config alias.p '!gh api -X POST repos/o/r/pulls'").reason, /alias|gh write inside/)
+  assert.match(bash('git config alias.p push').reason, /alias|run another program/)
   assert.match(
     bash(`gh api graphql -f query='mutation { mergePullRequest(input: {}) { clientMutationId } }'`).reason,
     /GraphQL mutation/,
@@ -500,11 +501,90 @@ test("audit 2: workflow runs and releases are the owner's", () => {
     'gh workflow list',
     'gh release list',
     `bash -s <<'EOS'\necho hi\nEOS`,
-    `cat <<'EOS' > notes.txt\ngh api -X DELETE x\nEOS`,
     'find . -maxdepth 1 -name "*.md" -exec cat {} ;',
     'echo hi | sh -c "cat"',
     'npx -y @biomejs/biome@2.5.15 check --write x.mjs',
     'pnpm dlx @scope/tool@1.0.0 --help',
   ])
     assert.equal(bash(c).denied, false, `${c}: ${bash(c).reason}`)
+})
+
+test('audit 3: a gh write under a program the hook does not peel is refused', () => {
+  const del = 'gh api -X DELETE repos/mcthaydt/One/branches/main/protection'
+  for (const c of [
+    `builtin command ${del}`,
+    `watch -n 999 ${del}`,
+    'parallel gh api -X DELETE ::: repos/mcthaydt/One/branches/main/protection',
+    `dash -c '${del}'`,
+    `ksh -c '${del}'`,
+    `busybox sh -c '${del}'`,
+    `su root -c '${del}'`,
+    `python3.12 -c 'import subprocess; subprocess.run(["gh","api","-X","DELETE","repos/mcthaydt/One/branches/main/protection"])'`,
+    `uv run python -c 'import os; os.system("${del}")'`,
+    `node -pe "require('child_process').execSync('${del}')"`,
+    `git -c core.pager='sh -c "${del}"' log -1`,
+    `cat <<'EOS' > notes.txt\n${del}\nEOS`,
+  ])
+    assert.equal(bash(c).denied, true, c)
+})
+
+test('audit 3: a file written earlier cannot run gh later', () => {
+  const gh = 'gh api -X DELETE repos/mcthaydt/One/branches/main/protection'
+  writeFileSync(join(repo, 'Makefile'), `nuke:\n\t${gh}\n`)
+  for (const c of [
+    'make nuke',
+    'make -f Makefile nuke',
+    'git -c core.sshCommand=/tmp/x fetch',
+    'git -c alias.x=push x',
+    'git nuke',
+    'GIT_PAGER=/tmp/x.sh git log',
+    'PATH=/tmp/fake:$PATH gh pr list',
+    'export PATH=/tmp/fake:$PATH; gh pr list',
+    'git config core.pager /tmp/x.sh',
+    'cp /tmp/x .git/hooks/pre-push',
+    'echo x > .git/hooks/pre-push',
+  ])
+    assert.equal(bash(c).denied, true, c)
+  rmSync(join(repo, 'Makefile'))
+  const write = (file_path, content) =>
+    hook('PreToolUse', { tool_name: 'Write', tool_input: { file_path, content } })
+  const home = process.env.HOME ?? '/root'
+  for (const [p, t] of [
+    [join(repo, '.git', 'hooks', 'pre-push'), 'echo hi'],
+    [join(repo, '.git', 'config'), '[alias]\n\tnuke = push'],
+    [join(home, '.gitconfig'), '[core]\n\tpager = less'],
+    [join(home, '.config', 'gh', 'config.yml'), 'aliases: {}'],
+    [join(repo, 'Makefile'), `nuke:\n\t${gh}\n`],
+    [join(repo, 'tools', 'nuke.mk'), `nuke:\n\t${gh}\n`],
+    [join(repo, 'nuke.py'), `import os\nos.system("${gh}")\n`],
+  ])
+    assert.equal(write(p, t).denied, true, p)
+  assert.equal(write(join(repo, 'notes.md'), `Run \`${gh}\` to clear it.`).denied, false)
+  for (const c of [
+    'git status',
+    'git log -1',
+    'git config --get user.name',
+    'git config user.email a@b.c',
+    'git -c color.ui=never log -1',
+    'cat .git/config',
+  ])
+    assert.equal(bash(c).denied, false, `${c}: ${bash(c).reason}`)
+})
+
+test('audit 3: the hooks cannot be switched off', () => {
+  const off = ['disable', 'AllHooks'].join('')
+  const write = (file_path, content) =>
+    hook('PreToolUse', { tool_name: 'Write', tool_input: { file_path, content } })
+  assert.equal(write(join(repo, '.claude', 'settings.local.json'), '{}').denied, true)
+  assert.equal(write(join(process.env.HOME ?? '/root', '.claude', 'settings.json'), '{}').denied, true)
+  assert.equal(write(join(repo, '.claude', 'other.json'), `{"${off}": true}`).denied, true)
+  assert.equal(bash(`echo '{"${off}":true}' > x.json`).denied, true)
+  assert.equal(bash(`git -c core.${'hooks'}Path=/tmp/h push origin feature`).denied, true)
+  for (const n of [
+    'mcp__claude-code-remote__update_environment',
+    'mcp__claude-code-remote__create_environment',
+    'mcp__claude-code-remote__switch_environment',
+  ])
+    assert.equal(mcp(n, { setup_script: 'true' }).denied, true, n)
+  assert.equal(mcp('mcp__claude-code-remote__list_environments', {}).denied, false)
 })
