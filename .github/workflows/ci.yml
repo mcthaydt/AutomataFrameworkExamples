@@ -109,13 +109,11 @@ jobs:
     name: ${{ needs.plan.outputs.quick }}check
     runs-on: ubuntu-latest
     env:
-      # On a draft: the Node tests the change reaches, stopping at the first failure.
-      ONLY: ${{ needs.plan.outputs.full != 'true' && '--changed=origin/main --bail=1 --passWithNoTests' || '' }}
+      # On a draft: every Node test, stopping at the first failure. They take seconds here, and choosing them by the
+      # change (`--changed` with `--passWithNoTests`) let a draft pass with no test run at all.
+      ONLY: ${{ needs.plan.outputs.full != 'true' && '--bail=1' || '' }}
     steps:
-      # The whole history, so `--changed` can compare with `origin/main`.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
@@ -137,6 +135,13 @@ jobs:
     if: needs.plan.outputs.docs != 'true'
     name: browsers (${{ matrix.engine }} ${{ matrix.shard }}/6)
     runs-on: ubuntu-latest
+    # Playwright's own image for the version the lockfile pins: the browsers and the system libraries they need are
+    # already in it, so nothing comes from the runner's package mirror, whose slow days left `install-deps` hanging
+    # until the job's timeout. Pinned by digest; moving Playwright in the lockfile moves this tag and digest with it.
+    # The runner's own user (1001), so the checkout, the caches and Firefox's home folder all belong to it.
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+      options: --user 1001
     strategy:
       # On a draft the first failure stops the other shards too; the whole suite lets every shard finish.
       fail-fast: ${{ needs.plan.outputs.full != 'true' }}
@@ -155,18 +160,9 @@ jobs:
           node-version: 24.21.0
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # The browser is kept between runs, by Playwright's version; the system libraries it needs are put in each time.
-      - id: version
-        run: echo "playwright=$(pnpm exec playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        id: browser
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.version.outputs.playwright }}-${{ matrix.engine }}
-      - if: steps.browser.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps ${{ matrix.engine }}
-      - if: steps.browser.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps ${{ matrix.engine }}
+      # The image's browsers fit only the Playwright they came with: say so plainly if the lockfile moves without it.
+      - name: The image's Playwright is the lockfile's
+        run: test "$(pnpm exec playwright --version)" = "Version 1.63.0"
       - run: pnpm test:engine ${{ matrix.engine }}
         if: matrix.shard == 1
       # The browser just saved where it ended in `.hashes/`. Node plays the same recording here, so the two can be
